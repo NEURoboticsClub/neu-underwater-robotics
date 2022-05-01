@@ -5,7 +5,7 @@ from time import sleep
 
 # Initiate communication with Arduino
 board = pyfirmata.ArduinoMega('/dev/ttyACM0')
-print("Communication Successfully started")
+print("Successfully connected to Arduino")
 
 # Start iterator to receive input data
 it = pyfirmata.util.Iterator(board)
@@ -36,13 +36,20 @@ def parseInput(msg):
         writeToArduino(x.split(':')[0], x.split(':')[1])
 
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+while True:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
-    s.listen()
+    print("Ready to accept connection. Please start client.py")
+    s.listen(5)
     conn, addr = s.accept()
     print(f"Connected by {addr}")
     while True:
         data = conn.recv(1024)
-        if data:
-            print(f'{data=}')
-            parseInput(data.decode("utf-8"))
+        if len(data) == 0:
+            break
+        print(f'{data=}')
+        parseInput(data.decode("utf-8"))
+    s.shutdown(2)
+    s.close()
+    print("Connection closed. Re-opening server")
