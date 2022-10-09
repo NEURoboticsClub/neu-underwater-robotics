@@ -20,13 +20,13 @@ for x in range(2, 14):
 
 # myservo = board.get_pin('d:10:s')
 
-HOST = "raspberrypi.local"  # Standard loopback interface address (localhost)
-PORT = 2048  # Port to listen on (non-privileged ports are > 1023)
+HOST = "192.168.0.101"  # Standard loopback interface address (localhost)
+PORT = 2049  # Port to listen on (non-privileged ports are > 1023)
 
 
 def writeToArduino(pin, val):
-    # myservo.write(val)
-    # board.digital[int(pin)].write(float(val))
+    #myservo.write(val)
+    #board.digital[int(pin)].write(float(val))
     pins[int(pin)].write(val)
 
 
@@ -40,7 +40,7 @@ while True:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
-    print("Ready to accept connection. Please start client.py")
+    print(f"Ready to accept connection. Please start client.py {HOST=} {PORT=}")
     s.listen(5)
     conn, addr = s.accept()
     print(f"Connected by {addr}")
@@ -52,4 +52,5 @@ while True:
         parseInput(data.decode("utf-8"))
     s.shutdown(2)
     s.close()
+    s = None
     print("Connection closed. Re-opening server")
