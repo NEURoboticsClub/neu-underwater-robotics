@@ -16,7 +16,7 @@ host_name  = socket.gethostname()
 #host_ip = socket.gethostbyname(host_name)
 host_ip = '192.168.0.101'
 print('HOST IP:',host_ip)
-port = 10002
+port = 10000
 socket_address = (host_ip,port)
 
 # Socket Bind
