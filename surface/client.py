@@ -168,21 +168,21 @@ j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 j1.setup(0)
 
 
-while True:
-    j1.detect_event()
-    j1.get_rov_input()
+# while True:
+#     j1.detect_event()
+#     j1.get_rov_input()
 
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#     s.connect((HOST, PORT))
-#     print(f'connecting to {HOST}:{PORT}')
-#     old = ''
-#     while True:
-#         j1.detect_event()
-#         x = j1.get_rov_input()
-#         if not x == old:
-#             s.send(str.encode(x))
-#             old = x
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    print(f'connecting to {HOST}:{PORT}')
+    old = ''
+    while True:
+        j1.detect_event()
+        x = j1.get_rov_input()
+        if not x == old:
+            s.send(str.encode(x))
+            old = x
 
-    # data = s.recv(1024)
+    data = s.recv(1024)
 
 # print(f"Received {data!r}")
