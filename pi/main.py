@@ -3,7 +3,7 @@ import time
 
 if __name__ == '__main__':
     # Initiate communication with Arduino
-    board = pyfirmata.Arduino('/dev/ttyACM0 (Arduino Mega or Mega 2560)')
+    board = pyfirmata.Arduino('/dev/ttyACM0')
     print("Communication Successfully started")
 
     # Create bunch of useful variables
