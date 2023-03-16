@@ -22,9 +22,13 @@ class Stepper(object):
     pin: int
     direction: bool
     direction_pin: int
+    on: int
+    lastTime: float
 
 
-STEPPERS = [Stepper(2, True, 3)]  # list of pins that are used for steppers
+
+STEPPERS = [Stepper(26, True, 28, 1, float(time.time())), 
+]  # list of pins that are used for steppers
 
 
 for x in range(2, 14):
@@ -33,15 +37,13 @@ for x in range(2, 14):
 
 # myservo = board.get_pin('d:10:s')
 
-HOST = "192.168.0.100"  # Standard loopback interface address (localhost)
+HOST = "192.168.0.101"  # Standard loopback interface address (localhost)
 PORT = 2049  # Port to listen on (non-privileged ports are > 1023)
 
 
 def writeToArduino(pin: int, val: int):
-    if val == 0:
-        return
     if pin in [s.pin for s in STEPPERS]:
-        stepper = next(filter(lambda x: x.pin == pin, STEPPERS))
+        stepper = filter(lambda x: x.pin == pin, STEPPERS)
         # stepper
         if val < 0 and stepper.direction:
             stepper.direction = False
@@ -50,26 +52,42 @@ def writeToArduino(pin: int, val: int):
             stepper.direction = True
             pins[stepper.direction_pin].write(1)
 
-        pins[stepper.pin].write(1)
-        sleep(0.0005)
-        #sleep(abs((1/val)/2))
-        pins[stepper.pin].write(0)
-        #sleep(abs((1/val)/2))
-        sleep(0.0005)
-        print(f"{abs((1/val)/2)}")
+        #pins[stepper.pin].write(1)
+        # sleep(abs((1/val)/2))
+        # pins[stepper.pin].write(0)
+        # sleep(abs((1/val)/2))
+
+        if val in range(-2 , 3):
+            pins[stepper.pin].write(0)
+        else:
+            writeIfAble(stepper, val, pins)
+
+
+
         pins[stepper.direction_pin].write(0)
 
     # myservo.write(val)
     # board.digital[pin].write(float(val))
-    else:
-        pins[pin].write(val)
+    pins[pin].write(val)
+
+def writeIfAble(stepper, val, pins):
+    
+    rest_time = 500 / val
+
+    if (stepper.lastTime < time.time() - rest_time):
+        stepper.on = (stepper.on + 1) % 2
+        pins[stepper.pin].write(stepper.on)
+        print("stepper on")
+        stepper.lastTime = time.time()
+
+    print("stepper on")
+    
 
 
 def parseInput(msg):
     ls = msg.split(';')
     for x in ls:
-        if x:
-            writeToArduino(int(x.split(':')[0]), int(x.split(':')[1]))
+        writeToArduino(int(x.split(':')[0]), int(x.split(':')[1]))
 
 
 while True:
