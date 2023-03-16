@@ -1,7 +1,7 @@
 import socket
 import pygame
 
-HOST = "192.168.0.101"  # The server's hostname or IP address
+HOST = "192.168.0.103"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 
 
@@ -118,14 +118,20 @@ class joystick:
         precision_val = self.precisionToggle.get_precision_val()
         left_axis_val = self.leftAxis.calculate_values(precision_val)
         right_axis_val = self.rightAxis.calculate_values(precision_val)
-        vert_front_val = 90 + (55 * (self.leftBumper.calculate_values(
-            precision_val) - self.leftTrigger.calculate_values(precision_val)))
-#         print("left",precision_val,self.leftTrigger.calculate_values(precision_val))
-        vert_back_val = 90 + (55 * (self.rightBumper.calculate_values(
-            precision_val) - self.rightTrigger.calculate_values(precision_val)))
+        left_axis_val = ((left_axis_val - 90) * -1) + 90
+#         vert_front_val = 90 + (55 * (self.leftBumper.calculate_values(
+#             precision_val) - self.leftTrigger.calculate_values(precision_val)))
+# #         print("left",precision_val,self.leftTrigger.calculate_values(precision_val))
+#         vert_back_val = 90 + (55 * self.rightBumper.calculate_values(
+#             precision_val)) - self.rightTrigger.calculate_values(precision_val)
+
+        vert_front_val = 90 + (55 * self.rightTrigger.calculate_values(
+            precision_val)) - (55 * self.leftTrigger.calculate_values(precision_val))
+        vert_back_val = 90 + (55 * self.leftTrigger.calculate_values(
+            precision_val)) - (55 * self.rightTrigger.calculate_values(precision_val))
         # print("right",self.rightBumper.calculate_values(precision_val), self.rightTrigger.calculate_values(precision_val))self.pin_dict = {4:left_axis_val,5:right_axis_val,6:left_axis_val,7:right_axis_val,8:int(vert_front_val),9:int(vert_back_val),10:"",11:"",12:"",13:""}
         pin_dict = {4: left_axis_val, 5: right_axis_val, 6: left_axis_val, 7: right_axis_val, 8: int(
-            vert_front_val), 9: int(vert_back_val), 10: "0", 11: "0", 12: "0", 13: "0"}
+            vert_front_val), 9: "0", 10: int(vert_back_val), 11: "0", 12: "0", 13: "0"}
         # return left_axis_val,right_axis_val,int(vert_front_val),int(vert_back_val)
         output = ""
         for pin in pin_dict:
