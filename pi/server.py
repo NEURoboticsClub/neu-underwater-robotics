@@ -33,7 +33,7 @@ for x in range(2, 14):
 
 # myservo = board.get_pin('d:10:s')
 
-HOST = "192.168.0.100"  # Standard loopback interface address (localhost)
+HOST = "192.168.0.103"  # Standard loopback interface address (localhost)
 PORT = 2049  # Port to listen on (non-privileged ports are > 1023)
 
 
@@ -52,9 +52,9 @@ def writeToArduino(pin: int, val: int):
 
         pins[stepper.pin].write(1)
         sleep(0.0005)
-        #sleep(abs((1/val)/2))
+        # sleep(abs((1/val)/2))
         pins[stepper.pin].write(0)
-        #sleep(abs((1/val)/2))
+        # sleep(abs((1/val)/2))
         sleep(0.0005)
         print(f"{abs((1/val)/2)}")
         pins[stepper.direction_pin].write(0)
@@ -80,9 +80,13 @@ while True:
         f"Ready to accept connection. Please start client.py {HOST=} {PORT=}")
     s.listen(5)
     conn, addr = s.accept()
+    s.settimeout(0.1)
     print(f"Connected by {addr}")
     while True:
+        old_data = data
         data = conn.recv(1024)
+        if not data:
+            data = old_data
         if len(data) == 0:
             break
         print(f'{data=}')
