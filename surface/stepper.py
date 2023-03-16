@@ -17,6 +17,8 @@ class joy_item:
         pass
 
 # represents a button and keeps track of it as 0 for up, 1 for down.
+
+
 class button(joy_item):
     def __init__(self):
         self.button_pressed = 0
@@ -39,6 +41,8 @@ class toggle(button):
             self.button_pressed = (self.button_pressed + 1) % 2
 
 # defines an axis with a double for the value (triggers are axes) range [-1, 1]
+
+
 class axis(joy_item):
     def __init__(self, trigger_val):
         self.trigger_val = trigger_val
@@ -50,6 +54,8 @@ class axis(joy_item):
         return self.trigger_val
 
 # represents the d-pad with 1 being (up/right)? -1 being (down/left)
+
+
 class hat():
     def __init__(self, up, right):
         self.up = up
@@ -63,6 +69,8 @@ class hat():
         return [self.up, self.right]
 
 # class representing a full joystick with dictionarys for buttons and axes.
+
+
 class joystick:
     # we use a list of toggle_vals for all values that behave like toggles not buttons
     # buttons is number of buttons and axes is number of axes
@@ -88,7 +96,7 @@ class joystick:
 
      # get the string to send to robot, format pin:val;
     def get_rov_input(self):
-        
+
         # max is up right
         # right = self.axis_dict[0].get_joy_val()
 
@@ -96,21 +104,20 @@ class joystick:
         elbow = self.axis_dict[1].get_joy_val() * -1
         wrist = self.axis_dict[3].get_joy_val()
         extend = self.axis_dict[4].get_joy_val() * -1
-        
+
         # left is close
         close_claw = (self.axis_dict[2].get_joy_val() + 1) / 2
         open_claw = (self.axis_dict[5].get_joy_val() + 1) / 2
 
-        pin_dict = {1: int(self.radius * extend + self.center),
-                    2: int(self.radius * wrist + self.center),
-                    3: int(self.center + self.radius * (close_claw - open_claw)),
-                    10: int(self.radius * elbow + self.center)}
+        pin_dict = {2: int(self.radius * wrist + self.center)}
+        # 4: int(self.radius * wrist + self.center),
+        # 6: int(self.center + self.radius * (close_claw - open_claw)),
+        # 10: int(self.radius * elbow + self.center)}
 
         output = ""
         for pin in pin_dict:
             output += f"{pin}:{pin_dict[pin]};"
-        return output[:-1]
-
+        return output
 
     def detect_event(self):
         for event in pygame.event.get():
@@ -142,7 +149,6 @@ class joystick:
 
 
 j1 = joystick(11, 6, [0, 2], [], 0, 50, 0.2)
-
 
 
 j1.setup(0)
