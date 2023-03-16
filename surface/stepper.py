@@ -1,7 +1,8 @@
 import socket
 import pygame
+import time
 from abc import abstractmethod
-HOST = "192.168.0.100"  # The server's hostname or IP address
+HOST = "192.168.0.101"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 
 
@@ -79,7 +80,7 @@ class joystick:
             if i in trigger_vals:
                 self.axis_dict[i] = axis(0)
             else:
-                self.axis_dict[i] = axis(-1)
+                self.axis_dict[i] = axis(0)
 
         self.hat = hat(0, 0)
         self.center = center
@@ -101,18 +102,20 @@ class joystick:
         close_claw = (self.axis_dict[2].get_joy_val() + 1) / 2
         open_claw = (self.axis_dict[5].get_joy_val() + 1) / 2
 
-        pin_dict = {1: int(self.radius * extend + self.center),
-                    2: int(self.radius * wrist + self.center),
-                    3: int(self.center + self.radius * (close_claw - open_claw)),
-                    10: int(self.radius * elbow + self.center)}
+        pin_dict = {26: int(self.radius * extend + self.center),
+                    36: int(self.radius * wrist + self.center)}
+                    # 3: int(self.center + self.radius * (close_claw - open_claw)),
+                    # 10: int(self.radius * elbow + self.center)}
 
         output = ""
         for pin in pin_dict:
             output += f"{pin}:{pin_dict[pin]};"
+
         return output[:-1]
 
 
     def detect_event(self):
+
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
                 self.axis_dict[event.axis].update(event.value)
@@ -129,6 +132,7 @@ class joystick:
             elif event.type == pygame.JOYHATMOTION:
                 value = event.value
                 self.hat.update(value[0], value[1])
+            
 
             print(self.get_rov_input())
 
@@ -152,16 +156,21 @@ j1.setup(0)
 #     j1.detect_event()
 #     j1.get_rov_input()
 
+prev_time = time.time()
+epsilon = 0.0009
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     print(f'connecting to {HOST}:{PORT}')
     old = ''
     while True:
         j1.detect_event()
-        x = j1.get_rov_input()
-        if not x == old:
+        x = j1.get_rov_input() + "&"
+        if not x == old or time.time() > prev_time + epsilon:
             s.send(str.encode(x))
             old = x
+            prev_time = time.time()
+
 
     data = s.recv(1024)
 
