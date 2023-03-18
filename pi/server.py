@@ -65,7 +65,7 @@ def parseInput(msg):
     for x in ls:
         writeToArduino(int(x.split(':')[0]), int(x.split(':')[1]))
 
-
+#comment
 while True:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
