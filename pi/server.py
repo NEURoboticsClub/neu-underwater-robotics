@@ -1,4 +1,4 @@
-from dataclasses import *
+from dataclasses import dataclass
 import socket
 import pyfirmata
 from time import sleep
