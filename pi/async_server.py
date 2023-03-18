@@ -72,7 +72,7 @@ class Stepper:
         while True:
             async with self.lock:
                 speed = self.speed
-            print(f"speed: {speed}")
+            # print(f"speed: {speed}")
             if speed == 0:
                 await asyncio.sleep(0.1)
                 continue
@@ -94,7 +94,8 @@ class Servo:
 
     @classmethod
     def linear_map(cls, x: float):
-        return int(linear_map(x, -1, 1, 0, 180))
+        # return int(linear_map(x, 0, 180, 0, 180))
+        return int(x)
 
     async def set_val(self, angle: int):
         if angle < 0 or angle > 180:
@@ -146,7 +147,7 @@ class Server:
         #         self.board.get_pin(f"d:{i + 1}:o"),
         #     )
         #     tasks.append(self.pins[i].run())
-        for i in range(6, 14):
+        for i in range(4, 14):
             self.pins[i] = Servo(self.board.get_pin(f"d:{i}:s"))
             tasks.append(self.pins[i].run())
 

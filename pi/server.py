@@ -83,10 +83,10 @@ while True:
     s.settimeout(0.1)
     print(f"Connected by {addr}")
     while True:
-        old_data = data
+        # old_data = data
         data = conn.recv(1024)
-        if not data:
-            data = old_data
+        # if not data:
+        #     data = old_data
         if len(data) == 0:
             break
         print(f'{data=}')
