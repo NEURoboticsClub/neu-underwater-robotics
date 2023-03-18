@@ -3,7 +3,7 @@ import socket
 from time import time_ns
 import pyfirmata
 
-SERVER_IP = "localhost"  # raspberry pi ip
+SERVER_IP = "192.168.0.103"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
 STEPS_PER_REV = 200
@@ -49,7 +49,7 @@ class Stepper:
 
     @classmethod
     def linear_map(cls, x: float):
-        return int(linear_map(x, -1, 1, -5, 5))
+        return int(linear_map(x, -50, 50, -5, 5))
 
     async def set_val(self, speed: int):
         """set speed of stepper motor in rev / s
@@ -116,7 +116,8 @@ class Server:
         self._init_firmata()
         self.last_msg = ""
         self.last_update = time_ms()
-        self.tasks = []  # all tasks so they can be destroyed (idk if this is necessary)
+        # all tasks so they can be destroyed (idk if this is necessary)
+        self.tasks = []
 
     def __del__(self):
         self.server.close()
@@ -151,7 +152,8 @@ class Server:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind((SERVER_IP, PORT))
-        print(f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
+        print(
+            f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
         self.socket.listen(5)
         self.conn, addr = self.socket.accept()
         print(f"Connected by {addr}")
@@ -159,7 +161,8 @@ class Server:
     async def run(self):
         self.server = await asyncio.start_server(self._handle_client, SERVER_IP, PORT)
         async with self.server:
-            print(f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
+            print(
+                f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
             await self.server.serve_forever()
 
     async def _handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):

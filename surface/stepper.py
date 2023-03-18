@@ -2,7 +2,7 @@ import socket
 import pygame
 import time
 from abc import abstractmethod
-HOST = "192.168.0.101"  # The server's hostname or IP address
+HOST = "192.168.0.103"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 
 
