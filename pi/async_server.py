@@ -62,21 +62,24 @@ class Stepper:
 
     async def reverse(self):
         async with self.lock:
+            self.direction_pin.write(self.direction_pin)
             self.direction = not self.direction
-        self.direction_pin.write(1)
-        await asyncio.sleep(0.01)
-        self.direction_pin.write(0)
+        # self.direction_pin.write(1)
+        # await asyncio.sleep(0.01)
+        # self.direction_pin.write(0)
 
     async def run(self):
         while True:
             async with self.lock:
                 speed = self.speed
+            print(f"speed: {speed}")
             if speed == 0:
                 await asyncio.sleep(0.1)
                 continue
             delay = (1 / 200) * (1 / speed)
-            if speed < 0 and self.direction or speed > 0 and not self.direction:
-                asyncio.ensure_future(self.reverse())
+            # if speed < 0 and self.direction or speed > 0 and not self.direction:
+            #     asyncio.ensure_future(self.reverse())
+            asyncio.ensure_future(self.reverse())
             self.pin.write(1)
             await asyncio.sleep(delay)
             self.pin.write(0)
@@ -113,16 +116,18 @@ class Server:
     def __init__(self):
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
+        self.tasks = []
         self._init_firmata()
         self.last_msg = ""
         self.last_update = time_ms()
         # all tasks so they can be destroyed (idk if this is necessary)
-        self.tasks = []
 
     def __del__(self):
-        self.server.close()
-        for task in self.tasks:
-            task.cancel()
+        try:
+            for task in self.tasks:
+                task.cancel()
+        except:
+            pass
         self.loop.close()
 
     def _init_firmata(self):
@@ -154,20 +159,28 @@ class Server:
         tasks.append(self.pins[36].run())
 
         for task in tasks:
-            self.tasks.append(self.loop.create_task(task))
-
-    def _init_server(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind((SERVER_IP, PORT))
-        print(
-            f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
-        self.socket.listen(5)
-        self.conn, addr = self.socket.accept()
-        print(f"Connected by {addr}")
+            if task:
+                print(f"adding task")
+                self.tasks.append(task)
+        
+        # self.loop.run_forever()
+        
+    # def _init_server(self):
+    #     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #     self.socket.bind((SERVER_IP, PORT))
+    #     print(
+    #         f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
+    #     self.socket.listen(5)
+    #     self.conn, addr = self.socket.accept()
+    #     print(f"Connected by {addr}")
 
     async def run(self):
         self.server = await asyncio.start_server(self._handle_client, SERVER_IP, PORT)
+        print(f"{len(self.tasks)}")
+        for task in self.tasks:
+            print(f"ensuring future")
+            asyncio.create_task(task)
         async with self.server:
             print(
                 f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
@@ -175,8 +188,11 @@ class Server:
 
     async def _handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         """called when a client connects to the server"""
-        parser = asyncio.create_task(self._parse())
+        print(f"client connected:")
+        asyncio.create_task(self._parse())
+        print(f"started parser")
         msg = (await reader.read(1024)).decode("utf-8")
+        print(f"received first message: {msg}")
         while msg:
             print(f"from handle_client: {msg=}")
             async with self.lock:
@@ -184,15 +200,15 @@ class Server:
                 self.last_update = time_ms()
             msg = (await reader.read(1024)).decode("utf-8")
         print("client disconnected, closing parser")
-        parser.cancel()
 
     async def _parse(self):
         while True:
+            await asyncio.sleep(0.01)
             async with self.lock:
                 msg = self.last_msg
 
-            if msg:
-                print(f"from parse: {msg=}")
+            # if msg:
+            #     print(f"from parse: {msg=}")
 
             for x in msg.split(";"):
                 if not x:
