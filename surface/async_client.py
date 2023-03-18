@@ -20,7 +20,7 @@ class Client:
             await asyncio.sleep(1)
 
         writer.close()
-        await writer.wair_closed()
+        await writer.wait_closed()
 
 
 if __name__ == "__main__":
