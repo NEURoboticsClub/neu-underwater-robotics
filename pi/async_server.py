@@ -134,16 +134,24 @@ class Server:
             0: None,
             1: None,
         }
-        tasks = []
-        for i in range(2, 6, 2):
-            self.pins[i] = Stepper(
-                self.board.get_pin(f"d:{i}:o"),
-                self.board.get_pin(f"d:{i + 1}:o"),
-            )
-            tasks.append(self.pins[i].run())
+        tasks = [None for i in range(40)]
+        # for i in range(2, 6, 2):
+        #     self.pins[i] = Stepper(
+        #         self.board.get_pin(f"d:{i}:o"),
+        #         self.board.get_pin(f"d:{i + 1}:o"),
+        #     )
+        #     tasks.append(self.pins[i].run())
         for i in range(6, 14):
             self.pins[i] = Servo(self.board.get_pin(f"d:{i}:s"))
             tasks.append(self.pins[i].run())
+
+        # steppers = [Stepper(26, 28) 36 34]
+        steppers = [Stepper(self.board.get_pin("d:26:o"), self.board.get_pin(
+            "d:28:o")), Stepper(self.board.get_pin("d:36:o"), self.board.get_pin("d:34:o"))]
+        self.pins[26] = steppers[0]
+        tasks.append(self.pins[26].run())
+        self.pins[36] = steppers[1]
+        tasks.append(self.pins[36].run())
 
         for task in tasks:
             self.tasks.append(self.loop.create_task(task))
