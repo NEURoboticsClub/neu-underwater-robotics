@@ -24,7 +24,7 @@ class Stepper(object):
 
 
 
-STEPPERS = [Stepper(26, True, 28, 1, float(time.time())]  # list of pins that are used for steppers
+STEPPERS = [Stepper(26, True, 28, 1, float(time.time()))]  # list of pins that are used for steppers
 
 
 for step in Steppers:

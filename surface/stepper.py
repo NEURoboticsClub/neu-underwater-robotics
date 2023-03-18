@@ -157,7 +157,7 @@ j1.setup(0)
 #     j1.get_rov_input()
 
 prev_time = time.time()
-epsilon = 0.0009
+epsilon = 0.009
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
@@ -165,8 +165,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     old = ''
     while True:
         j1.detect_event()
-        x = j1.get_rov_input() + "&"
-        if not x == old or time.time() > prev_time + epsilon:
+        x = j1.get_rov_input()
+        if not x == old:
             s.send(str.encode(x))
             old = x
             prev_time = time.time()
