@@ -170,28 +170,49 @@ class joystick:
         j = pygame.joystick.Joystick(joy_num)
         j.init()
 
+class arm_joystick(joystick):
+    def __init__(self, buttons, axes, toggle_vals, trigger_vals, center, radius, ratio):
+        super(joystick, self).__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
+    
+    def get_rov_input(self):
+        servo = self.buttons_dict[0].get_joy_val()
+        lb = self.buttons_dict[4].get_joy_val()
+        rb = self.buttons_dict[5].get_joy_val()
+        wrist = self.axis_dict[0].get_joy_val()
+        extend = self.axis_dict[1].get_joy_val() * -1
+
+        lin_actuator = lb - rb
+        return 
+
 
 j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
-
+j2 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 j1.setup(0)
+j2.setup(1)
 
 
-# while True:
-#     j1.detect_event()
-#     j1.get_rov_input()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    print(f'connecting to {HOST}:{PORT}')
-    old = ''
-    while True:
-        j1.detect_event()
-        x = j1.get_rov_input()
-        if not x == old:
-            s.send(str.encode(x))
-            old = x
 
-    data = s.recv(1024)
+while True:
+    j1.detect_event()
+    x = j1.get_rov_input()
+    j2.detect_event()
+    y = j2.get_rov_input()
+    print(x, y)
+
+
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#     s.connect((HOST, PORT))
+#     print(f'connecting to {HOST}:{PORT}')
+#     old = ''
+#     while True:
+#         j1.detect_event()
+#         x = j1.get_rov_input()
+#         if not x == old:
+#             s.send(str.encode(x))
+#             old = x
+
+#     data = s.recv(1024)
 
 # print(f"Received {data!r}")
