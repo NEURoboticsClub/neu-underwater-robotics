@@ -179,10 +179,10 @@ class arm_joystick(joystick):
             output += f"{pin}:{pin_dict[pin]};"
         return output[:-1]
 
-j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
+j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 
-j1.setup(0)
+j2.setup(1)
 
 # while True:
 #     j1.detect_event()
@@ -193,14 +193,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f'connecting to {HOST}:{PORT}')
     old = ''
     while True:
-        j1.detect_event()
-        x = j1.get_rov_input()
-        out = x
-        if not out == old:
+        j2.detect_event()
+        y = j2.get_rov_input()
+        if not y == old:
             s.send(str.encode(out))
-            old = out
+            y = out
 
     data = s.recv(1024)
 
 # print(f"Received {data!r}")
-Footer
