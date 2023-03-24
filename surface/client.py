@@ -159,18 +159,40 @@ class joystick:
         pygame.init()
         j = pygame.joystick.Joystick(joy_num)
         j.init()
+        
+        
+class arm_joystick(joystick):
 
+    def __init__(self, buttons, axes, toggle_vals, trigger_vals, center, radius, ratio):
+        super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
+    def get_rov_input(self):
+        servo = self.buttons_dict[0].get_joy_val()
+        lt = self.axis_dict[3].get_joy_val() 
+        wrist = self.buttons_dict[0].get_joy_val()
+        extend = -1*self.buttons_dict[1].get_joy_val()
+        lin_act_val = lt
+        print(lt)
+        pin_dict = {10: int(servo),11:int(lin_act_val),12:int(wrist),13:int(extend)}
+
+        output = ""
+        for pin in pin_dict:
+            output += f"{pin}:{pin_dict[pin]};"
+        return output[:-1]
 
 j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
-
+j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 
 j1.setup(0)
-
+j2.setup(1)
 
 while True:
     j1.detect_event()
-    j1.get_rov_input()
+    j2.detect_event()
+    x = j1.get_rov_input()
+    y = j2.get_rov_input()
+    out = x + y
+    print(out)
 
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 #     s.connect((HOST, PORT))
@@ -178,10 +200,13 @@ while True:
 #     old = ''
 #     while True:
 #         j1.detect_event()
+#         j2.detect_event()
 #         x = j1.get_rov_input()
-#         if not x == old:
-#             s.send(str.encode(x))
-#             old = x
+#         y = j2.get_rov_input()
+#         out = x+y
+#         if not out == old:
+#             s.send(str.encode(out))
+#             old = out
 
 #     data = s.recv(1024)
 
