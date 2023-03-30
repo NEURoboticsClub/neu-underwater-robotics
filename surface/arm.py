@@ -77,9 +77,9 @@ class joystick:
         self.axis_dict = {}
         for i in range(axes):
             if i in trigger_vals:
-                self.axis_dict[i] = axis(-1)
-            else:
                 self.axis_dict[i] = axis(0)
+            else:
+                self.axis_dict[i] = axis(-1)
 
         self.hat = hat(0, 0)
         self.center = center
@@ -134,6 +134,11 @@ class joystick:
 
     def detect_event(self):
         for event in pygame.event.get():
+            try:
+                if event.joy != self.joy_num:
+                    continue
+            except:  # not a joystick event
+                continue
             if event.type == pygame.JOYAXISMOTION:
                 self.axis_dict[event.axis].update(event.value)
 
@@ -158,6 +163,7 @@ class joystick:
             x) for x in range(pygame.joystick.get_count())]
         pygame.init()
         j = pygame.joystick.Joystick(joy_num)
+        self.joy_num = joy_num
         j.init()
         
         
@@ -182,13 +188,17 @@ class arm_joystick(joystick):
         return output[:-1]
 
 j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
+j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
-
+j1.setup(1)
 j2.setup(0)
 
 while True:
+    j1.detect_event()
+    x = j1.get_rov_input()
     j2.detect_event()
-    j2.get_rov_input()
+    y = j2.get_rov_input()
+    print(x, y)
 
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 #     s.connect((HOST, PORT))
