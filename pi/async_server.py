@@ -109,6 +109,29 @@ class Servo:
                 self.pin.write(self.angle)
             await asyncio.sleep(0.1)
 
+class LinActuator:
+    def __init__(self, pin: pyfirmata.Pin):
+        self.pin = pin
+        self.pos = 0
+        self.lock = asyncio.Lock()
+
+    @classmethod
+    def linear_map(cls, x: float):
+        # return int(linear_map(x, 0, 180, 0, 180))
+        return int(x)
+
+    async def set_val(self, pos: int):
+        if pos < 0 or pos > 1:
+            raise ValueError("Angle must be between 0 and 1")
+        async with self.lock:
+            self.pos = pos
+
+    async def run(self):
+        while True:
+            async with self.lock:
+                self.pin.write(self.pos)
+            await asyncio.sleep(0.1)
+
 
 # endregion: hardware
 
@@ -149,6 +172,9 @@ class Server:
         #     tasks.append(self.pins[i].run())
         for i in range(4, 14):
             self.pins[i] = Servo(self.board.get_pin(f"d:{i}:s"))
+            tasks.append(self.pins[i].run())
+        for i in range(2, 4):
+            self.pins[i] = LinActuator(self.board.get_pin(f"d:{i}:o"))
             tasks.append(self.pins[i].run())
 
         # steppers = [Stepper(26, 28) 36 34]
