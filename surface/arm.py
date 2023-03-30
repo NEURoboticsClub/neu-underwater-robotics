@@ -166,8 +166,8 @@ class arm_joystick(joystick):
         super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
     def get_rov_input(self):
         servo = 180 if self.buttons_dict[0].get_joy_val() > 0 else 20
-        lin_act_forward = self.buttons_dict[4].get_joy_val() * 180
-        lin_act_reverse = self.buttons_dict[5].get_joy_val() * 180
+        lin_act_forward = self.buttons_dict[4].get_joy_val() 
+        lin_act_reverse = self.buttons_dict[5].get_joy_val()
         la = self.axis_dict[0].get_joy_val()
         ua = -1*self.axis_dict[1].get_joy_val()
 
