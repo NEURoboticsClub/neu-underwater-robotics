@@ -1,7 +1,7 @@
 import socket
 import pygame
 from abc import abstractmethod
-HOST = "192.168.0.101"  # The server's hostname or IP address
+HOST = "192.168.0.103"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 
 
@@ -161,46 +161,27 @@ class joystick:
         j.init()
         
         
-class arm_joystick(joystick):
-    def __init__(self, buttons, axes, toggle_vals, trigger_vals, center, radius, ratio):
-        super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
-    def get_rov_input(self):
-        servo = 180 if self.buttons_dict[0].get_joy_val() > 0 else 20
-        lin_act_forward = self.buttons_dict[4].get_joy_val() * 180
-        lin_act_reverse = self.buttons_dict[5].get_joy_val() * 180
-        la = self.axis_dict[0].get_joy_val()
-        ua = -1*self.axis_dict[1].get_joy_val()
-
-        wrist = 50*la if la<0.1 else 50*la if la>-0.1 else 0
-        extend = 50*ua if ua<0.1 else 50*ua if ua>-0.1 else 0
-       
-        pin_dict = {10: int(servo),2:int(lin_act_forward),3:int(lin_act_reverse),12:int(wrist),13:int(extend)}
-
-        output = ""
-        for pin in pin_dict:
-            output += f"{pin}:{pin_dict[pin]};"
-        return output[:-1]
-
-j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
+j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 
-j2.setup(0)
+j1.setup(1)
 
 while True:
-    j2.detect_event()
-    j2.get_rov_input()
+    j1.detect_event()
+    j1.get_rov_input()
 
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 #     s.connect((HOST, PORT))
 #     print(f'connecting to {HOST}:{PORT}')
 #     old = ''
 #     while True:
-#         j2.detect_event()
-#         y = j2.get_rov_input()
-#         if not y == old:
+#         j1.detect_event()
+#         x = j1.get_rov_input()
+#         out = x
+#         if not out == old:
 #             s.send(str.encode(out))
-#             y = out
+#             old = out
 
 #     data = s.recv(1024)
 
-# # print(f"Received {data!r}")
+# print(f"Received {data!r}")
