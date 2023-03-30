@@ -77,9 +77,9 @@ class joystick:
         self.axis_dict = {}
         for i in range(axes):
             if i in trigger_vals:
-                self.axis_dict[i] = axis(0)
-            else:
                 self.axis_dict[i] = axis(-1)
+            else:
+                self.axis_dict[i] = axis(0)
 
         self.hat = hat(0, 0)
         self.center = center
@@ -132,30 +132,24 @@ class joystick:
         return output[:-1]
 
 
-    def detect_event(self):
-        for event in pygame.event.get():
-            try:
-                if event.joy != self.joy_num:
-                    continue
-            except:  # not a joystick event
-                continue
-            if event.type == pygame.JOYAXISMOTION:
-                self.axis_dict[event.axis].update(event.value)
+    def detect_event(self, event):
+        if event.type == pygame.JOYAXISMOTION:
+            self.axis_dict[event.axis].update(event.value)
 
-            elif event.type == pygame.JOYBALLMOTION:
-                print("ball motions")
+        elif event.type == pygame.JOYBALLMOTION:
+            print("ball motions")
 
-            elif event.type == pygame.JOYBUTTONDOWN:
-                self.buttons_dict[event.button].update(1)
+        elif event.type == pygame.JOYBUTTONDOWN:
+            self.buttons_dict[event.button].update(1)
 
-            elif event.type == pygame.JOYBUTTONUP:
-                self.buttons_dict[event.button].update(0)
+        elif event.type == pygame.JOYBUTTONUP:
+            self.buttons_dict[event.button].update(0)
 
-            elif event.type == pygame.JOYHATMOTION:
-                value = event.value
-                self.hat.update(value[0], value[1])
+        elif event.type == pygame.JOYHATMOTION:
+            value = event.value
+            self.hat.update(value[0], value[1])
 
-            print(self.get_rov_input())
+        print(self.get_rov_input())
 
     def setup(self, joy_num):
         pygame.joystick.init()
@@ -187,18 +181,40 @@ class arm_joystick(joystick):
             output += f"{pin}:{pin_dict[pin]};"
         return output[:-1]
 
+
+class Joysticks:
+    def __init__(self, joysticks):
+        self.joysticks = joysticks
+
+    def detect_event(self):
+        try:
+            for event in pygame.event.get():
+                self.joysticks[event.joy].detect_event(event)
+        except:
+            print(event)
+
+    def get_rov_input(self):
+        output = ""
+        for joystick in self.joysticks:
+            output += joystick.get_rov_input()
+
+        return output
+
+
+
+
 j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 j1.setup(1)
 j2.setup(0)
 
+jstks = Joysticks([j1, j2])
+
 while True:
-    j1.detect_event()
-    x = j1.get_rov_input()
-    j2.detect_event()
-    y = j2.get_rov_input()
-    print(x, y)
+    jstks.detect_event()
+    jstks.get_rov_input()
+    
 
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 #     s.connect((HOST, PORT))
