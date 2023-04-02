@@ -250,7 +250,10 @@ class Server:
                     continue
 
                 if isinstance(self.pins[pin], LinActuator) or isinstance(self.pins[pin], Stepper) or isinstance(self.pins[pin], Servo):
-                    await self.pins[pin].set_val(self.pins[pin].linear_map(value))
+                    try:
+                        await self.pins[pin].set_val(self.pins[pin].linear_map(value))
+                    except:
+                        print(f"Invalid something: {pin} {value}")
                 else:
                     print(f"Invalid pin type: {type(self.pins[pin])}")
 
