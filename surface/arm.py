@@ -1,7 +1,7 @@
 import socket
 import pygame
 from abc import abstractmethod
-HOST = "192.168.0.101"  # The server's hostname or IP address
+HOST = "192.168.0.103"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 
 
@@ -123,13 +123,13 @@ class joystick:
             precision * (self.radius * height + self.radius * back_tilt) + self.center))
 
 
-        pin_dict = {4: int(front_left), 5: int(front_right), 6: int(back_left), 
+        pin_dict = {4: int(self.flip_thruster(front_left)), 5: int(front_right), 6: int(self.flip_thruster(back_left)), 
                     7: int(back_right), 8: int(front_vert), 9: int(back_vert)}
 
         output = ""
         for pin in pin_dict:
             output += f"{pin}:{pin_dict[pin]};"
-        return output[:-1]
+        return output
 
 
     def detect_event(self, event):
@@ -159,6 +159,9 @@ class joystick:
         j = pygame.joystick.Joystick(joy_num)
         self.joy_num = joy_num
         j.init()
+
+    def flip_thruster(self, val):
+        return 2* self.center - val
         
         
 class arm_joystick(joystick):
@@ -166,8 +169,8 @@ class arm_joystick(joystick):
         super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
     def get_rov_input(self):
         servo = 180 if self.buttons_dict[0].get_joy_val() > 0 else 20
-        lin_act_forward = self.buttons_dict[4].get_joy_val() * 180
-        lin_act_reverse = self.buttons_dict[5].get_joy_val() * 180
+        lin_act_forward = self.buttons_dict[4].get_joy_val()
+        lin_act_reverse = self.buttons_dict[5].get_joy_val()
         la = self.axis_dict[0].get_joy_val()
         ua = -1*self.axis_dict[1].get_joy_val()
 
@@ -179,7 +182,7 @@ class arm_joystick(joystick):
         output = ""
         for pin in pin_dict:
             output += f"{pin}:{pin_dict[pin]};"
-        return output[:-1]
+        return output
 
 
 class Joysticks:
@@ -198,7 +201,7 @@ class Joysticks:
         for joystick in self.joysticks:
             output += joystick.get_rov_input()
 
-        return output
+        return output[:-1] + "&"
 
 
 
@@ -209,24 +212,28 @@ j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 j1.setup(1)
 j2.setup(0)
 
-jstks = Joysticks([j1, j2])
+jstks = Joysticks([j2, j1])
 
-while True:
-    jstks.detect_event()
-    jstks.get_rov_input()
+# while True:
+#     jstks.detect_event()
+#     jstks.get_rov_input()
     
 
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#     s.connect((HOST, PORT))
-#     print(f'connecting to {HOST}:{PORT}')
-#     old = ''
-#     while True:
-#         j2.detect_event()
-#         y = j2.get_rov_input()
-#         if not y == old:
-#             s.send(str.encode(out))
-#             y = out
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    print(f'connecting to {HOST}:{PORT}')
+    old = ''
+    while True:
+        jstks.detect_event()
+        x = jstks.get_rov_input()
+        out = x
+        if not out == old:
+            s.send(str.encode(out))
+            old = out
 
-#     data = s.recv(1024)
+    data = s.recv(1024)
 
-# # print(f"Received {data!r}")
+print(f"Received {data!r}")
+
+
+# print(f"Received {data!r}")
