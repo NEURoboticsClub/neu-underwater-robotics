@@ -108,10 +108,10 @@ class joystick:
         # max is up right
         right = self.axis_dict[0].get_joy_val()
         forward = self.axis_dict[1].get_joy_val() * -1
-        yaw = self.axis_dict[3].get_joy_val()
-        height = self.axis_dict[4].get_joy_val() * -1
+        yaw = self.axis_dict[2].get_joy_val()
+        height = self.axis_dict[3].get_joy_val() * -1
 
-        front_tilt = (self.axis_dict[2].get_joy_val() + 1) / 2
+        front_tilt = (self.axis_dict[4].get_joy_val() + 1) / 2
         back_tilt = (self.axis_dict[5].get_joy_val() + 1) / 2
 
         precision = self.buttons_dict[0].get_joy_val() + 1.0
@@ -129,10 +129,13 @@ class joystick:
         back_right = self.radius * precision * \
             (forward + right - yaw) / 3.0 + self.center
 
-        front_vert = max(self.center - self.radius, min(self.center + self.radius,
-                                                        precision * (self.radius * height + self.radius * front_tilt) + self.center))
-        back_vert = max(self.center - self.radius, min(self.center + self.radius,
-                                                       precision * (self.radius * height + self.radius * back_tilt) + self.center))
+        # front_vert = max(self.center - self.radius, min(self.center + self.radius,
+        #                                                 precision * (self.radius * height + self.radius * front_tilt) + self.center))
+        # back_vert = max(self.center - self.radius, min(self.center + self.radius,
+        #                                                precision * (self.radius * height + self.radius * back_tilt) + self.center))
+
+        front_vert = self.center + self.radius * height
+        back_vert = self.center + self.radius * height
 
         pin_dict = {4: int(self.flip_thruster(front_left)), 5: int(front_right), 6: int(self.flip_thruster(back_left)),
                     7: int(back_right), 8: int(front_vert), 9: int(back_vert)}
