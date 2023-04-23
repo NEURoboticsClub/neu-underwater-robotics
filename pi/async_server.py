@@ -20,14 +20,12 @@ def linear_map(
     x: float, in_min: float = -1, in_max: float = 1, out_min: float = -5, out_max: float = 5
 ):
     """Linear map function.
-
     Args:
         x (float): value to map
         in_min (float): minimum input value
         in_max (float): maximum input value
         out_min (float): minimum output value
         out_max (float): maximum output value
-
     Returns:
         float: mapped value
     """
@@ -53,7 +51,6 @@ class Stepper:
 
     async def set_val(self, speed: int):
         """set speed of stepper motor in rev / s
-
         Args:
             speed (float): speed in rev / s
         """
@@ -236,7 +233,7 @@ class Server:
 
             # if msg:
             #     print(f"from parse: {msg=}")
-
+            msg = msg.split("&")[0]
             for x in msg.split(";"):
                 if not x:
                     continue
@@ -252,8 +249,11 @@ class Server:
                     print(f"Invalid pin: {pin}")
                     continue
 
-                if isinstance(self.pins[pin], Stepper) or isinstance(self.pins[pin], Servo):
-                    await self.pins[pin].set_val(self.pins[pin].linear_map(value))
+                if isinstance(self.pins[pin], LinActuator) or isinstance(self.pins[pin], Stepper) or isinstance(self.pins[pin], Servo):
+                    try:
+                        await self.pins[pin].set_val(self.pins[pin].linear_map(value))
+                    except:
+                        print(f"Invalid something: {pin} {value}")
                 else:
                     print(f"Invalid pin type: {type(self.pins[pin])}")
 
