@@ -8,6 +8,9 @@ class Camera:
     
     def get_frame(self):
         ret, image = self.video.read()
+        if not ret:
+            print('No image from camera')
+            return
         ret, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
         
