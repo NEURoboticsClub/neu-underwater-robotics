@@ -167,10 +167,10 @@ class Server:
         #         self.board.get_pin(f"d:{i + 1}:o"),
         #     )
         #     tasks.append(self.pins[i].run())
-        for i in range(4, 14):
+        for i in range(4, 12):
             self.pins[i] = Servo(self.board.get_pin(f"d:{i}:s"))
             tasks.append(self.pins[i].run())
-        for i in range(2, 4):
+        for i in [2, 3, 12, 13]:
             self.pins[i] = LinActuator(self.board.get_pin(f"d:{i}:o"))
             tasks.append(self.pins[i].run())
 
