@@ -1,4 +1,5 @@
 import socket
+import sys
 import pygame
 from abc import abstractmethod
 HOST = "192.168.0.103"  # The server's hostname or IP address
@@ -233,26 +234,22 @@ j2.setup(0)
 
 jstks = Joysticks([j2, j1])
 
-# while True:
-#     jstks.detect_event()
-#     print(jstks.get_rov_input())
 
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    print(f'connecting to {HOST}:{PORT}')
-    old = ''
-    while True:
-        jstks.detect_event()
-        x = jstks.get_rov_input()
-        out = x
-        if not out == old:
-            s.send(str.encode(out))
-            old = out
-
-    data = s.recv(1024)
-
-print(f"Received {data!r}")
-
-
-# print(f"Received {data!r}")
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        while True:
+            jstks.detect_event()
+            print(jstks.get_rov_input())
+    else:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            print(f'connecting to {HOST}:{PORT}')
+            old = ''
+            while True:
+                jstks.detect_event()
+                x = jstks.get_rov_input()
+                out = x
+                if not out == old:
+                    s.send(str.encode(out))
+                    old = out
+        
