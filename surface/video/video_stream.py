@@ -2,7 +2,8 @@ import time
 
 from flask import Flask, render_template, Response
 
-from camera import Camera
+# from camera import Camera
+from mock_camera import Camera
 
 app = Flask(__name__)
 
