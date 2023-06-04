@@ -1,8 +1,7 @@
 import socket
-import sys
 import pygame
 from abc import abstractmethod
-HOST = "192.168.0.103"  # The server's hostname or IP address
+HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 
 
@@ -114,7 +113,7 @@ class joystick:
         front_tilt = (self.axis_dict[2].get_joy_val() + 1) / 2
         back_tilt = (self.axis_dict[5].get_joy_val() + 1) / 2
 
-        precision =  self.ratio if self.buttons_dict[0].get_joy_val() > 0 else 1.0
+        precision =  self.ratio if self.buttons_dict[0].get_joy_val() > 0 else 0.6
 
         # depth_hold = self.buttons_dict[2].get_joy_val() # for auto depth
 
@@ -132,8 +131,8 @@ class joystick:
         back_vert = max(self.center - self.radius, min(self.center + self.radius,
                                                        precision * (self.radius * height + self.radius * back_tilt) + self.center))
 
-        pin_dict = {4: int(self.flip_thruster(front_left)), 5: int(front_right), 6: int(self.flip_thruster(back_left)),
-                    7: int(back_right), 8: int(front_vert), 9: int(back_vert)}
+        pin_dict = {4: int(self.flip_thruster(front_right)), 5: int(front_left), 6: int(self.flip_thruster(back_right)),
+                    7: int(back_left), 8: int(front_vert), 9: int(back_vert)}
 
         output = ""
         for pin in pin_dict:
@@ -175,7 +174,7 @@ class joystick:
 class arm_joystick(joystick):
     def __init__(self, buttons, axes, toggle_vals, trigger_vals, center, radius, ratio):
         super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
-        self.wrist = center + radius
+        self.wrist = center - radius
         self.claw = center + radius
 
     def get_rov_input(self):
@@ -192,14 +191,14 @@ class arm_joystick(joystick):
         # if is for dead zone in the middle so that you cannot be slightly off and do something
         self.wrist = min(self.center + self.radius, max(self.center - self.radius, \
             la * self.radius * self.ratio + self.wrist if la > 0.1 or la < -0.1 else self.wrist))
-        self.claw = min(self.center + self.radius, max(self.center - self.radius, \
+        self.claw = min(self.center + self.radius, max(self.center - 40.0, \
             claw_axis * self.radius * self.ratio + self.claw \
             if claw_axis > 0.1 or claw_axis < -0.1 else self.claw))
         extend = 1 if ua > 0.25 else 0
         retract = 1 if ua < -0.25 else 0
 
-        pin_dict = {2: int(extend), 3: int(retract), 10: int(self.claw), \
-            11:int(self.wrist), 12: int(elbow_down), 13: int(elbow_up)}
+        pin_dict = {2: int(extend), 3: int(retract), 10: int(self.wrist), \
+            11:int(self.claw), 12: int(elbow_down), 13: int(elbow_up)}
 
         output = ""
         for pin in pin_dict:
@@ -226,7 +225,7 @@ class Joysticks:
         return output[:-1] + "&"
 
 
-j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 90, 0.000005)
+j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 90, 0.00003)
 j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 j1.setup(1)
@@ -234,22 +233,27 @@ j2.setup(0)
 
 jstks = Joysticks([j2, j1])
 
+# while True:
+#     jstks.detect_event()
+#     print(jstks.get_rov_input())
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == 'test':
-        while True:
-            jstks.detect_event()
-            print(jstks.get_rov_input())
-    else:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            print(f'connecting to {HOST}:{PORT}')
-            old = ''
-            while True:
-                jstks.detect_event()
-                x = jstks.get_rov_input()
-                out = x
-                if not out == old:
-                    s.send(str.encode(out))
-                    old = out
-        
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    print(f'connecting to {HOST}:{PORT}')
+    old = ''
+    while True:
+        jstks.detect_event()
+        x = jstks.get_rov_input()
+        out = x
+        if not out == old:
+            s.send(str.encode(out))
+            print(out)
+            old = out
+
+    data = s.recv(1024)
+
+print(f"Received {data!r}")
+
+
+# print(f"Received {data!r}")
