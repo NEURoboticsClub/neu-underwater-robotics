@@ -11,7 +11,7 @@ class Camera:
     def __init__(self, port):
         self._frame = None
         Gst.init(None)
-        gst_str = f'udpsrc port={port} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw,width=1920,height=1080,format=RGB ! appsink name=appsink0'
+        gst_str = f'udpsrc port={port} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! appsink name=appsink0'
         print(gst_str)
         self.pipeline = Gst.parse_launch(gst_str)
         self.appsink = self.pipeline.get_by_name('appsink0')
@@ -30,7 +30,7 @@ class Camera:
         sample = sink.emit('pull-sample')
         buffer = sample.get_buffer()
         self._frame = np.ndarray(
-            shape=(1080, 1920, 3),
+            shape=(720, 1280, 3),
             buffer=buffer.extract_dup(0, buffer.get_size()),
             dtype=np.uint8,
         )
