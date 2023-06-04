@@ -1,4 +1,5 @@
 import socket
+import sys
 import pygame
 from abc import abstractmethod
 HOST = "192.168.0.103"  # The server's hostname or IP address
@@ -108,34 +109,28 @@ class joystick:
         # max is up right
         right = self.axis_dict[0].get_joy_val()
         forward = self.axis_dict[1].get_joy_val() * -1
-        yaw = self.axis_dict[2].get_joy_val()
-        height = self.axis_dict[3].get_joy_val() * -1
-
-        front_tilt = (self.axis_dict[4].get_joy_val() + 1) / 2
+        yaw = self.axis_dict[3].get_joy_val()
+        height = self.axis_dict[4].get_joy_val() * -1
+        front_tilt = (self.axis_dict[2].get_joy_val() + 1) / 2
         back_tilt = (self.axis_dict[5].get_joy_val() + 1) / 2
 
-        precision = self.buttons_dict[0].get_joy_val() + 1.0
+        precision =  self.ratio if self.buttons_dict[0].get_joy_val() > 0 else 1.0
 
-        if precision > 1.1:
-            precision = self.ratio
         # depth_hold = self.buttons_dict[2].get_joy_val() # for auto depth
 
-        front_left = self.radius * precision * \
-            (forward + right + yaw) / 3.0 + self.center
-        back_left = self.radius * precision * \
-            (forward - right + yaw) / 3.0 + self.center
-        front_right = self.radius * precision * \
-            (forward - right - yaw) / 3.0 + self.center
-        back_right = self.radius * precision * \
-            (forward + right - yaw) / 3.0 + self.center
+        front_left = max(self.center - self.radius, min(self.center + self.radius, \
+            self.radius * precision * (forward + right + yaw) + self.center))
+        back_left = max(self.center - self.radius, min(self.center + self.radius, \
+            self.radius * precision * (forward - right + yaw) + self.center))
+        front_right = max(self.center - self.radius, min(self.center + self.radius, \
+            self.radius * precision * (forward - right - yaw) + self.center))
+        back_right = max(self.center - self.radius, min(self.center + self.radius, \
+            self.radius * precision * (forward + right - yaw) + self.center))
 
-        # front_vert = max(self.center - self.radius, min(self.center + self.radius,
-        #                                                 precision * (self.radius * height + self.radius * front_tilt) + self.center))
-        # back_vert = max(self.center - self.radius, min(self.center + self.radius,
-        #                                                precision * (self.radius * height + self.radius * back_tilt) + self.center))
-
-        front_vert = self.center + self.radius * height
-        back_vert = self.center + self.radius * height
+        front_vert = max(self.center - self.radius, min(self.center + self.radius,
+                                                        precision * (self.radius * height + self.radius * front_tilt) + self.center))
+        back_vert = max(self.center - self.radius, min(self.center + self.radius,
+                                                       precision * (self.radius * height + self.radius * back_tilt) + self.center))
 
         pin_dict = {4: int(self.flip_thruster(front_left)), 5: int(front_right), 6: int(self.flip_thruster(back_left)),
                     7: int(back_right), 8: int(front_vert), 9: int(back_vert)}
@@ -162,7 +157,7 @@ class joystick:
             value = event.value
             self.hat.update(value[0], value[1])
 
-        print(self.get_rov_input())
+        self.get_rov_input()
 
     def setup(self, joy_num):
         pygame.joystick.init()
@@ -180,19 +175,31 @@ class joystick:
 class arm_joystick(joystick):
     def __init__(self, buttons, axes, toggle_vals, trigger_vals, center, radius, ratio):
         super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
+        self.wrist = center + radius
+        self.claw = center + radius
 
     def get_rov_input(self):
-        servo = 180 if self.buttons_dict[0].get_joy_val() > 0 else 20
-        lin_act_forward = self.buttons_dict[4].get_joy_val()
-        lin_act_reverse = self.buttons_dict[5].get_joy_val()
+        claw_axis = -1 * self.axis_dict[4].get_joy_val()
+        elbow_down = self.buttons_dict[4].get_joy_val()
+        elbow_up = self.buttons_dict[5].get_joy_val()
+        # la is left axis, ua is up axis, both on left stick
         la = self.axis_dict[0].get_joy_val()
-        ua = -1*self.axis_dict[1].get_joy_val()
+        ua = -1 * self.axis_dict[1].get_joy_val()
 
-        wrist = la * self.radius + self.center if la < 0.1 or la > -0.1 else self.center
-        extend = la * self.radius + self.center if ua < 0.1 or ua > -0.1 else self.center
 
-        pin_dict = {10: int(servo), 2: int(lin_act_forward), 3: int(
-            lin_act_reverse), 12: int(wrist), 13: int(extend)}
+        # bounding: min = center - radius,   max = center + radius, 
+        # move by radius times ratio each time for how far la is from center
+        # if is for dead zone in the middle so that you cannot be slightly off and do something
+        self.wrist = min(self.center + self.radius, max(self.center - self.radius, \
+            la * self.radius * self.ratio + self.wrist if la > 0.1 or la < -0.1 else self.wrist))
+        self.claw = min(self.center + self.radius, max(self.center - self.radius, \
+            claw_axis * self.radius * self.ratio + self.claw \
+            if claw_axis > 0.1 or claw_axis < -0.1 else self.claw))
+        extend = 1 if ua > 0.25 else 0
+        retract = 1 if ua < -0.25 else 0
+
+        pin_dict = {2: int(extend), 3: int(retract), 10: int(self.claw), \
+            11:int(self.wrist), 12: int(elbow_down), 13: int(elbow_up)}
 
         output = ""
         for pin in pin_dict:
@@ -219,7 +226,7 @@ class Joysticks:
         return output[:-1] + "&"
 
 
-j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 90, 0.2)
+j2 = arm_joystick(11, 6, [0, 2], [2, 5], 90, 90, 0.000005)
 j1 = joystick(11, 6, [0, 2], [2, 5], 90, 55, 0.2)
 
 j1.setup(1)
@@ -227,26 +234,22 @@ j2.setup(0)
 
 jstks = Joysticks([j2, j1])
 
-# while True:
-#     jstks.detect_event()
-#     jstks.get_rov_input()
 
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    print(f'connecting to {HOST}:{PORT}')
-    old = ''
-    while True:
-        jstks.detect_event()
-        x = jstks.get_rov_input()
-        out = x
-        if not out == old:
-            s.send(str.encode(out))
-            old = out
-
-    data = s.recv(1024)
-
-print(f"Received {data!r}")
-
-
-# print(f"Received {data!r}")
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        while True:
+            jstks.detect_event()
+            print(jstks.get_rov_input())
+    else:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            print(f'connecting to {HOST}:{PORT}')
+            old = ''
+            while True:
+                jstks.detect_event()
+                x = jstks.get_rov_input()
+                out = x
+                if not out == old:
+                    s.send(str.encode(out))
+                    old = out
+        
