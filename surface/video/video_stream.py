@@ -2,8 +2,12 @@ import time
 
 from flask import Flask, render_template, Response
 
-# from camera import Camera
-from mock_camera import Camera
+from io import BytesIO
+from base64 import b64encode
+from PIL import Image
+
+from camera import Camera
+# from mock_camera import Camera
 
 app = Flask(__name__)
 
@@ -30,7 +34,11 @@ def gen(port):
 @app.route("/raw_frame/<port>")
 def raw_frame(port):
     camera = cameras.get(str(port))
-    return Response(camera.get_frame())
+    img = Image.open(BytesIO(camera.get_frame()))
+    image_io = BytesIO()
+    img.save(image_io, 'PNG')
+    dataurl = 'data:image/png;base64,' + b64encode(image_io.getvalue()).decode('ascii')
+    return render_template('image.html', image_data=dataurl)
 
 
 @app.route("/video_feed/<port>")
