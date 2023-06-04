@@ -4,7 +4,8 @@ import shutil
 from bs4 import BeautifulSoup
 #r = requests.get("http://localhost:5000//video_feed//5000",stream = True)
 #r = requests.get("http://localhost:5000//video_feed",stream = True,headers = {'content-type':"image/jpg"})
-r = requests.get("http://localhost:5000//video_feed")
+#r = requests.get("http://localhost:5000//video_feed")
+r = requests.get("http://localhost:5000//raw_frame")
 print(r.iter_content())
 print(r.text)
 print(r.json)
