@@ -10,7 +10,7 @@ class Camera:
     def __init__(self, port):
         self._frame = None
         Gst.init(None)
-        gst_str = f'v4l2src device=/dev/video0 ! videoconvert ! video/x-raw, format=RGBx ! appsink name=appsink0'
+        gst_str = f'v4l2src device=/dev/video0 ! videoconvert ! video/x-raw, format=RGB ! appsink name=appsink0'
         print(gst_str)
         self.pipeline = Gst.parse_launch(gst_str)
         self.appsink = self.pipeline.get_by_name('appsink0')
@@ -38,7 +38,7 @@ class Camera:
 
     def get_frame(self) -> bytes:
         if self._frame is not None:
-            img = Image.frombytes(mode='RGB', size=(1080, 1920), data=self._frame)
+            img = Image.frombytes(mode='RGB', size=(1920, 1080), data=self._frame)
             file_object = BytesIO()
             img.save(file_object, 'JPEG')
             file_object.seek(0)
