@@ -10,7 +10,7 @@ class Camera:
     def __init__(self, port):
         self._frame = None
         Gst.init(None)
-        gst_str = f'v4l2src device=/dev/video0 ! videoconvert ! appsink name=appsink0'
+        gst_str = f'v4l2src device=/dev/video0 ! videoconvert ! video/x-raw, format=RGBx ! appsink name=appsink0'
         print(gst_str)
         self.pipeline = Gst.parse_launch(gst_str)
         self.appsink = self.pipeline.get_by_name('appsink0')
