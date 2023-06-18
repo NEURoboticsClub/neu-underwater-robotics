@@ -6,8 +6,8 @@ gi.require_version('Gst', '1.0')
 gi.require_version('GstApp', '1.0')
 from gi.repository import Gst, GstApp
 
-HEIGHT = 1280
-WIDTH = 720
+WIDTH = 1280
+HEIGHT = 720
 
 class Camera:
     def __init__(self, port):
