@@ -27,7 +27,6 @@ def gen(port):
     camera = cameras.get(str(port))
     while True:
         frame = camera.get_frame()
-        print(frame)
         yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
 

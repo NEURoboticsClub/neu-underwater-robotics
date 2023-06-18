@@ -38,7 +38,7 @@ class Camera:
 
     def get_frame(self) -> bytes:
         if self._frame is not None:
-            img = Image.frombytes(mode='RGB', size=(1920, 1080), data=self._frame)
+            img = Image.frombytes(mode='RGB', size=(1080, 1920), data=self._frame)
             file_object = BytesIO()
             img.save(file_object, 'JPEG')
             file_object.seek(0)
