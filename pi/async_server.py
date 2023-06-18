@@ -3,7 +3,7 @@ import socket
 from time import time_ns
 import pyfirmata
 
-SERVER_IP = "192.168.0.103"  # raspberry pi ip
+SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
 STEPS_PER_REV = 200
