@@ -10,7 +10,7 @@ class Camera:
     def __init__(self, port):
         self._frame = None
         Gst.init(None)
-        gst_str = f'v4l2src device=/dev/video2 ! video/x-h264, width=1920,height=1080! h264parse ! queue ! v4l2h264dec ! videoconvert ! videoscale ! video/x-raw,width=1280,height=720,format=RGB ! appsink name=appsink0'
+        gst_str = f'v4l2src device=/dev/video0 ! videoconvert ! appsink name=appsink0'
         print(gst_str)
         self.pipeline = Gst.parse_launch(gst_str)
         self.appsink = self.pipeline.get_by_name('appsink0')
@@ -29,7 +29,7 @@ class Camera:
         sample = sink.emit('pull-sample')
         buffer = sample.get_buffer()
         self._frame = np.ndarray(
-            shape=(720, 1280, 3),
+            shape=(1080, 1920, 3),
             buffer=buffer.extract_dup(0, buffer.get_size()),
             dtype=np.uint8,
         )
