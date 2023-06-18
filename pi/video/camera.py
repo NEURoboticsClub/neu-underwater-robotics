@@ -38,7 +38,11 @@ class Camera:
 
     def get_frame(self) -> bytes:
         if self._frame is not None:
-            return self._frame
+            img = Image.frombytes(mode='RGB', size=(1920, 1080), data=self._frame)
+            file_object = BytesIO()
+            img.save(file_object, 'JPEG')
+            file_object.seek(0)
+            return file_object.read()
         # if self._frame is not None and self._frame.any():
         #     file_object = BytesIO()
         #     img = Image.fromarray(self._frame)
