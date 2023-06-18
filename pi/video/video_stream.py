@@ -18,8 +18,8 @@ def index():
 
 
 INDEX_TO_DEVICE = {
-    "0": "/dev/video0",
-    "1": "/dev/video4",
+    "0": "0",  # /dev/video0
+    "1": "4",  # /dev/video4
 }
 
 cameras = {
