@@ -11,6 +11,7 @@ HEIGHT = 720
 
 class Camera:
     def __init__(self, index):
+        self.index = index
         self._frame = None
         Gst.init(None)
         gst_str = f'v4l2src device=/dev/video{index} ! videoscale ! video/x-raw,width={WIDTH},height={HEIGHT} ! videoconvert ! video/x-raw, format=RGB ! appsink name=appsink0'
@@ -53,5 +54,8 @@ class Camera:
         #     file_object.seek(0)
         #     return file_object.read()
         return b''
+    
+    def __str__(self):
+        return f'Camera: device=/dev/video{self.index}'
 
         
