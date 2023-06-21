@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -7,11 +6,15 @@ gi.require_version('Gst', '1.0')
 gi.require_version('GstApp', '1.0')
 from gi.repository import Gst, GstApp
 
+WIDTH = 1280
+HEIGHT = 720
+
 class Camera:
-    def __init__(self, port):
+    def __init__(self, index):
+        self.index = index
         self._frame = None
         Gst.init(None)
-        gst_str = f'udpsrc port={port} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! appsink name=appsink0'
+        gst_str = f'v4l2src device=/dev/video{index} ! videoscale ! video/x-raw,width={WIDTH},height={HEIGHT} ! videoconvert ! video/x-raw, format=RGB ! appsink name=appsink0'
         print(gst_str)
         self.pipeline = Gst.parse_launch(gst_str)
         self.appsink = self.pipeline.get_by_name('appsink0')
@@ -29,20 +32,30 @@ class Camera:
     def on_new_buffer(self, sink):
         sample = sink.emit('pull-sample')
         buffer = sample.get_buffer()
-        self._frame = np.ndarray(
-            shape=(720, 1280, 3),
-            buffer=buffer.extract_dup(0, buffer.get_size()),
-            dtype=np.uint8,
-        )
+        self._frame = buffer.extract_dup(0, buffer.get_size())
+        # self._frame = np.ndarray(
+        #     shape=(1080, 1920, 3),
+        #     buffer=buffer.extract_dup(0, buffer.get_size()),
+        #     dtype=np.uint8,
+        # )
         return Gst.FlowReturn.OK
 
     def get_frame(self) -> bytes:
-        if self._frame is not None and self._frame.any():
+        if self._frame is not None:
+            img = Image.frombytes(mode='RGB', size=(WIDTH, HEIGHT), data=self._frame)
             file_object = BytesIO()
-            img = Image.fromarray(self._frame)
             img.save(file_object, 'JPEG')
             file_object.seek(0)
             return file_object.read()
+        # if self._frame is not None and self._frame.any():
+        #     file_object = BytesIO()
+        #     img = Image.fromarray(self._frame)
+        #     img.save(file_object, 'JPEG')
+        #     file_object.seek(0)
+        #     return file_object.read()
         return b''
+    
+    def __str__(self):
+        return f'Camera: device=/dev/video{self.index}'
 
         
