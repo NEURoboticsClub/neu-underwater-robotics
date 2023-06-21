@@ -5,9 +5,10 @@ from PIL import Image
 from datetime import datetime
 import piexif
 import os
+from pynput.keyboard import Key, Listener
 
 
-IP = '192.168.0.150'  # IP OF FLASK SERVER
+IP = '192.168.0.151'  # IP OF FLASK SERVER
 PORT = 5600  # PORT OF CAMERA
 
 def get_image(port):
