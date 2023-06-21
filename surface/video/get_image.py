@@ -35,14 +35,27 @@ def add_metadata(img: Image):
 def save_image(img: Image, name: str):
     img.save(f"{name}.jpg", exif=add_metadata(img))
 
-save_image(Image.open("images/MATE_5601_4.png"), "images/MATE_5601_4_edited")
+img_count = 0   
+def on_press(key):
+    global img_count                                                                               
+    if(key == Key.space):
+        print('capturing images')
+        img = get_image(5600)
+        add_metadata(img)
+        img_str = '/surface/video/output/img'+str(img_count)+'.png'
+        save_image(img,img_str)
+        #img = img.save(img_str)
+        img_count +=1
+    if key == Key.esc:
+        return False
+        
+def on_release(key):
+    print('stopping image capture')
 
-# if __name__ == "__main__":
-#     try:
-#         os.makedirs(f"images/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}")
-#     except FileExistsError:
-#         pass
-#     counter = 0
-#     while True:
-#         save_image(get_image(PORT), f"images/{counter}")
-#         counter += 1
+
+#save_image(Image.open("images/MATE_5601_4.png"), "images/MATE_5601_4_edited")
+
+with Listener(
+        on_press=on_press,
+        on_release=on_release) as listener:
+    listener.join()
