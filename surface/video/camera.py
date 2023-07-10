@@ -7,6 +7,10 @@ gi.require_version('Gst', '1.0')
 gi.require_version('GstApp', '1.0')
 from gi.repository import Gst, GstApp
 
+import get_image
+
+FRAMES_TO_SAVE = 2  # save a frame every x frames
+
 class Camera:
     def __init__(self, port):
         self._frame = None
@@ -21,10 +25,21 @@ class Camera:
         self.appsink.set_property('sync', False)
         self.appsink.connect('new-sample', self.on_new_buffer)
 
+        self.is_saving = False
+        self.frame_counter = 0
+        self.last_saved_frame = 0
+
         self.pipeline.set_state(Gst.State.PLAYING)
 
     def __del__(self):
         self.pipeline.set_state(Gst.State.NULL)
+
+    def start_saving(self):
+        self.is_saving = True
+        # get_image.make_folder()
+    
+    def stop_saving(self):
+        self.is_saving = False
 
     def on_new_buffer(self, sink):
         sample = sink.emit('pull-sample')
@@ -34,15 +49,28 @@ class Camera:
             buffer=buffer.extract_dup(0, buffer.get_size()),
             dtype=np.uint8,
         )
+        self.frame_counter += 1
         return Gst.FlowReturn.OK
 
     def get_frame(self) -> bytes:
         if self._frame is not None and self._frame.any():
             file_object = BytesIO()
             img = Image.fromarray(self._frame)
+            if self.is_saving and self.frame_counter - self.last_saved_frame >= FRAMES_TO_SAVE:
+                get_image.save_image(img, str(self.frame_counter))
+                self.last_saved_frame = self.frame_counter
             img.save(file_object, 'JPEG')
             file_object.seek(0)
             return file_object.read()
         return b''
+
+    def get_cropped_frame(self) -> bytes:
+        if self._frame is not None and self._frame.any():
+            file_object = BytesIO()
+            img = Image.fromarray(self._frame)
+            cropped_img = img.crop((1280*0.3, 0, 1280-(1280*0.3), 720))
+            cropped_img.save(file_object, 'JPEG')
+            file_object.seek(0)
+            return file_object.read()
 
         
