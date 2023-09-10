@@ -5,16 +5,25 @@ from PIL import Image
 from datetime import datetime
 import piexif
 import os
+import time
 
 
-IP = '192.168.0.150'  # IP OF FLASK SERVER
+IP = 'localhost'  # IP OF FLASK SERVER
 PORT = 5600  # PORT OF CAMERA
+folder_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
-def get_image(port):
-    url = f'http://{IP}:5000/raw_frame/{port}'
-    r = requests.get(url)
-    im = Image.open(BytesIO(base64.b64decode(r.text[34:-10])))
-    return im
+os.makedirs(f"images/{folder_name}", exist_ok=True)
+
+# def get_image_request(port):
+#     url = f'http://{IP}:5000/raw_frame/{port}'
+#     r = requests.get(url)
+#     im = Image.open(BytesIO(base64.b64decode(r.text[34:-10])))
+#     return im
+
+def make_folder():
+    global folder_name
+    folder_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    os.makedirs(f"images/{folder_name}", exist_ok=True)
 
 def add_metadata(img: Image):
     exif_dict = {
@@ -24,25 +33,26 @@ def add_metadata(img: Image):
     focal_length = (35, 10)  # 35/10
     exif_dict["Exif"][piexif.ExifIFD.FocalLength] = focal_length
 
-    width, height = img.size
     exif_dict["0th"][piexif.ImageIFD.Make] = "NUWAVE"
-    exif_dict["0th"][piexif.ImageIFD.LocalizedCameraModel] = "NUWAVE"
+    exif_dict["0th"][piexif.ImageIFD.Model] = "NUWAVE"
 
 
     exif_bytes = piexif.dump(exif_dict)
     return exif_bytes
     
 def save_image(img: Image, name: str):
-    img.save(f"{name}.jpg", exif=add_metadata(img))
+    img.save(f"images/{folder_name}/{name}.jpg", exif=add_metadata(img))
 
-save_image(Image.open("images/MATE_5601_4.png"), "images/MATE_5601_4_edited")
+# save_image(Image.open("images/MATE_5601_4.png"), "images/MATE_5601_4_edited")
 
-# if __name__ == "__main__":
-#     try:
-#         os.makedirs(f"images/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}")
-#     except FileExistsError:
-#         pass
-#     counter = 0
-#     while True:
-#         save_image(get_image(PORT), f"images/{counter}")
-#         counter += 1
+
+if __name__ == "__main__":
+    folder_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    os.makedirs(f"images/{folder_name}", exist_ok=True)
+    counter = 0
+    while True:
+        input("Press enter to take a picture")
+        start_time = time.time()
+        save_image(get_image(PORT), f"images/{folder_name}/{counter}")
+        print(f"Saved image {counter} in {time.time() - start_time} seconds")
+        counter += 1
