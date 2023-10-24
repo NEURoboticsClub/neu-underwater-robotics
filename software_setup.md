@@ -33,7 +33,7 @@ activate marine-robotics
 Open Terminal (Mac/Linux/WSL) or Git Bash (Windows) and type this: `git clone git@github.com:JonahJ27/neu-underwater-robotics.git`
 
 ## Install dependencies:
-Open terminal and navigate to the repo you just cloned (`cd ~/neu-underwater-robotics`). Then run `pip install -r requirements.txt` to install all the dependencies for this project.
+Open terminal and navigate to the repo you just cloned (`cd ~/neu-underwater-robotics`).If you don't want to use a virtual environment, run `pip install -r requirements.txt` to install all needed dependencies. If you would like to use a venv, run `./setup.sh` to create a virtual environment for this project. Remember to run `source ./activate.sh` to activate this virtual environment when working with code in this repository, and `deactivate` when you are done.
 
 ## Editor:
 Any editor that works with Python is fine, but I recommend using [VSCode](https://code.visualstudio.com/download) as your editor. It has great support for Python and Git. If you use VSCode, I recommend installing the following extensions:
