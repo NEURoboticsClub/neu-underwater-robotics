@@ -28,4 +28,4 @@ max-statements = 50
 max-attributes=11
 
 [MASTER]
-extension-pkg-whitelist=numpy,pygame
+extension-pkg-whitelist=numpy,pygame,pyfirmata

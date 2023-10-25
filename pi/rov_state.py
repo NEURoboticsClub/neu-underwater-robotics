@@ -39,6 +39,15 @@ class ROVState:
         self._last_current_velocity_update = 0  # time of last current velocity update in ms
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
 
+    def get_tasks(self) -> list[asyncio.Task]:
+        """Return tasks for all actuators"""
+        tasks = []
+        for actuator in self.actuators.values():
+            tasks.append(actuator.run())
+        for actuator in self.thrusters.values():
+            tasks.append(actuator.run())
+        return tasks
+
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector
     ) -> dict[str, float]:

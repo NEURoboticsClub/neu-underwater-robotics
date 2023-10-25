@@ -37,6 +37,8 @@ class Server:
             },
             sensors={},
         )
+        self.tasks.append(self.rov_state.control_loop())
+        self.tasks.extend(self.rov_state.get_tasks())
 
     def __del__(self):
         try:
@@ -51,33 +53,6 @@ class Server:
         print("Successfully connected to Arduino")
         it = pyfirmata.util.Iterator(self.board)
         it.start()
-
-        # self.pins: Dict[int, None | Actuator] = {
-        #     0: None,
-        #     1: None,
-        # }
-        # tasks: Any = [None for _ in range(40)]
-        # for i in range(4, 12):
-        #     self.pins[i] = Servo(self.board.get_pin(f"d:{i}:s"))
-        #     tasks.append(self.pins[i].run())
-        # for i in [2, 3, 12, 13]:
-        #     self.pins[i] = LinActuator(self.board.get_pin(f"d:{i}:o"))
-        #     tasks.append(self.pins[i].run())
-        #
-        # # steppers = [Stepper(26, 28) 36 34]
-        # steppers = [
-        #     Stepper(self.board.get_pin("d:26:o"), self.board.get_pin("d:28:o")),
-        #     Stepper(self.board.get_pin("d:36:o"), self.board.get_pin("d:34:o")),
-        # ]
-        # self.pins[26] = steppers[0]
-        # tasks.append(self.pins[26].run())
-        # self.pins[36] = steppers[1]
-        # tasks.append(self.pins[36].run())
-        #
-        # for task in tasks:
-        #     if task:
-        #         print("adding task")
-        #         self.tasks.append(task)
 
     def _get_pin(self, pin: int, mode: str = "o") -> Pin:
         """get a pin from the board. mode can be 'i', 'o', or 's' for servo"""
@@ -116,7 +91,7 @@ class Server:
             async with self.lock:
                 msg = self.last_msg
 
-            if msg is None:
+            if msg is None:  # no message received yet
                 await asyncio.sleep(0.01)
                 continue
 
