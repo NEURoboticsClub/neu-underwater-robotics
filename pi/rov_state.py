@@ -1,7 +1,14 @@
 import asyncio
+import logging
 
 from hardware import Actuator, Sensor
-from utils import PIDController, VelocityVector, linear_map, time_ms
+
+from common.utils import (  # pylint: disable=line-too-long, import-error
+    PIDController,
+    VelocityVector,
+    linear_map,
+    time_ms,
+)
 
 
 class ROVState:
@@ -10,10 +17,6 @@ class ROVState:
     actuators: dict[str, Actuator]  # name: actuator  arm motors
     thrusters: dict[str, Actuator]  # name: actuator  thrusters
     sensors: dict[str, Sensor]  # name: sensor
-    current_velocity: VelocityVector
-    target_veolocity: VelocityVector
-    pid_controllers: dict[str, PIDController]  # name: pid controller
-    last_time: int  # time of last update in ms
 
     def __init__(
         self,
@@ -24,15 +27,17 @@ class ROVState:
         self.actuators = actuators
         self.thrusters = thrusters
         self.sensors = sensors
-        self.current_velocity = VelocityVector()
-        self.target_velocity = VelocityVector()
-        self.pid_controllers = {}
-        for axis in self.current_velocity.keys():
-            self.pid_controllers[axis] = PIDController(
+        self._current_velocity = VelocityVector()
+        self._target_velocity = VelocityVector()
+        self._pid_controllers = {}  # axis: PIDController
+        for axis in self._current_velocity.keys():
+            self._pid_controllers[axis] = PIDController(
                 kp=1.0, ki=0.1, kd=0.01, max_output=90, max_rate_of_change=180
             )
-        self.control_loop_frequency = 10  # Hz
-        self.last_time = time_ms()
+        self._control_loop_frequency = 10  # Hz
+        self._last_time = time_ms()  # time the last control loop iteration was executed in ms
+        self._last_current_velocity_update = 0  # time of last current velocity update in ms
+        self._last_target_velocity_update = 0  # time of last target velocity update in ms
 
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector
@@ -46,8 +51,8 @@ class ROVState:
         """
         mix = {
             "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "front_right_horizontal": target_velocity.x - target_velocity.y - target_velocity.yaw,
-            "back_left_horizontal": target_velocity.x - target_velocity.y + target_velocity.yaw,
+            "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
+            "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
             "back_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
             "left_vertical": target_velocity.z + target_velocity.roll,
             "right_vertical": target_velocity.z - target_velocity.roll,
@@ -59,26 +64,57 @@ class ROVState:
 
         return mix
 
+    def set_current_velocity(self, velocity: VelocityVector):
+        """Set current velocity.
+
+        Args:
+            velocity (VelocityVector): current velocity
+        """
+        self._current_velocity = velocity
+        self._last_current_velocity_update = time_ms()
+
+    def set_target_velocity(self, velocity: VelocityVector):
+        """Set target velocity.
+
+        Args:
+            velocity (VelocityVector): target velocity
+        """
+        self._target_velocity = velocity
+        self._last_target_velocity_update = time_ms()
+
     async def control_loop(self):
         """Control loop."""
-        # get current velocity
-        # TODO: get current velocity from sensors
+        loop_period = 1000 / self._control_loop_frequency  # ms
+        while True:
+            dt = (time_ms() - self._last_time) / 1000
+            # update last time
+            self._last_time = time_ms()
 
-        dt = time_ms() - self.last_time
-        # sleep until next control loop iteration
-        await asyncio.sleep(1 / self.control_loop_frequency - dt / 1000)
+            if time_ms() - self._last_target_velocity_update > 2 * loop_period:
+                # target velocity is stale, stop ROV
+                self._target_velocity = VelocityVector()
 
-        output_velocity = VelocityVector()
-        for axis, controller in self.pid_controllers.items():
-            # get error
-            error = self.target_velocity[axis] - self.current_velocity[axis]
-            # get output
-            output_velocity[axis] = controller.update(error, dt)
+            if time_ms() - self._last_current_velocity_update <= 2 * loop_period:
+                # current velocity is not stale, use PID controller
+                output_velocity = VelocityVector()
+                for axis, controller in self._pid_controllers.items():
+                    error = self._target_velocity[axis] - self._current_velocity[axis]
+                    output_velocity[axis] = controller.update(error, dt)
+            else:
+                # controller bypass. uses target velocity directly.
+                output_velocity = self._target_velocity
 
-        # translate output velocity to thruster mix
-        thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
-        for name, value in thruster_mix.items():
-            await self.thrusters[name].set_val(value)
+            # translate output velocity to thruster mix
+            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
+            thruster_tasks = [
+                self.thrusters[name].set_val(value) for name, value in thruster_mix.items()
+            ]
+            await asyncio.gather(*thruster_tasks)
 
-        # update last time
-        self.last_time = time_ms()
+            # sleep until next control loop iteration
+            if (time_ms() - self._last_time) < loop_period:
+                await asyncio.sleep(
+                    (1 / self._control_loop_frequency) - (time_ms() - self._last_time) / 1000
+                )
+            else:
+                logging.warning("Control loop iteration took too long.")

@@ -27,3 +27,5 @@ max-statements = 50
 # Maximum number of attributes for a class (see R0902).
 max-attributes=11
 
+[MASTER]
+extension-pkg-whitelist=numpy,pygame

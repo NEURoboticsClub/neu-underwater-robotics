@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from time import time_ns
 
 
@@ -25,7 +25,10 @@ def linear_map(
 
 @dataclass
 class VelocityVector:
-    """Represents a velocity vector in 3D space."""
+    """Represents a velocity vector in 3D space. Standard 3D right handed coordinate system.
+    The vehicle is parallel to the xy plane, pointed to +y.
+    yaw is about the z axis, pitch is about the x axis, roll is about the y axis.
+    """
 
     x: float = 0.0
     y: float = 0.0
@@ -34,21 +37,36 @@ class VelocityVector:
     pitch: float = 0.0
     roll: float = 0.0
 
+    def __init__(self, vals: dict[str, float] | None = None):
+        if vals is not None:
+            for key, value in vals.items():
+                setattr(self, key, value)
+
     def __getitem__(self, key):
         return asdict(self)[key]
 
     def __setitem__(self, key, value):
         asdict(self)[key] = value
 
-    @classmethod
-    def keys(cls):
-        return asdict(cls()).keys()
+    def keys(self):
+        """Return keys."""
+        return asdict(self).keys()
+
+    def __dict__(self):
+        return asdict(self)
 
 
 class PIDController:
     """Generic PID Controller"""
 
-    def __init__(self, kp: float, ki: float, kd: float, max_output: float = 90, max_rate_of_change: float = 180):
+    def __init__(
+        self,
+        kp: float,
+        ki: float,
+        kd: float,
+        max_output: float = 90,
+        max_rate_of_change: float = 180,
+    ):
         """
         Args:
             kp (float): proportional gain
