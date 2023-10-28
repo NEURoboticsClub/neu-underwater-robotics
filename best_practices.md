@@ -10,6 +10,6 @@ We aren't too strict about following this down to the letter, but try to stick t
 
 ## Code Style:
 - We use Python, so follow [PEP8](https://peps.python.org/pep-0008/). Line length of 100 characters is fine.
-- Also encouraged to use an autoformatter such as [black](https://github.com/psf/black) and a linter such as [flake8](https://flake8.pycqa.org/en/latest/) or similar.
+- Also encouraged to use an autoformatter such as [black](https://github.com/psf/black) and a linter such as [pylint](https://github.com/pylint-dev/pylint) or similar.
 - Docstrings are encouraged but not required for all public functions. [Google style docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) are preferred.
 - General good coding practices such as descriptive variable names, comments, etc. are encouraged.
