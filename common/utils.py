@@ -20,7 +20,7 @@ def linear_map(
     Returns:
         float: mapped value
     """
-    return min(max(((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min), -5), 5)
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
 @dataclass
@@ -52,8 +52,9 @@ class VelocityVector:
         """Return keys."""
         return asdict(self).keys()
 
-    def __dict__(self):
-        return asdict(self)
+    def to_dict(self):
+        """Return dict representation. Rounds values to 3 decimal places."""
+        return {k: round(v, 3) for k, v in asdict(self).items()}
 
 
 class PIDController:

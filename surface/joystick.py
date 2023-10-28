@@ -3,7 +3,9 @@ from typing import Generic, TypeVar
 
 import pygame
 
-from common.utils import VelocityVector # pylint: disable=import-error
+from common import utils
+
+VelocityVector = utils.VelocityVector
 
 T = TypeVar("T")  # Generic type
 
@@ -75,7 +77,7 @@ class Hat(JoyItem[tuple[float, float]]):
         return (self.up, self.right)
 
 
-class Controller:
+class Controller(ABC):
     """Controller class to represent any joystick."""
 
     def __init__(self, joy_id: int):
@@ -147,10 +149,11 @@ class XBoxDriveController(Controller):
         }
 
     def get_velocity_vector(self) -> VelocityVector:
+        """get the desired velocity vector from joystick values"""
+        pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
         vec = VelocityVector()
         # TODO: control scheme goes here
-
         return vec
 
 
