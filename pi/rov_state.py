@@ -1,14 +1,14 @@
 import asyncio
 import logging
 
-from hardware import Actuator, Sensor
+from common import utils
 
-from common.utils import (  # pylint: disable=line-too-long, import-error
-    PIDController,
-    VelocityVector,
-    linear_map,
-    time_ms,
-)
+from .hardware import Actuator, Sensor
+
+PIDController = utils.PIDController
+VelocityVector = utils.VelocityVector
+time_ms = utils.time_ms
+linear_map = utils.linear_map
 
 
 class ROVState:
@@ -67,9 +67,9 @@ class ROVState:
             "right_vertical": target_velocity.z - target_velocity.roll,
         }
 
-        # normalize mix, map it to [-1, 1]
+        # cap value to [-1, 1]
         for name, value in mix.items():
-            mix[name] = linear_map(value, -3, -3, -1, 1)
+            mix[name] = max(min(value, 1), -1)
 
         return mix
 
@@ -111,10 +111,12 @@ class ROVState:
                     output_velocity[axis] = controller.update(error, dt)
             else:
                 # controller bypass. uses target velocity directly.
+                # logging.warning("Current velocity is stale, using target velocity directly.")
                 output_velocity = self._target_velocity
 
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
+            print(thruster_mix)
             thruster_tasks = [
                 self.thrusters[name].set_val(value) for name, value in thruster_mix.items()
             ]

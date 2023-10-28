@@ -2,8 +2,10 @@ import asyncio
 from abc import ABC, abstractmethod
 
 from pyfirmata import Pin
-from utils import linear_map
 
+from common import utils
+
+linear_map = utils.linear_map
 
 class Sensor(ABC):
     """Abstract sensor class."""
@@ -18,8 +20,7 @@ class Sensor(ABC):
 class Actuator(ABC):
     """Abstract actuator class."""
 
-    @classmethod
-    def linear_map(cls, _: float):
+    def linear_map(self, _: float):
         """map value to actuator value"""
 
     @abstractmethod
@@ -41,8 +42,7 @@ class Stepper(Actuator):
         self.speed = 0  # rev / s
         self.lock = asyncio.Lock()
 
-    @classmethod
-    def linear_map(cls, x: float):
+    def linear_map(self, x: float):
         return int(linear_map(x, -50, 50, -5, 5))
 
     async def set_val(self, val: int):
@@ -88,14 +88,14 @@ class Servo(Actuator):
         self.angle = 90
         self.lock = asyncio.Lock()
 
-    @classmethod
-    def linear_map(cls, x: float):
+    def linear_map(self, x: float):
         """no mapping needed"""
         # return int(linear_map(x, 0, 180, 0, 180))
         return int(x)
 
     async def set_val(self, val: int):
         """set angle of servo motor in degrees"""
+        val = self.linear_map(val)
         if val < 0 or val > 180:
             raise ValueError("Angle must be between 0 and 180")
         async with self.lock:
@@ -111,16 +111,16 @@ class Servo(Actuator):
 
 class Thruster(Servo):
     """Thruster class."""
+
     active_range: tuple
 
     def __init__(self, pin: Pin, active_range: tuple = (30, 150)):
         super().__init__(pin)
         self.active_range = active_range
 
-    @classmethod
-    def linear_map(cls, x: float):
+    def linear_map(self, x: float):
         """map value to thruster value"""
-        return int(linear_map(x, -1, 1, cls.active_range[0], cls.active_range[1]))
+        return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
 
 
 class LinActuator(Actuator):
@@ -131,8 +131,7 @@ class LinActuator(Actuator):
         self.pos = 0
         self.lock = asyncio.Lock()
 
-    @classmethod
-    def linear_map(cls, x: float):
+    def linear_map(self, x: float):
         """no mapping needed"""
         # return int(linear_map(x, 0, 180, 0, 180))
         return int(x)

@@ -1,16 +1,23 @@
 import asyncio
 import json
+import os
 
 import pyfirmata
-from hardware import Actuator, LinActuator, Servo, Stepper, Thruster
 from pyfirmata import Pin
-from rov_state import ROVState
-from utils import VelocityVector, time_ms
+
+from common import utils
+
+from .hardware import Servo, Thruster
+from .rov_state import ROVState
 
 SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
-STEPS_PER_REV = 200
+
+if os.environ.get("SIM"):
+    from .sim_hardware import SimThruster
+
+    SERVER_IP = "127.0.0.1"
 
 
 class Server:
@@ -20,23 +27,40 @@ class Server:
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
         self.tasks = []
-        self._init_firmata()
         self.last_msg = ""
-        self.last_update = time_ms()
-        self.rov_state = ROVState(
-            actuators={
-                "servo": Servo(self._get_pin(12, "s")),
-            },
-            thrusters={
-                "front_left_horizontal": Thruster(self._get_pin(4, "s")),
-                "front_right_horizontal": Thruster(self._get_pin(5, "s")),
-                "back_left_horizontal": Thruster(self._get_pin(6, "s")),
-                "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                "left_vertical": Thruster(self._get_pin(8, "s")),
-                "right_vertical": Thruster(self._get_pin(9, "s")),
-            },
-            sensors={},
-        )
+        self.last_update = utils.time_ms()
+        if not os.environ.get("SIM"):
+            self._init_firmata()
+            self.rov_state = ROVState(
+                actuators={
+                    "servo": Servo(self._get_pin(12, "s")),
+                },
+                thrusters={
+                    "front_left_horizontal": Thruster(self._get_pin(4, "s")),
+                    "front_right_horizontal": Thruster(self._get_pin(5, "s")),
+                    "back_left_horizontal": Thruster(self._get_pin(6, "s")),
+                    "back_right_horizontal": Thruster(self._get_pin(7, "s")),
+                    "left_vertical": Thruster(self._get_pin(8, "s")),
+                    "right_vertical": Thruster(self._get_pin(9, "s")),
+                },
+                sensors={},
+            )
+        else:
+            print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
+            if input() != "YES":
+                raise RuntimeError("Simulation mode not confirmed")
+            self.rov_state = ROVState(
+                actuators={},
+                thrusters={
+                    "front_left_horizontal": SimThruster(4),
+                    "front_right_horizontal": SimThruster(5),
+                    "back_left_horizontal": SimThruster(6),
+                    "back_right_horizontal": SimThruster(7),
+                    "left_vertical": SimThruster(8),
+                    "right_vertical": SimThruster(9),
+                },
+                sensors={},
+            )
         self.tasks.append(self.rov_state.control_loop())
         self.tasks.extend(self.rov_state.get_tasks())
 
@@ -78,10 +102,9 @@ class Server:
         msg = (await reader.read(1024)).decode("utf-8")
         print(f"received first message: {msg}")
         while msg:
-            print(f"from handle_client: {msg=}")
             async with self.lock:
                 self.last_msg = msg
-                self.last_update = time_ms()
+                self.last_update = utils.time_ms()
             msg = (await reader.read(1024)).decode("utf-8")
         print("client disconnected, closing parser")
 
@@ -103,7 +126,9 @@ class Server:
                 continue
 
             if "target_velocity" in json_msg:
-                self.rov_state.set_target_velocity(VelocityVector(json_msg["target_velocity"]))
+                self.rov_state.set_target_velocity(
+                    utils.VelocityVector(json.loads(json_msg["target_velocity"]))
+                )
 
 
 if __name__ == "__main__":
