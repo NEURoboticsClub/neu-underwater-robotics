@@ -1,0 +1,31 @@
+# use verbose names if possible for clarity i.e. "missing-module-docstring" over "C0114"
+
+[MESSAGES CONTROL]
+disable = missing-module-docstring, too-few-public-methods
+
+[BASIC]
+good-names = x,y,i,j,k,ex,Run,_
+
+include-naming-hint=yes
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args = 9
+
+# Maximum number of locals for function / method body
+max-locals = 19
+
+# Maximum number of return / yield for function / method body
+max-returns=11
+
+# Maximum number of branch for function / method body
+max-branches = 20
+
+# Maximum number of statements in function / method body
+max-statements = 50
+
+# Maximum number of attributes for a class (see R0902).
+max-attributes=11
+
+[MASTER]
+extension-pkg-whitelist=numpy,pygame,pyfirmata
