@@ -25,7 +25,7 @@ Please follow this [comprehensive guides](https://docs.github.com/en/authenticat
 For Mac/Linux: No action needed. Open terminal and type `python3 --version` and make sure the version is >= 3.10. If you need to update your version, follow the instructions on the [python website](https://wiki.python.org/moin/BeginnersGuide/Download) \
 For Windows: I recommend installing [Anaconda](https://www.anaconda.com/download) which is a package manager and virtual environment manager for Python. After downloading anaconda, open `Anaconda Powershell Prompt` from the start menu, and run the following commands:
 ```
-conda create --name marine-robotics --python=3.10
+conda create --name marine-robotics python=3.10
 conda activate marine-robotics
 ```
 Note: [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is absolutely fantastic for most python development on windows, but pygame has trouble finding the USB controller when run using WSL.
