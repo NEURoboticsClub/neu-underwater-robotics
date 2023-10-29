@@ -58,6 +58,7 @@ class Axis(JoyItem[float]):
 
     def get_joy_val(self) -> float:
         return self.val
+    
 
 
 class Hat(JoyItem[tuple[float, float]]):
@@ -147,6 +148,9 @@ class XBoxDriveController(Controller):
             "left_trigger": self._axes[2],
             "right_trigger": self._axes[5],
         }
+        self._hats_dict = { 
+            "dpad" : self._hats[0]
+        }
 
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
@@ -154,6 +158,44 @@ class XBoxDriveController(Controller):
         self._poll()  # get current joystick values
         vec = VelocityVector()
         # TODO: control scheme goes here
+        x_vel = self.axis_dict.get("right_x") 
+        y_vel = self.axis_dict.get("right_y") 
+        z_vel = self.axis_dict.get("left_y") 
+        yaw = 0
+        # when trigger is -1, yaw is 0
+        # when trigger is 0, yaw is 0.5
+        # when trigger is 1, yaw is 1
+        if self._axis_dict.get("right_trigger") > -1 :
+            yaw = (self._axis_dict.get("right_trigger") + 1) / 0.5
+
+        if self._axis_dict.get("left_trigger") > -1 :
+            yaw = (self._axis_dict.get("left_trigger") - 1) / 0.5
+
+        pitch = 0 
+        roll = 0
+        
+        if self.hats_dict.get("dpad").up > 0 :
+            pitch = 0.5
+        if self._hats_dict.get("dpad").up < 0 :
+            pitch = -0.5
+        if self._hats_dict.get("dpad").right > 0 :
+            roll = 0.5
+        if self._hats_dict.get("dpad").right < 0 :
+            roll = -0.5
+
+        vec.__setitem__("x", x_vel)
+        vec.__setitem__("y", y_vel)
+        vec.__setitem__("z", z_vel)
+        vec.__setitem__("yaw", yaw)
+        vec.__setitem__("pitch", pitch)
+        vec.__setitem__("roll", roll)
+        print("x: " +  x_vel)
+        print("y: " +  y_vel)
+        print("z: " +  z_vel)
+        print("yaw: " +  yaw)
+        print("pitch: " +  pitch)
+        print("roll: " +  roll)
+
         return vec
 
 
