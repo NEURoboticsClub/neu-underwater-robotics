@@ -154,6 +154,20 @@ class XBoxDriveController(Controller):
         self._poll()  # get current joystick values
         vec = VelocityVector()
         # TODO: control scheme goes here
+
+        vec["y"] = self.axis_dict["right_y"].get_joy_val()
+        vec["x"] = self.axis_dict["right_x"].get_joy_val()
+
+        vec["z"] = self.axis_dict["left_y"].get_joy_val()
+        vec["yaw"] = self.axis_dict["right_y"].get_joy_val()
+
+        if self.buttons_dict["RB"] and not self.buttons_dict["LB"]:
+            vec["roll"] = 1.0
+        if not self.buttons_dict["RB"] and self.buttons_dict["LB"]:
+            vec["roll"] = -1.0
+        else:
+            vec["roll"] = 0.0
+
         return vec
 
 

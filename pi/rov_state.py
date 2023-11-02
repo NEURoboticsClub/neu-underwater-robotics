@@ -68,8 +68,10 @@ class ROVState:
         }
 
         # cap value to [-1, 1]
-        for name, value in mix.items():
-            mix[name] = max(min(value, 1), -1)
+        # for name, value in mix.items():
+        #     mix[name] = max(min(value, 1), -1)
+
+        mix = {name : max(min(value, 1), -1) for name, value in mix.items()}
 
         return mix
 
