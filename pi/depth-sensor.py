@@ -32,23 +32,32 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print("Sensor could not be initialized")
         exit(1)
 
-    #store target height as a variable
-    #come up with target velocity based on current velocity, 
-    #target height and target depth
-    #hardcode velocity scalar proportional to where we are and
-    #where we want to be, in rov_state.py
-    #might have to store a couple of depth values
-    #pop off end and stack with list- queue, need to be able to 
-    #average the whole thing
-    #init param! 
-    #send over to rov_state, rov_state only has the height setpoint
-    #get vector down from top, pick some scalar (whatever speaks to you emotionally)
-    #change it by that much based on the message you get
+    # store target height as a variable
+    # come up with target velocity based on current velocity, 
+    # target height and target depth
+    # hardcode velocity scalar proportional to where we are and
+    # where we want to be, in rov_state.py
+    # might have to store a couple of depth values
+    # pop off end and stack with list- queue, need to be able to 
+    # average the whole thing
+    # init param! 
+    # send over to rov_state, rov_state only has the height setpoint
+    # get vector down from top, pick some scalar (whatever speaks to you emotionally)
+    # change it by that much based on the message you get
+
+    depth_list = []
+    depth_list_length = 10
 
     while True:
+        # appends the newest depth to the depth list
+        # pops off the oldest if there are enough values
         depth = read_depth(sensor)
+        depth_list.append(depth)
+        if len(depth_list) >= depth_list_length:
+            depth_list.pop(0)
+
         msg = {
-            "depth": json.dumps(depth.to_dict()),
+            "depth": json.dumps(depth_list.to_dict()),
         }
         s.send(str.encode(json.dumps(msg)))
         print(f"sent: {msg}")

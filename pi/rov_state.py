@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import numpy as np
 
 from common import utils
 
@@ -38,6 +39,9 @@ class ROVState:
         self._last_time = time_ms()  # time the last control loop iteration was executed in ms
         self._last_current_velocity_update = 0  # time of last current velocity update in ms
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
+        self._current_depth = 0 # current depth of ROV
+        self._target_depth = 0 # target depth for ROV
+        self._z_sensitivity = 0.0001 # how much the z changes with controller input
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -51,8 +55,8 @@ class ROVState:
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector
     ) -> dict[str, float]:
-        """Translate target velocity to thruster mix.
-
+        """
+        Translate target velocity to thruster mix.
         Args:
             target_velocity (VelocityVector): target velocity
         Returns:
@@ -74,13 +78,22 @@ class ROVState:
         return mix
 
     def set_current_velocity(self, velocity: VelocityVector):
-        """Set current velocity.
-
+        """
+        Set current velocity.
         Args:
             velocity (VelocityVector): current velocity
         """
         self._current_velocity = velocity
         self._last_current_velocity_update = time_ms()
+
+    def set_current_depth(self, recent_depths):
+        """
+        Set current depth by averaging previous 10 values
+        Args: 
+            recent_depths (List[float]): Lsit of the most recent depths
+        """
+        self._current_depth = np.avg(recent_depths)
+
 
     def set_target_velocity(self, velocity: VelocityVector):
         """Set target velocity.
@@ -91,8 +104,6 @@ class ROVState:
         self._target_velocity = velocity
         self._last_target_velocity_update = time_ms()
     
-    def set_target_depth(self, depth):
-
 
     async def control_loop(self):
         """Control loop."""
@@ -101,6 +112,12 @@ class ROVState:
             dt = (time_ms() - self._last_time) / 1000
             # update last time
             self._last_time = time_ms()
+
+            if -0.1 < self._target_velocity.z < 0.1:
+                self._target_depth -= self._target_velocity.z * self._z_sensitivity
+                # test different sensitivities and potentially functions
+                if self._target_depth > 1 and self._current_depth > 1:
+                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
 
             if time_ms() - self._last_target_velocity_update > 2 * loop_period:
                 # target velocity is stale, stop ROV
@@ -117,8 +134,6 @@ class ROVState:
                 # logging.warning("Current velocity is stale, using target velocity directly.")
                 output_velocity = self._target_velocity
             
-            if -0.1 < output_velocity.z < 0.1:
-                
 
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
