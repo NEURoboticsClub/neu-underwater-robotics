@@ -11,11 +11,12 @@ CONTROL_LOOP_FREQ = 100  # Hz
 # Print readings
 def read_depth(self, sensor):        
         if sensor.read():
-                print(("P: %0.1f mbar  %0.3f psi\tT: %0.2f C  %0.2f F") % (
+                print(("P: %0.1f mbar  %0.3f psi\tDepth: %0.3f\tT: %0.2f C  %0.2f F") % 
                 sensor.pressure(), # Default is mbar (no arguments)
                 sensor.pressure(ms5837.UNITS_psi), # Request psi
+                sensor.depth(),
                 sensor.temperature(), # Default is degrees C (no arguments)
-                sensor.temperature(ms5837.UNITS_Farenheit))) # Request Farenheit
+                sensor.temperature(ms5837.UNITS_Farenheit)) # Request Farenheit
         else:
                 print("Sensor read failed!")
                 exit(1)
@@ -30,7 +31,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     if not sensor.init():
         print("Sensor could not be initialized")
         exit(1)
-        
+
+    #store target height as a variable
+    #come up with target velocity based on current velocity, 
+    #target height and target depth
+    #hardcode velocity scalar proportional to where we are and
+    #where we want to be, in rov_state.py
+    #might have to store a couple of depth values
+    #pop off end and stack with list- queue, need to be able to 
+    #average the whole thing
+    #init param! 
+    #send over to rov_state, rov_state only has the height setpoint
+    #get vector down from top, pick some scalar (whatever speaks to you emotionally)
+    #change it by that much based on the message you get
+
     while True:
         depth = read_depth(sensor)
         msg = {

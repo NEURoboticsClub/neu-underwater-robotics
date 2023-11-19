@@ -90,6 +90,9 @@ class ROVState:
         """
         self._target_velocity = velocity
         self._last_target_velocity_update = time_ms()
+    
+    def set_target_depth(self, depth):
+
 
     async def control_loop(self):
         """Control loop."""
@@ -113,6 +116,9 @@ class ROVState:
                 # controller bypass. uses target velocity directly.
                 # logging.warning("Current velocity is stale, using target velocity directly.")
                 output_velocity = self._target_velocity
+            
+            if -0.1 < output_velocity.z < 0.1:
+                
 
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
