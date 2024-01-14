@@ -2,7 +2,7 @@ from PIL import Image
 from io import BytesIO
 
 
-class Camera:
+class Camera: # use for testing, displays mate logo
     def __init__(self, port):
         img = Image.open('nuwave.jpg')
         file_object = BytesIO()
