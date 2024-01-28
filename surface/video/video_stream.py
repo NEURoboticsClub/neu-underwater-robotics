@@ -6,7 +6,7 @@ from io import BytesIO
 from base64 import b64encode
 from PIL import Image
 
-from camera import Camera
+from surface.video.gui.camera import Camera
 # from mock_camera import Camera
 
 app = Flask(__name__)
