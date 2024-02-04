@@ -8,7 +8,7 @@
       .grid-container {
         display: grid;
         grid-template-columns: repeat(2, 1fr); /* Two columns with equal width */
-        grid-template-rows: repeat(2, 340px); /* Two rows with fixed height of 100px */
+        grid-template-rows: repeat(2, 250px); /* Two rows with fixed height of 100px */
         gap: 0px; /* Add some gap between grid items */
       }
 
@@ -25,6 +25,13 @@
             max-height: 100%;
             object-fit: cover; /* Ensure the image scales and covers the entire grid item */
         }
+
+        /* Style for the description box */
+      .description-box {
+        margin-top: 20px; /* Add some margin to separate the grid and description box */
+        padding: 40px; /* Adjust padding for a larger description box */
+        background-color: #f0f0f0; /* Add a background color for better visibility */
+      }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   </head>
@@ -49,8 +56,9 @@
 
 <!-- Box with description text -->
 <div class="description-box">
-  <p>This is a description text for the grid items.</p>
+  <p>src="{{ url_for('depth_route') }}"</p>
 </div>
+
 
 
   </body>

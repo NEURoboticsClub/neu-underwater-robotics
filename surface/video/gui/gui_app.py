@@ -5,10 +5,12 @@ from flask import Flask, render_template, send_file, Response
 from mock_camera import Camera  # Assuming your Camera class is defined in a file named camera.py
 from PIL import Image
 import io
+from mock_depth_sensor import Depth_Sensor
 
 app = Flask(__name__)
 
 camera = Camera(port=8080)  # Adjust the port as needed
+depth_sensor = Depth_Sensor
 
 # sends camera bytes as a file 
 @app.route('/image_route')
@@ -22,6 +24,10 @@ def split_view() :
 @app.route('/single_view/<int:camera_id>')
 def single_view(camera_id):
 	return render_template('single_view.html')
+
+@app.route('/depth_route')
+def depth_route() :
+	return depth_sensor.read_depth()
 
 
 if __name__ == '__main__':
