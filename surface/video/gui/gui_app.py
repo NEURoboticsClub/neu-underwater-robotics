@@ -10,7 +10,7 @@ from mock_depth_sensor import Depth_Sensor
 app = Flask(__name__)
 
 camera = Camera(port=8080)  # Adjust the port as needed
-depth_sensor = Depth_Sensor
+
 
 # sends camera bytes as a file 
 @app.route('/image_route')
@@ -19,7 +19,10 @@ def image_route():
 
 @app.route('/')
 def split_view() :
-	return render_template('split_view.html')
+	depth_sensor = Depth_Sensor
+	depth = depth_sensor.read_depth()
+	return render_template('split_view.html', data=depth)
+
 
 @app.route('/single_view/<int:camera_id>')
 def single_view(camera_id):
@@ -27,7 +30,10 @@ def single_view(camera_id):
 
 @app.route('/depth_route')
 def depth_route() :
-	return depth_sensor.read_depth()
+	depth_sensor = Depth_Sensor
+	depth = depth_sensor.read_depth()
+	print(depth)
+	return render_template('split_view.html', data=depth)
 
 
 if __name__ == '__main__':

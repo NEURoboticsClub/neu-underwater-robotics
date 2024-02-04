@@ -5,14 +5,12 @@ import time
 
 class Depth_Sensor :
 
-    HOST = "192.168.0.102"  # The server's hostname or IP address
-    PORT = 2049  # The port used by the server
-    CONTROL_LOOP_FREQ = 100  # Hz
-
-    # Print readings
-    def read_depth(self, sensor):     
+    def read_depth():
+        
         msg = {
-            "Depth": "100 Leagues Under The Sea"
+            "Depth": 10000
         }
         return msg
+
+   
            
