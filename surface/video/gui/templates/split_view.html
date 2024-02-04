@@ -31,19 +31,28 @@
   <body>
     <!-- Create a 2x2 grid using the specified classes -->
     <div class="grid-container">
-      <a href="{{ url_for("single_view", camera_id = 1 )}}" class="grid-item">
-          <img src="{{ url_for('video_feed') }}" alt="Image 1">
+      <!-- When clicked will reroute to single_view --> 
+      <a href="{{ url_for("single_view", camera_id=1) }}" class="grid-item">  
+        <!-- Gets file from the image_route -->
+        <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
       </a>
-      <a href="{{ url_for("single_view", camera_id = 2 )}}" class="grid-item">
-          <img src="{{ url_for('video_feed') }}" alt="Image 2">
+      <a href="{{ url_for("single_view", camera_id=2) }}" class="grid-item">
+        <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
       </a>
-      <a href="{{ url_for("single_view", camera_id = 3 )}}" class="grid-item">
-          <img src="{{ url_for('video_feed') }}" alt="Image 3">
+      <a href="{{ url_for("single_view", camera_id=3) }}" class="grid-item">
+        <img src="{{ url_for('image_route', camera_id=3) }}" alt="Image 3">
       </a>
-      <a href="{{ url_for("single_view", camera_id = 4 )}}" class="grid-item">
-          <img src="{{ url_for('video_feed') }}" alt="Image 4">
+      <a href="{{ url_for("single_view", camera_id=4) }}" class="grid-item">
+        <img src="{{ url_for('image_route', camera_id=4) }}" alt="Image 4">
       </a>
-  </div>
+</div>
+
+<!-- Box with description text -->
+<div class="description-box">
+  <p>This is a description text for the grid items.</p>
+</div>
+
+
   </body>
 </html>
 

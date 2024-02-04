@@ -4,7 +4,7 @@ from io import BytesIO
 
 class Camera:
     def __init__(self, port):
-        img = Image.open('nuwave.jpg')
+        img = Image.open('./nuwave.jpg')
         file_object = BytesIO()
         img = img.convert('RGB')
         img.save(file_object, 'JPEG')
