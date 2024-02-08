@@ -152,8 +152,23 @@ class XBoxDriveController(Controller):
         """get the desired velocity vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        vec = VelocityVector()
-        # TODO: control scheme goes here
+        vec = VelocityVector("left_x", "left_y", "B" - "X", "right_x", "right_y", "Y" - "A")
+        values = {
+            'a': 1 if "A".get_joy_val else 0,
+            'b': 1 if "B".get_joy_val else 0,
+            'x': 1 if "X".get_joy_val else 0,
+            'y': 1 if "Y".get_joy_val else 0,
+            'lr': "left_x".get_joy_val,
+            'ud': "left_y".get_joy_val,
+            'yaw': "right_x".get_joy_val,
+            'pitch': "right_y".get_joy_val
+        }
+        vec.x = values.get('lr')
+        vec.y = values.get('ud')
+        vec.z = values.get('b') - values.get('x')
+        vec.yaw = values.get('yaw')
+        vec.pitch = values.get('pitch')
+        vec.roll = values.get('y') - values.get('a')
         return vec
 
 
