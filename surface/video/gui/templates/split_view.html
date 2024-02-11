@@ -41,7 +41,7 @@
       <!-- When clicked will reroute to single_view --> 
       <a href="{{ url_for("single_view", camera_id=1) }}" class="grid-item">  
         <!-- Gets file from the image_route -->
-        <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
+        <img src="{{ url_for('image_route', camera_id=1) }}" alt="Image 1">
       </a>
       <a href="{{ url_for("single_view", camera_id=2) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
@@ -56,7 +56,7 @@
 
 <!-- Box with description text -->
 <div class="description-box">
-  <p>{{ data }}</p>
+  <p> Depth = "{{ url_for('depth_route') }}" </p>
 </div>
 
   </body>
