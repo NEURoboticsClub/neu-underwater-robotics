@@ -11,7 +11,7 @@ import json
 
 app = Flask(__name__)
 
-depth_sensor = Depth_Sensor
+depth_sensor = Depth_Sensor()
 camera = Camera(port=8080)  # Adjust the port as needed
 
 def genImg():
@@ -26,7 +26,7 @@ def image_route():
 
 def genDepth():
     while True:
-       depth = Depth_Sensor.read_depth()
+       depth = depth_sensor.read_depth()
        yield f"data: {depth}\n\n"
 
 @app.route('/depth_route')
