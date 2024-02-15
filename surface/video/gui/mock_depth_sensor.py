@@ -9,22 +9,18 @@ class Depth_Sensor :
         
         self.whichDepth = True
 
-        self.depth1 = {
-            "Depth": 99999
-        }
-
-        self.depth2 = {
-            "Depth": 00000
-        }
+        self.depth1 = {"Depth": 99999}
+        self.depth2 = {"Depth": 00000}
 
     def read_depth(self):
 
-        if self.whichDepth :
+         if self.whichDepth:
              self.whichDepth = not self.whichDepth
-             return self.depth1
-        else :
+             return json.dumps(self.depth1)
+         else:
              self.whichDepth = not self.whichDepth
-             return self.depth2
+             return json.dumps(self.depth2)
+
         
         
    

@@ -54,9 +54,16 @@
       </a>
 </div>
 
-<!-- Box with description text -->
 <div class="description-box">
-  <p> Depth = "{{ url_for('depth_route') }}" </p>
+  <p id="depth-display"></p>
+  <script>
+      const eventSource = new EventSource("{{ url_for('depth_route') }}");
+    
+      eventSource.onmessage = function(event) {
+      document.getElementById('depth-display').innerHTML = event.data;
+    };
+  </script>
+  
 </div>
 
   </body>

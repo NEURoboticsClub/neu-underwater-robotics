@@ -3,9 +3,11 @@ from asyncio.constants import _SendfileMode
 from io import BytesIO
 from flask import Flask, render_template, send_file, Response
 from mock_camera import Camera  # Assuming your Camera class is defined in a file named camera.py
+from mock_depth_sensor import Depth_Sensor
 from PIL import Image
 import io
-from mock_depth_sensor import Depth_Sensor
+import json
+
 
 app = Flask(__name__)
 
@@ -17,15 +19,19 @@ def genImg():
        frame = camera.get_frame()
        yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
-def genDepth():
-    while True:
-       depth = depth_sensor.read_depth()
-       yield f"--frame\r\nContent-Type: text/plain\r\n\r\n{depth}\r\n".encode()
-
 # sends camera bytes as a file 
 @app.route('/image_route')
 def image_route():
     return Response(genImg(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+def genDepth():
+    while True:
+       depth = Depth_Sensor.read_depth()
+       yield f"data: {depth}\n\n"
+
+@app.route('/depth_route')
+def depth_route() :
+	return Response(genDepth(), mimetype='text/event-stream')
 
 @app.route('/')
 def split_view() :
@@ -35,9 +41,7 @@ def split_view() :
 def single_view(camera_id):
 	return render_template('single_view.html')
 
-@app.route('/depth_route')
-def depth_route() :
-	return Response(genDepth(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
