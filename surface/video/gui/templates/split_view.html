@@ -67,5 +67,148 @@
 </div>
 
   </body>
+
+
+  <head>
+    <title>Attitude</title>
+    <script src="js/attitude.js"></script>
+  </head>
+  
+  <body>
+    <canvas id="drawingCanvas" width="640" height="480"></canvas>
+  </body>
+
+  <script>
+  window.onload = function () {
+
+    let canvas = document.getElementById("drawingCanvas");
+    let context = canvas.getContext("2d");
+    
+    let run = function () {
+        drawAttitude(context, 320, 240, 30 * Math.sin(performance.now() / 2000), 45 * Math.sin(performance.now() / 5000), 200);
+    }
+
+    let interval = setInterval(run, 1000 / 60);
+};
+
+
+drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 100) {
+    //   :
+    if (pitch > 30) pitch = 30;
+    if (pitch < -30) pitch = -30;
+
+    if (roll > 45) roll = 45;
+    if (roll < -45) roll = -45;
+    //  :
+    roll *= Math.PI / 180;
+    pitch *= Math.PI / 180;
+    // ""  :
+    let vehicleSize = radius * 0.8;
+    ctx.font = Math.round(radius / 8) + "px Arial";
+    //    :
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "Black";
+    // :
+    ctx.beginPath();
+    ctx.arc(centreX, centreY, radius, 0, Math.PI, false);
+    ctx.fillStyle = "Maroon";
+    ctx.stroke();
+    ctx.fill();
+    // :
+    ctx.beginPath();
+    ctx.arc(centreX, centreY, radius, 0, Math.PI, true);
+    ctx.fillStyle = "SkyBlue";
+    ctx.stroke();
+    ctx.fill();
+    //"":
+    ctx.beginPath();
+    //:
+    let topSideIsVisible = (pitch >= 0);
+    ctx.strokeStyle = topSideIsVisible ? "Orange" : "Brown";
+    ctx.fillStyle = topSideIsVisible ? "Yellow" : "Red";
+    ctx.lineWidth = 3;
+    //
+    //  4 ,       ,
+    //  :
+    ctx.moveTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
+    ctx.lineTo(centreX + vehicleSize * Math.cos(roll), centreY + vehicleSize * Math.sin(roll) * Math.cos(pitch));
+    ctx.lineTo(centreX, centreY - 2 * Math.sin(pitch) * vehicleSize);
+    ctx.lineTo(centreX - vehicleSize * Math.cos(roll), centreY - vehicleSize * Math.sin(roll) * Math.cos(pitch));
+    ctx.lineTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
+    ctx.stroke();
+    ctx.fill();
+    // :
+    // :
+    ctx.beginPath();
+    ctx.strokeStyle = "Black";
+    ctx.fillStyle = "Black";
+    ctx.lineWidth = 1;
+    //:
+    ctx.fillText(30, centreX - radius * 0.28, centreY - vehicleSize + radius / 20);
+    ctx.fillText(20, centreX - radius * 0.28, centreY - vehicleSize * 0.684 + radius / 20);
+    ctx.fillText(10, centreX - radius * 0.28, centreY - vehicleSize * 0.348 + radius / 20);
+    // - :
+    ctx.moveTo(centreX - radius / 10, centreY - vehicleSize);
+    ctx.lineTo(centreX + radius / 10, centreY - vehicleSize);
+    ctx.stroke();
+
+    ctx.moveTo(centreX - radius / 10, centreY - vehicleSize * 0.684);
+    ctx.lineTo(centreX + radius / 10, centreY - vehicleSize * 0.684);
+    ctx.stroke();
+
+    ctx.moveTo(centreX - radius / 10, centreY - vehicleSize * 0.348);
+    ctx.lineTo(centreX + radius / 10, centreY - vehicleSize * 0.348);
+    ctx.stroke();
+    // :
+    ctx.beginPath();
+    ctx.strokeStyle = "White";
+    ctx.fillStyle = "White";
+    //:
+    ctx.fillText(30, centreX - radius * 0.28, centreY + vehicleSize + radius / 20);
+    ctx.fillText(20, centreX - radius * 0.28, centreY + vehicleSize * 0.684 + radius / 20);
+    ctx.fillText(10, centreX - radius * 0.28, centreY + vehicleSize * 0.348 + radius / 20);
+    // - :
+    ctx.moveTo(centreX - radius / 10, centreY + vehicleSize);
+    ctx.lineTo(centreX + radius / 10, centreY + vehicleSize);
+    ctx.stroke();
+
+    ctx.moveTo(centreX - radius / 10, centreY + vehicleSize * 0.684);
+    ctx.lineTo(centreX + radius / 10, centreY + vehicleSize * 0.684);
+    ctx.stroke();
+
+    ctx.moveTo(centreX - radius / 10, centreY + vehicleSize * 0.348);
+    ctx.lineTo(centreX + radius / 10, centreY + vehicleSize * 0.348);
+    ctx.stroke();
+
+    // :
+    ctx.lineWidth = 2;
+
+    //+-15 :
+    ctx.fillText(15, centreX + radius * 0.6, centreY + radius * 0.22);
+    ctx.moveTo(centreX + 0.966 * 0.8 * radius, centreY + 0.259 * 0.8 * radius);
+    ctx.lineTo(centreX + 0.966 * 0.95 * radius, centreY + 0.259 * 0.95 * radius);
+
+    ctx.fillText(15, centreX - radius * 0.75, centreY + radius * 0.22);
+    ctx.moveTo(centreX - 0.966 * 0.8 * radius, centreY + 0.259 * 0.8 * radius);
+    ctx.lineTo(centreX - 0.966 * 0.95 * radius, centreY + 0.259 * 0.95 * radius);
+
+    //+-30 :
+    ctx.moveTo(centreX + 0.866 * 0.8 * radius, centreY + 0.5 * 0.8 * radius);
+    ctx.lineTo(centreX + 0.866 * 0.95 * radius, centreY + 0.5 * 0.95 * radius);
+
+    ctx.moveTo(centreX - 0.866 * 0.8 * radius, centreY + 0.5 * 0.8 * radius);
+    ctx.lineTo(centreX - 0.866 * 0.95 * radius, centreY + 0.5 * 0.95 * radius);
+
+    //+-45 :
+    ctx.moveTo(centreX + 0.707 * 0.8 * radius, centreY + 0.707 * 0.8 * radius);
+    ctx.lineTo(centreX + 0.707 * 0.95 * radius, centreY + 0.707 * 0.95 * radius);
+
+    ctx.moveTo(centreX - 0.707 * 0.8 * radius, centreY + 0.707 * 0.8 * radius);
+    ctx.lineTo(centreX - 0.707 * 0.95 * radius, centreY + 0.707 * 0.95 * radius);
+
+    ctx.stroke();
+}
+
+</script>
 </html>
 
