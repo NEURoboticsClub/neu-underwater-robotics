@@ -120,6 +120,8 @@ class ROVState:
             thruster_tasks = [
                 self.thrusters[name].set_val(value) for name, value in thruster_mix.items()
             ]
+            for thruster_name, thruster in self.thrusters.items():
+                print(f"{thruster_name}: {thruster_mix[thruster_name]}")
             await asyncio.gather(*thruster_tasks)
 
             # sleep until next control loop iteration
