@@ -2,7 +2,7 @@ from asyncio import SendfileNotAvailableError
 from asyncio.constants import _SendfileMode
 from io import BytesIO
 from flask import Flask, render_template, send_file, Response
-from mock_camera import Camera  # Assuming your Camera class is defined in a file named camera.py
+from camera import Camera  # Assuming your Camera class is defined in a file named camera.py
 from mock_depth_sensor import Depth_Sensor
 from PIL import Image
 import io
@@ -44,7 +44,7 @@ def single_view(camera_id):
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=3000, debug=True)
+    app.run(host="0.0.0.0", port=3000, debug=True)
 
 
 # sends camera bytes as a file 
