@@ -12,7 +12,7 @@ import json
 app = Flask(__name__)
 
 depth_sensor = Depth_Sensor()
-camera = Camera(port=8080)  # Adjust the port as needed
+camera = Camera(port=5600)  # Adjust the port as needed
 
 def genImg():
     while True:

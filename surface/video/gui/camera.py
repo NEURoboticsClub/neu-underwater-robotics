@@ -50,6 +50,7 @@ class Camera:
             dtype=np.uint8,
         )
         self.frame_counter += 1
+        print("new frame")
         return Gst.FlowReturn.OK
 
     def get_frame(self) -> bytes:
