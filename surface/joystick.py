@@ -154,6 +154,9 @@ class XBoxDriveController(Controller):
         self._poll()  # get current joystick values
         vec = VelocityVector()
         # TODO: control scheme goes here
+        vec.x = self.axis_dict["left_x"].get_joy_val()
+        vec.y = self.axis_dict["left_y"].get_joy_val()
+        vec.z = self.axis_dict["right_x"].get_joy_val()
 
         return vec
 
