@@ -85,14 +85,14 @@
     let context = canvas.getContext("2d");
     
     let run = function () {
-        drawAttitude(context, 320, 240, 30 * Math.sin(performance.now() / 2000), 45 * Math.sin(performance.now() / 5000), 200);
+        drawAttitude(context, 320, 240, 30 * Math.sin(20), 45 * Math.sin(50), 200); // THIS IS WHERE WE WILL WANT TO INPUT IMU DATA
     }
 
     let interval = setInterval(run, 1000 / 60);
 };
 
 
-drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 100) {
+drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 50) {
     //   :
     if (pitch > 30) pitch = 30;
     if (pitch < -30) pitch = -30;
@@ -104,19 +104,19 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 100) {
     pitch *= Math.PI / 180;
     // ""  :
     let vehicleSize = radius * 0.8;
-    ctx.font = Math.round(radius / 8) + "px Arial";
+    ctx.font = Math.round(radius / 10) + "px Arial";
     //    :
     ctx.lineWidth = 2;
     ctx.strokeStyle = "Black";
     // :
     ctx.beginPath();
-    ctx.arc(centreX, centreY, radius, 0, Math.PI, false);
-    ctx.fillStyle = "Maroon";
+    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll, false);
+    ctx.fillStyle = "DarkBlue";
     ctx.stroke();
     ctx.fill();
     // :
     ctx.beginPath();
-    ctx.arc(centreX, centreY, radius, 0, Math.PI, true);
+    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll, true);
     ctx.fillStyle = "SkyBlue";
     ctx.stroke();
     ctx.fill();
@@ -130,13 +130,13 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 100) {
     //
     //  4 ,       ,
     //  :
-    ctx.moveTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
-    ctx.lineTo(centreX + vehicleSize * Math.cos(roll), centreY + vehicleSize * Math.sin(roll) * Math.cos(pitch));
-    ctx.lineTo(centreX, centreY - 2 * Math.sin(pitch) * vehicleSize);
-    ctx.lineTo(centreX - vehicleSize * Math.cos(roll), centreY - vehicleSize * Math.sin(roll) * Math.cos(pitch));
-    ctx.lineTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
-    ctx.stroke();
-    ctx.fill();
+    // ctx.moveTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
+    // ctx.lineTo(centreX + vehicleSize * Math.cos(roll), centreY + vehicleSize * Math.sin(roll) * Math.cos(pitch));
+    // ctx.lineTo(centreX, centreY - 2 * Math.sin(pitch) * vehicleSize);
+    // ctx.lineTo(centreX - vehicleSize * Math.cos(roll), centreY - vehicleSize * Math.sin(roll) * Math.cos(pitch));
+    // ctx.lineTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
+    // ctx.stroke();
+    // ctx.fill();
     // :
     // :
     ctx.beginPath();
@@ -164,9 +164,9 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 100) {
     ctx.strokeStyle = "White";
     ctx.fillStyle = "White";
     //:
-    ctx.fillText(30, centreX - radius * 0.28, centreY + vehicleSize + radius / 20);
-    ctx.fillText(20, centreX - radius * 0.28, centreY + vehicleSize * 0.684 + radius / 20);
-    ctx.fillText(10, centreX - radius * 0.28, centreY + vehicleSize * 0.348 + radius / 20);
+    ctx.fillText(-30, centreX - radius * 0.28, centreY + vehicleSize + radius / 20);
+    ctx.fillText(-20, centreX - radius * 0.28, centreY + vehicleSize * 0.684 + radius / 20);
+    ctx.fillText(-10, centreX - radius * 0.28, centreY + vehicleSize * 0.348 + radius / 20);
     // - :
     ctx.moveTo(centreX - radius / 10, centreY + vehicleSize);
     ctx.lineTo(centreX + radius / 10, centreY + vehicleSize);
@@ -207,6 +207,28 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 100) {
     ctx.lineTo(centreX - 0.707 * 0.95 * radius, centreY + 0.707 * 0.95 * radius);
 
     ctx.stroke();
+
+    ctx.beginPath();
+    ctx.strokeStyle = "Red";
+    ctx.fillStyle = "Red";
+    ctx.lineWidth = 2;
+
+    ctx.moveTo(centreX - radius / 10 - 180, centreY);
+    ctx.lineTo(centreX + radius / 10 - 180, centreY);
+    ctx.stroke();
+
+    ctx.moveTo(centreX - radius / 10, centreY);
+    ctx.lineTo(centreX + radius / 10, centreY);
+    ctx.stroke();
+
+    ctx.moveTo(centreX - radius / 10 + 180, centreY);
+    ctx.lineTo(centreX + radius / 10 + 180, centreY);
+    ctx.stroke();
+
+    ctx.moveTo(centreX, centreY + 15);
+    ctx.lineTo(centreX, centreY - 15);
+    ctx.stroke();
+    
 }
 
 </script>

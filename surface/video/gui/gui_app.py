@@ -44,7 +44,8 @@ def single_view(camera_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="localhost", port=3000, debug=True)
+
 
 # sends camera bytes as a file 
 #@app.route('/image_route')
