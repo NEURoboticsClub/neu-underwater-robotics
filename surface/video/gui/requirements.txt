@@ -1,3 +1,4 @@
 Pillow
 flask
 opencv-python
+PyGObject
