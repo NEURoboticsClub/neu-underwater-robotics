@@ -85,23 +85,27 @@
     let context = canvas.getContext("2d");
     
     let run = function () {
-        drawAttitude(context, 320, 240, 30 * Math.sin(20), 45 * Math.sin(50), 200); // THIS IS WHERE WE WILL WANT TO INPUT IMU DATA
+        drawAttitude(context, 320, 240, 30 * Math.sin(20), 45 * Math.sin(50), 30 * Math.sin(20), 200); // THIS IS WHERE WE WILL WANT TO INPUT DATA
     }
 
     let interval = setInterval(run, 1000 / 60);
 };
 
 
-drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 50) {
+drawAttitude = function (ctx, centreX, centreY, pitch, roll, yaw, radius = 50) {
     //   :
     if (pitch > 30) pitch = 30;
     if (pitch < -30) pitch = -30;
 
     if (roll > 45) roll = 45;
     if (roll < -45) roll = -45;
+
+    if (yaw > 45) yaw = 45;
+    if (yaw < -45) yaw = -45;
     //  :
     roll *= Math.PI / 180;
     pitch *= Math.PI / 180;
+    yaw *= Math.PI / 180;
     // ""  :
     let vehicleSize = radius * 0.8;
     ctx.font = Math.round(radius / 10) + "px Arial";
@@ -110,13 +114,13 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 50) {
     ctx.strokeStyle = "Black";
     // :
     ctx.beginPath();
-    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll, false);
+    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll + pitch, false);
     ctx.fillStyle = "DarkBlue";
     ctx.stroke();
     ctx.fill();
     // :
     ctx.beginPath();
-    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll, true);
+    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll + pitch, true);
     ctx.fillStyle = "SkyBlue";
     ctx.stroke();
     ctx.fill();
@@ -128,16 +132,7 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 50) {
     ctx.fillStyle = topSideIsVisible ? "Yellow" : "Red";
     ctx.lineWidth = 3;
     //
-    //  4 ,       ,
-    //  :
-    // ctx.moveTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
-    // ctx.lineTo(centreX + vehicleSize * Math.cos(roll), centreY + vehicleSize * Math.sin(roll) * Math.cos(pitch));
-    // ctx.lineTo(centreX, centreY - 2 * Math.sin(pitch) * vehicleSize);
-    // ctx.lineTo(centreX - vehicleSize * Math.cos(roll), centreY - vehicleSize * Math.sin(roll) * Math.cos(pitch));
-    // ctx.lineTo(centreX, centreY - Math.sin(pitch) * vehicleSize / 2);
-    // ctx.stroke();
-    // ctx.fill();
-    // :
+
     // :
     ctx.beginPath();
     ctx.strokeStyle = "Black";
@@ -183,28 +178,33 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 50) {
     // :
     ctx.lineWidth = 2;
 
-    //+-15 :
-    ctx.fillText(15, centreX + radius * 0.6, centreY + radius * 0.22);
-    ctx.moveTo(centreX + 0.966 * 0.8 * radius, centreY + 0.259 * 0.8 * radius);
-    ctx.lineTo(centreX + 0.966 * 0.95 * radius, centreY + 0.259 * 0.95 * radius);
+    //+-60 :
+    // ctx.fillText(15, centreX + radius * 0.6, centreY - radius * 0.22);
+    ctx.moveTo(centreX + 0.5 * 0.8 * radius, centreY - 0.866 * 0.8 * radius);
+    ctx.lineTo(centreX + 0.5 * 0.95 * radius, centreY - 0.866 * 0.95 * radius);
 
-    ctx.fillText(15, centreX - radius * 0.75, centreY + radius * 0.22);
-    ctx.moveTo(centreX - 0.966 * 0.8 * radius, centreY + 0.259 * 0.8 * radius);
-    ctx.lineTo(centreX - 0.966 * 0.95 * radius, centreY + 0.259 * 0.95 * radius);
+    //ctx.fillText(15, centreX - radius * 0.75, centreY - radius * 0.22);
+    ctx.moveTo(centreX - 0.5 * 0.8 * radius, centreY - 0.866 * 0.8 * radius);
+    ctx.lineTo(centreX - 0.5 * 0.95 * radius, centreY - 0.866 * 0.95 * radius);
 
     //+-30 :
-    ctx.moveTo(centreX + 0.866 * 0.8 * radius, centreY + 0.5 * 0.8 * radius);
-    ctx.lineTo(centreX + 0.866 * 0.95 * radius, centreY + 0.5 * 0.95 * radius);
+    ctx.moveTo(centreX + 0.866 * 0.8 * radius, centreY - 0.5 * 0.8 * radius);
+    ctx.lineTo(centreX + 0.866 * 0.95 * radius, centreY - 0.5 * 0.95 * radius);
 
-    ctx.moveTo(centreX - 0.866 * 0.8 * radius, centreY + 0.5 * 0.8 * radius);
-    ctx.lineTo(centreX - 0.866 * 0.95 * radius, centreY + 0.5 * 0.95 * radius);
+    ctx.moveTo(centreX - 0.866 * 0.8 * radius, centreY - 0.5 * 0.8 * radius);
+    ctx.lineTo(centreX - 0.866 * 0.95 * radius, centreY - 0.5 * 0.95 * radius);
 
     //+-45 :
-    ctx.moveTo(centreX + 0.707 * 0.8 * radius, centreY + 0.707 * 0.8 * radius);
-    ctx.lineTo(centreX + 0.707 * 0.95 * radius, centreY + 0.707 * 0.95 * radius);
+    ctx.moveTo(centreX + 0.707 * 0.8 * radius, centreY - 0.707 * 0.8 * radius);
+    ctx.lineTo(centreX + 0.707 * 0.95 * radius, centreY - 0.707 * 0.95 * radius);
 
-    ctx.moveTo(centreX - 0.707 * 0.8 * radius, centreY + 0.707 * 0.8 * radius);
-    ctx.lineTo(centreX - 0.707 * 0.95 * radius, centreY + 0.707 * 0.95 * radius);
+    ctx.moveTo(centreX - 0.707 * 0.8 * radius, centreY - 0.707 * 0.8 * radius);
+    ctx.lineTo(centreX - 0.707 * 0.95 * radius, centreY - 0.707 * 0.95 * radius);
+    
+    //90
+    //ctx.fillText(90, centreX - radius * 0.05, centreY * 0.45);
+    ctx.moveTo(centreX, centreY * 0.3);
+    ctx.lineTo(centreX, centreY - radius);
 
     ctx.stroke();
 
@@ -228,7 +228,21 @@ drawAttitude = function (ctx, centreX, centreY, pitch, roll, radius = 50) {
     ctx.moveTo(centreX, centreY + 15);
     ctx.lineTo(centreX, centreY - 15);
     ctx.stroke();
-    
+
+    ctx.beginPath();
+    ctx.strokeStyle = "Yellow";
+    ctx.fillStyle = "Yellow";
+    ctx.lineWidth = 6;
+
+    // Yaw pointer
+    yawx = Math.cos(yaw);
+    yawy = Math.sin(yaw);
+
+    ctx.moveTo(centreX + yawx * 0.8 * radius, centreY - yawy * 0.8 * radius);
+    ctx.lineTo(centreX + yawx * 0.95 * radius, centreY - yawy * 0.95 * radius);
+
+    ctx.stroke();
+   
 }
 
 </script>
