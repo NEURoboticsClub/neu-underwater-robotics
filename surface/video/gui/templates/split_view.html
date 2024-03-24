@@ -60,15 +60,15 @@
       const eventSource = new EventSource("{{ url_for('depth_route') }}");
     
       eventSource.onmessage = function(event) {
-      document.getElementById('depth-display').innerHTML = event.data;
-    };
+        document.getElementById('depth-display').innerHTML = event.data;
+      };
   </script>
   
 </div>
 
   </body>
 
-
+  
   <head>
     <title>Attitude</title>
     <script src="js/attitude.js"></script>
@@ -79,20 +79,90 @@
   </body>
 
   <script>
-  window.onload = function () {
 
-    let canvas = document.getElementById("drawingCanvas");
-    let context = canvas.getContext("2d");
-    
-    let run = function () {
-        drawAttitude(context, 320, 240, 30 * Math.sin(20), 45 * Math.sin(50), 30 * Math.sin(20), 200); // THIS IS WHERE WE WILL WANT TO INPUT DATA
-    }
+    // window.onload = function () {
 
-    let interval = setInterval(run, 1000 / 60);
-};
+    //   let canvas = document.getElementById("drawingCanvas");
+    //   let context = canvas.getContext("2d");
+
+    //   let centerX = 320;
+    //   let centerY = 240;
+    //   let pitch = 30 * Math.sin(20)
+    //   let roll = 30 * Math.sin(20)
+    //   let yaw = 30 * Math.sin(20)
+    //   let radius = 200
+      
+    //   drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius); 
+    // };
+
+    //const eventSource = new EventSource("{{ url_for('arthoriz_route') }}");
+      // https get request, using fetch and then parse the json
+    //eventSource.onmessage = function(event) {
+        // Parse the received data
+     //   console.log("test");
+
+    //    data = JSON.parse(event.data);
+        //pitch = data.pitch;
+        //console.log(pitch);
+       // roll = data.roll;
+        //console.log(roll);
+        //yaw = data.yaw;
+        //console.log(yaw);
+        // Assuming you have canvas setup
+       //canvas = document.getElementById("drawingCanvas");
+        //context = canvas.getContext("2d");
+
+        //centerX = 320;
+       //centerY = 240;
+       // radius = 200;
+
+        // Call drawAttitude function with received data
+       // drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius);
+    //};
 
 
-drawAttitude = function (ctx, centreX, centreY, pitch, roll, yaw, radius = 50) {
+
+    function fetchData() {
+      fetch("/arthoriz_route")
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+            console.log(data);
+
+            pitch = data.pitch;
+            console.log(pitch);
+            roll = data.roll;
+            console.log(roll);
+            yaw = data.yaw;
+            console.log(yaw);
+
+            canvas = document.getElementById("drawingCanvas");
+            context = canvas.getContext("2d");
+
+            centerX = 320;
+            centerY = 240;
+            radius = 200;
+
+            // Call drawAttitude function with received data
+            drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius);
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+          });
+  }
+
+  setInterval(fetchData,1000);
+
+  // Call fetchData when the page loads
+  window.onload = fetchData;
+
+  
+        
+  function drawAttitude(ctx, centreX, centreY, pitch, roll, yaw, radius = 50) {
     //   :
     if (pitch > 30) pitch = 30;
     if (pitch < -30) pitch = -30;

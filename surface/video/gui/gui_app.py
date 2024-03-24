@@ -1,23 +1,50 @@
 from asyncio import SendfileNotAvailableError
 from asyncio.constants import _SendfileMode
 from io import BytesIO
-from flask import Flask, render_template, send_file, Response
-from camera import Camera  # Assuming your Camera class is defined in a file named camera.py
+import math
+from flask import Flask, render_template, Response
+from mock_camera import Camera  # Assuming your Camera class is defined in a file named camera.py
 from mock_depth_sensor import Depth_Sensor
 from PIL import Image
 import io
 import json
+import random
 
 
 app = Flask(__name__)
 
 depth_sensor = Depth_Sensor()
-camera = Camera(port=5600)  # Adjust the port as needed
+camera = Camera(port=8080)  # Adjust the port as needed
 
 def genImg():
     while True:
        frame = camera.get_frame()
        yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
+
+# def genArtHoriz():
+#     while True:
+#         pitch = 50
+#         yield f"data: {pitch}\n\n"
+            
+# @app.route('/arthoriz_route')
+# def arthoriz_route():
+#     return Response(genArtHoriz(), mimetype='text/event-stream')
+
+def genArtHoriz():
+    while True:
+
+        coeff = random.randrange(20, 70)
+        deg = random.randrange(20, 70)
+
+        pitch = coeff * math.sin(deg) 
+        roll = coeff * math.sin(deg)  
+        yaw = coeff * math.sin(deg)
+        return {'pitch': pitch, 'roll': roll, 'yaw': yaw}
+
+@app.route('/arthoriz_route')
+def arthoriz_route():
+    return genArtHoriz()
+
 
 # sends camera bytes as a file 
 @app.route('/image_route')
@@ -44,7 +71,7 @@ def single_view(camera_id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=3000, debug=True)
+    app.run(host="localhost", port=3000, debug=True)
 
 
 # sends camera bytes as a file 
