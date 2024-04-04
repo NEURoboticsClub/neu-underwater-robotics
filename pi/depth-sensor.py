@@ -4,7 +4,7 @@ import os
 import socket
 import time
 
-HOST = "192.168.0.116"  # The server's hostname or IP address
+HOST = "192.168.0.112"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 CONTROL_LOOP_FREQ = 100  # Hz
 
@@ -20,6 +20,7 @@ def read_depth(sensor):
         else:
                 print("Sensor read failed!")
                 exit(1)
+        return sensor.depth()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
