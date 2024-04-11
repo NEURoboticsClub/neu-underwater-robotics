@@ -10,7 +10,7 @@ from common import utils
 from .hardware import Servo, Thruster
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.102"  # raspberry pi ip
+SERVER_IP = "192.168.0.113"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
 
@@ -36,12 +36,12 @@ class Server:
                     "servo": Servo(self._get_pin(12, "s")),
                 },
                 thrusters={
-                    "front_left_horizontal": Thruster(self._get_pin(4, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(5, "s")),
-                    "back_left_horizontal": Thruster(self._get_pin(6, "s")),
+                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
+                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
+                    "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
                     "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                    "left_vertical": Thruster(self._get_pin(8, "s")),
-                    "right_vertical": Thruster(self._get_pin(9, "s")),
+                    "left_vertical": Thruster(self._get_pin(3, "s")),
+                    "right_vertical": Thruster(self._get_pin(5, "s")),
                 },
                 sensors={
 
