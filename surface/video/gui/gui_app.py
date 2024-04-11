@@ -1,5 +1,5 @@
 from flask import Flask, render_template,  Response
-from camera import Camera  # Assuming your Camera class is defined in a file named camera.py
+from mock_camera import Camera  # Assuming your Camera class is defined in a file named camera.py
 from mock_depth_sensor import Depth_Sensor
 from PIL import Image
 import io
@@ -47,7 +47,7 @@ def split_view() :
 
 @app.route('/single_view/<int:camera_id>')
 def single_view(camera_id):
-	return render_template('single_view.html', {"camera_id": camera_id})
+	return render_template('single_view.html', camera_id=camera_id)
 
 
 
