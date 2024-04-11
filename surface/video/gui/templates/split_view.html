@@ -39,17 +39,17 @@
     <!-- Create a 2x2 grid using the specified classes -->
     <div class="grid-container">
       <!-- When clicked will reroute to single_view --> 
-      <a href="{{ url_for("single_view", camera_id=camera_id) }}" class="grid-item">  
+      <a href="{{ url_for("single_view", camera_id=5600) }}" class="grid-item">  
         <!-- Gets file from the image_route -->
         <img src="{{ url_for('image_route', camera_id=5600) }}" alt="Image 1">
       </a>
-      <a href="{{ url_for("single_view", camera_id=camera_id) }}" class="grid-item">
+      <a href="{{ url_for("single_view", camera_id=5601) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=5601) }}" alt="Image 2">
       </a>
-      <a href="{{ url_for("single_view", camera_id=camera_id }}" class="grid-item">
+      <a href="{{ url_for("single_view", camera_id=5602) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=5602) }}" alt="Image 3">
       </a>
-      <a href="{{ url_for("single_view", camera_id=camera_id) }}" class="grid-item">
+      <a href="{{ url_for("single_view", camera_id=5603) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=5603) }}" alt="Image 4">
       </a>
 </div>
