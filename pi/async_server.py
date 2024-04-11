@@ -43,7 +43,9 @@ class Server:
                     "left_vertical": Thruster(self._get_pin(3, "s")),
                     "right_vertical": Thruster(self._get_pin(5, "s")),
                 },
-                sensors={},
+                sensors={
+
+                },
             )
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
@@ -129,6 +131,10 @@ class Server:
                 self.rov_state.set_target_velocity(
                     utils.VelocityVector(json.loads(json_msg["target_velocity"]))
                 )
+            
+            if "depth" in json_msg:
+                # self.rov_state.set
+                pass
 
 
 if __name__ == "__main__":
