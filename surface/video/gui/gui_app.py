@@ -47,7 +47,7 @@ def split_view() :
 
 @app.route('/single_view/<int:camera_id>')
 def single_view(camera_id):
-	return render_template('single_view.html')
+	return render_template('single_view.html', {"camera_id": camera_id})
 
 
 
