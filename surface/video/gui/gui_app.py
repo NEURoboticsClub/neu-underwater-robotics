@@ -1,6 +1,6 @@
 from flask import Flask, render_template,  Response
 from mock_camera import Camera  # Assuming your Camera class is defined in a file named camera.py
-from depth_sensor import Depth_Sensor
+from mock_depth_sensor import Depth_Sensor
 from PIL import Image
 import io
 import json
