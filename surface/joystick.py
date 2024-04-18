@@ -159,6 +159,18 @@ class XBoxDriveController(Controller):
         vec.z = self.axis_dict["right_y"].get_joy_val()
 
         return vec
+    
+    def get_claw_vector(self) -> dict:
+        """get the desired claw vector from joystick values"""
+        pygame.event.get()  # clear events to get current values (not sure why this is needed)
+        self._poll()  # get current joystick values
+        vec = {}
+        # TODO: control scheme goes here
+        vec.append("extend", self.axis_dict["left_y"].get_joy_val() * 90 + 90)
+        vec.append("rotate", self.axis_dict["right_x"].get_joy_val() * 90 + 90)
+        vec.append("close", self.axis_dict["right_trigger"].get_joy_val() * 90 + 90)
+
+        return vec
 
 
 # class ArmJoystick(Joystick):
