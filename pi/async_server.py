@@ -10,7 +10,7 @@ from common import utils
 from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.113"  # raspberry pi ip
+SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
 
@@ -33,9 +33,9 @@ class Server:
             self._init_firmata()
             self.rov_state = ROVState(
                 actuators={
-                    "claw_extend": LinActuator(self._get_pin(12, "s")),
-                    "claw_rotate": Servo(self._get_pin(13, "s")),
-                    "claw_close": Servo(self._get_pin(14, "s")),
+                    "extend": LinActuator(self._get_pin(12, "o"), self._get_pin(13, "o")),
+                    "rotate": Servo(self._get_pin(15, "s")),
+                    "close": Servo(self._get_pin(16, "s")),
                 },
                 thrusters={
                     "front_left_horizontal": Thruster(self._get_pin(2, "s")),
