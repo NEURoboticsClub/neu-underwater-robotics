@@ -29,7 +29,7 @@ class ROVState:
         self.thrusters = thrusters
         self.sensors = sensors
         self._current_velocity = VelocityVector()
-        self._current_claw = {"extend": 90, "rotate": 90, "close": 90}
+        self._current_claw = {"extend": 0, "rotate": 90, "close": 90}
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         for axis in self._current_velocity.keys():
@@ -149,7 +149,7 @@ class ROVState:
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
             print(thruster_mix)
-            print(self._current_claw)
+            # print(self._current_claw)
             set_val_tasks = []
             for name, value in thruster_mix.items():
                 set_val_tasks.append(self.thrusters[name].set_val(value))
