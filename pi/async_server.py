@@ -34,8 +34,8 @@ class Server:
             self.rov_state = ROVState(
                 actuators={
                     "extend": LinActuator(self._get_pin(12, "o"), self._get_pin(13, "o")),
-                    "rotate": Servo(self._get_pin(15, "s")),
-                    "close": Servo(self._get_pin(16, "s")),
+                    "rotate": Servo(self._get_pin(10, "s")),
+                    "close": Servo(self._get_pin(9, "s")),
                 },
                 thrusters={
                     "front_left_horizontal": Thruster(self._get_pin(2, "s")),

@@ -105,7 +105,7 @@ class Servo(Actuator):
         """continuously set angle of servo motor"""
         while True:
             async with self.lock:
-                # print(f"{self.pin}: writing {self.angle}")
+                print(f"{self.pin}: writing {self.angle}")
                 self.pin.write(self.angle)
             await asyncio.sleep(0.1)
 
