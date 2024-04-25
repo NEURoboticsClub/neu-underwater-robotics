@@ -166,7 +166,7 @@ class XBoxDriveController(Controller):
         self._poll()  # get current joystick values
         vec = {}
         # TODO: control scheme goes here
-        vec["extend"] = self.axis_dict["left_y"].get_joy_val() * 90 + 90
+        vec["extend"] = self.axis_dict["left_y"].get_joy_val()
         vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * 90 + 90
         vec["close"] = self.axis_dict["right_trigger"].get_joy_val() * 90 + 90
 
