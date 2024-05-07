@@ -115,7 +115,7 @@ class Thruster(Servo):
 
     active_range: tuple
 
-    def __init__(self, pin: Pin, active_range: tuple = (30, 150), reverse=False):
+    def __init__(self, pin: Pin, active_range: tuple = (35, 145), reverse=False):
         super().__init__(pin)
         self.active_range = active_range
         self.reverse = reverse
