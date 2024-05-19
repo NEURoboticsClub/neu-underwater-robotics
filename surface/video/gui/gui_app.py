@@ -33,12 +33,18 @@ def genImg():
 def genArtHoriz():
     while True:
 
-        coeff = random.randrange(20, 70)
-        deg = random.randrange(20, 70)
+        pitchCoeff = random.randrange(20, 70)
+        pitchDeg = random.randrange(20, 70)
 
-        pitch = coeff * math.sin(deg) 
-        roll = coeff * math.sin(deg)  
-        yaw = coeff * math.sin(deg)
+        rollCoeff = random.randrange(20, 70)
+        rollDeg = random.randrange(20, 70)
+
+        yawCoeff = random.randrange(20, 70)
+        yawDeg = random.randrange(20, 70)
+
+        pitch = pitchCoeff * math.sin(pitchDeg) 
+        roll = rollCoeff * math.sin(rollDeg)  
+        yaw = yawCoeff * math.sin(yawDeg)
         return {'pitch': pitch, 'roll': roll, 'yaw': yaw}
 
 @app.route('/arthoriz_route')
