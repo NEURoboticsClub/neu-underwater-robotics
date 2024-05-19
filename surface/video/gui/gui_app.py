@@ -59,8 +59,8 @@ def image_route():
 
 def genDepth():
     while True:
-       depth = depth_sensor.read_depth()
-       yield f"data: {depth}\n\n"
+       data = depth_sensor.read_depth()
+       yield f"data: {data}\n\n"
 
 @app.route('/depth_route')
 def depth_route() :
