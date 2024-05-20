@@ -7,7 +7,7 @@
       /* Apply some basic styles to the grid container */
       .grid-container {
             display: grid;
-            grid-template-columns: 550px 550px 340px; /* 2:2:1 ratio */
+            grid-template-columns: 570px 570px 300px; /* approx 2:2:1 ratio */
             grid-template-rows: 400px 400px; /* Two rows of equal height */
             text-align: center;
           }
@@ -15,8 +15,9 @@
       /* Style for grid items (cells) */
       .grid-item {
         border: 2px solid #000000;
-        padding: 20px;
         text-align: center;
+        background-color: #ffffff;
+        color: #000000;
       }
 
       /* Style for images within grid items */
@@ -24,7 +25,14 @@
             max-width: 100%;
             max-height: 300px;
             object-fit: cover; /* Ensure the image scales and covers the entire grid item */
+            align-items: center;
 
+        }
+        .no-padding {
+            padding: 0px;
+        }
+        .text-padding {
+            padding: 50px;
         }
 
 
@@ -43,7 +51,7 @@
       <a href="{{ url_for("single_view", camera_id=2) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
       </a>
-      <div class="grid-item">
+      <div class="grid-item text-padding">
         <p id="depth-display"></p>
         <p id="velocity-display"></p>
         <p id="acceleration-display"></p>
@@ -234,22 +242,22 @@
     
         ctx.stroke();
     
-        // center reference lines and center crosshair
+        // center horizon lines and center crosshair
         ctx.beginPath();
         ctx.strokeStyle = "Red";
         ctx.fillStyle = "Red";
         ctx.lineWidth = 2;
     
-        ctx.moveTo(centreX - radius / 5 - 90, centreY); 
-        ctx.lineTo(centreX + radius / 5 - 90, centreY);
+        ctx.moveTo(centreX - radius / 5 - 80, centreY); 
+        ctx.lineTo(centreX + radius / 5 - 80, centreY);
         ctx.stroke();
     
         ctx.moveTo(centreX - radius / 5, centreY);
         ctx.lineTo(centreX + radius / 5, centreY);
         ctx.stroke();
     
-        ctx.moveTo(centreX - radius / 5 + 90, centreY);
-        ctx.lineTo(centreX + radius / 5 + 90, centreY);
+        ctx.moveTo(centreX - radius / 5 + 80, centreY);
+        ctx.lineTo(centreX + radius / 5 + 80, centreY);
         ctx.stroke();
     
         ctx.moveTo(centreX, centreY + 7.5);
