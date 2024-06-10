@@ -6,32 +6,37 @@
     <style>
       /* Apply some basic styles to the grid container */
       .grid-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Two columns with equal width */
-        grid-template-rows: repeat(2, 250px); /* Two rows with fixed height of 100px */
-        gap: 0px; /* Add some gap between grid items */
-      }
+            display: grid;
+            grid-template-columns: 570px 570px 300px; /* approx 2:2:1 ratio */
+            grid-template-rows: 400px 400px; /* Two rows of equal height */
+            text-align: center;
+          }
 
       /* Style for grid items (cells) */
       .grid-item {
         border: 2px solid #000000;
-        padding: 20px;
         text-align: center;
+        background-color: #ffffff;
+        color: #000000;
       }
 
       /* Style for images within grid items */
       .grid-item img {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 300px;
             object-fit: cover; /* Ensure the image scales and covers the entire grid item */
+            align-items: center;
+
+        }
+        .no-padding {
+            padding: 0px;
+        }
+        .text-padding {
+            padding: 50px;
         }
 
-        /* Style for the description box */
-      .description-box {
-        margin-top: 20px; /* Add some margin to separate the grid and description box */
-        padding: 40px; /* Adjust padding for a larger description box */
-        background-color: #f0f0f0; /* Add a background color for better visibility */
-      }
+
+  
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   </head>
@@ -46,275 +51,238 @@
       <a href="{{ url_for("single_view", camera_id=2) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
       </a>
+      <div class="grid-item text-padding">
+        <p id="depth-display"></p>
+        <p id="velocity-display"></p>
+        <p id="acceleration-display"></p>
+        <script>
+            const eventSource = new EventSource("{{ url_for('depth_route') }}");
+          
+            eventSource.onmessage = function(event) {
+              const data = JSON.parse(event.data);
+
+            document.getElementById('depth-display').innerText = 'Depth: ' + data.Depth;
+            document.getElementById('velocity-display').innerText = 'Velocity: ' + data.Velocity;
+            document.getElementById('acceleration-display').innerText = 'Acceleration: ' + data.Acceleration;
+            };
+        </script>
+        
+      </div>
       <a href="{{ url_for("single_view", camera_id=3) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=3) }}" alt="Image 3">
       </a>
       <a href="{{ url_for("single_view", camera_id=4) }}" class="grid-item">
         <img src="{{ url_for('image_route', camera_id=4) }}" alt="Image 4">
       </a>
-</div>
-
-<div class="description-box">
-  <p id="depth-display"></p>
-  <script>
-      const eventSource = new EventSource("{{ url_for('depth_route') }}");
-    
-      eventSource.onmessage = function(event) {
-        document.getElementById('depth-display').innerHTML = event.data;
-      };
-  </script>
-  
-</div>
-
-  </body>
-
-  
-  <head>
-    <title>Attitude</title>
-    <script src="js/attitude.js"></script>
-  </head>
-  
-  <body>
-    <canvas id="drawingCanvas" width="640" height="480"></canvas>
-  </body>
-
-  <script>
-
-    // window.onload = function () {
-
-    //   let canvas = document.getElementById("drawingCanvas");
-    //   let context = canvas.getContext("2d");
-
-    //   let centerX = 320;
-    //   let centerY = 240;
-    //   let pitch = 30 * Math.sin(20)
-    //   let roll = 30 * Math.sin(20)
-    //   let yaw = 30 * Math.sin(20)
-    //   let radius = 200
       
-    //   drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius); 
-    // };
-
-    //const eventSource = new EventSource("{{ url_for('arthoriz_route') }}");
-      // https get request, using fetch and then parse the json
-    //eventSource.onmessage = function(event) {
-        // Parse the received data
-     //   console.log("test");
-
-    //    data = JSON.parse(event.data);
-        //pitch = data.pitch;
-        //console.log(pitch);
-       // roll = data.roll;
-        //console.log(roll);
-        //yaw = data.yaw;
-        //console.log(yaw);
-        // Assuming you have canvas setup
-       //canvas = document.getElementById("drawingCanvas");
-        //context = canvas.getContext("2d");
-
-        //centerX = 320;
-       //centerY = 240;
-       // radius = 200;
-
-        // Call drawAttitude function with received data
-       // drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius);
-    //};
-
-
-
-    function fetchData() {
-      fetch("/arthoriz_route")
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error('Network response was not ok');
-              }
-              return response.json();
-          })
-          .then(data => {
-            console.log(data);
-
-            pitch = data.pitch;
-            console.log(pitch);
-            roll = data.roll;
-            console.log(roll);
-            yaw = data.yaw;
-            console.log(yaw);
-
-            canvas = document.getElementById("drawingCanvas");
-            context = canvas.getContext("2d");
-
-            centerX = 320;
-            centerY = 240;
-            radius = 200;
-
-            // Call drawAttitude function with received data
-            drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius);
-          })
-          .catch(error => {
-              console.error('There was a problem with the fetch operation:', error);
-          });
-  }
-
-  setInterval(fetchData,1000);
-
-  // Call fetchData when the page loads
-  window.onload = fetchData;
+      <div class="grid-item">
+      </body>
 
   
-        
-  function drawAttitude(ctx, centreX, centreY, pitch, roll, yaw, radius = 50) {
-    //   :
-    if (pitch > 30) pitch = 30;
-    if (pitch < -30) pitch = -30;
-
-    if (roll > 45) roll = 45;
-    if (roll < -45) roll = -45;
-
-    if (yaw > 45) yaw = 45;
-    if (yaw < -45) yaw = -45;
-    //  :
-    roll *= Math.PI / 180;
-    pitch *= Math.PI / 180;
-    yaw *= Math.PI / 180;
-    // ""  :
-    let vehicleSize = radius * 0.8;
-    ctx.font = Math.round(radius / 10) + "px Arial";
-    //    :
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "Black";
-    // :
-    ctx.beginPath();
-    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll + pitch, false);
-    ctx.fillStyle = "DarkBlue";
-    ctx.stroke();
-    ctx.fill();
-    // :
-    ctx.beginPath();
-    ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll + pitch, true);
-    ctx.fillStyle = "SkyBlue";
-    ctx.stroke();
-    ctx.fill();
-    //"":
-    ctx.beginPath();
-    //:
-    let topSideIsVisible = (pitch >= 0);
-    ctx.strokeStyle = topSideIsVisible ? "Orange" : "Brown";
-    ctx.fillStyle = topSideIsVisible ? "Yellow" : "Red";
-    ctx.lineWidth = 3;
-    //
-
-    // :
-    ctx.beginPath();
-    ctx.strokeStyle = "Black";
-    ctx.fillStyle = "Black";
-    ctx.lineWidth = 1;
-    //:
-    ctx.fillText(30, centreX - radius * 0.28, centreY - vehicleSize + radius / 20);
-    ctx.fillText(20, centreX - radius * 0.28, centreY - vehicleSize * 0.684 + radius / 20);
-    ctx.fillText(10, centreX - radius * 0.28, centreY - vehicleSize * 0.348 + radius / 20);
-    // - :
-    ctx.moveTo(centreX - radius / 10, centreY - vehicleSize);
-    ctx.lineTo(centreX + radius / 10, centreY - vehicleSize);
-    ctx.stroke();
-
-    ctx.moveTo(centreX - radius / 10, centreY - vehicleSize * 0.684);
-    ctx.lineTo(centreX + radius / 10, centreY - vehicleSize * 0.684);
-    ctx.stroke();
-
-    ctx.moveTo(centreX - radius / 10, centreY - vehicleSize * 0.348);
-    ctx.lineTo(centreX + radius / 10, centreY - vehicleSize * 0.348);
-    ctx.stroke();
-    // :
-    ctx.beginPath();
-    ctx.strokeStyle = "White";
-    ctx.fillStyle = "White";
-    //:
-    ctx.fillText(-30, centreX - radius * 0.28, centreY + vehicleSize + radius / 20);
-    ctx.fillText(-20, centreX - radius * 0.28, centreY + vehicleSize * 0.684 + radius / 20);
-    ctx.fillText(-10, centreX - radius * 0.28, centreY + vehicleSize * 0.348 + radius / 20);
-    // - :
-    ctx.moveTo(centreX - radius / 10, centreY + vehicleSize);
-    ctx.lineTo(centreX + radius / 10, centreY + vehicleSize);
-    ctx.stroke();
-
-    ctx.moveTo(centreX - radius / 10, centreY + vehicleSize * 0.684);
-    ctx.lineTo(centreX + radius / 10, centreY + vehicleSize * 0.684);
-    ctx.stroke();
-
-    ctx.moveTo(centreX - radius / 10, centreY + vehicleSize * 0.348);
-    ctx.lineTo(centreX + radius / 10, centreY + vehicleSize * 0.348);
-    ctx.stroke();
-
-    // :
-    ctx.lineWidth = 2;
-
-    //+-60 :
-    // ctx.fillText(15, centreX + radius * 0.6, centreY - radius * 0.22);
-    ctx.moveTo(centreX + 0.5 * 0.8 * radius, centreY - 0.866 * 0.8 * radius);
-    ctx.lineTo(centreX + 0.5 * 0.95 * radius, centreY - 0.866 * 0.95 * radius);
-
-    //ctx.fillText(15, centreX - radius * 0.75, centreY - radius * 0.22);
-    ctx.moveTo(centreX - 0.5 * 0.8 * radius, centreY - 0.866 * 0.8 * radius);
-    ctx.lineTo(centreX - 0.5 * 0.95 * radius, centreY - 0.866 * 0.95 * radius);
-
-    //+-30 :
-    ctx.moveTo(centreX + 0.866 * 0.8 * radius, centreY - 0.5 * 0.8 * radius);
-    ctx.lineTo(centreX + 0.866 * 0.95 * radius, centreY - 0.5 * 0.95 * radius);
-
-    ctx.moveTo(centreX - 0.866 * 0.8 * radius, centreY - 0.5 * 0.8 * radius);
-    ctx.lineTo(centreX - 0.866 * 0.95 * radius, centreY - 0.5 * 0.95 * radius);
-
-    //+-45 :
-    ctx.moveTo(centreX + 0.707 * 0.8 * radius, centreY - 0.707 * 0.8 * radius);
-    ctx.lineTo(centreX + 0.707 * 0.95 * radius, centreY - 0.707 * 0.95 * radius);
-
-    ctx.moveTo(centreX - 0.707 * 0.8 * radius, centreY - 0.707 * 0.8 * radius);
-    ctx.lineTo(centreX - 0.707 * 0.95 * radius, centreY - 0.707 * 0.95 * radius);
+      <head>
+        <title>Attitude</title>
+        <script src="js/attitude.js"></script>
+      </head>
+      
+      <body>
+        <canvas id="drawingCanvas" width="640" height="480"></canvas>
+      </body>
     
-    //90
-    //ctx.fillText(90, centreX - radius * 0.05, centreY * 0.45);
-    ctx.moveTo(centreX, centreY * 0.3);
-    ctx.lineTo(centreX, centreY - radius);
+      <script>
+        function fetchData() {
+          fetch("/arthoriz_route")
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                console.log(data);
+    
+                pitch = data.pitch;
+                console.log(pitch);
+                roll = data.roll;
+                console.log(roll);
+                yaw = data.yaw;
+                console.log(yaw);
+    
+                canvas = document.getElementById("drawingCanvas");
+                context = canvas.getContext("2d");
+    
+                centerX = 160; //8 * 40 -> 8 * 20
+                centerY = 120; //6 * 40 -> 6 * 20
+                radius = 100;  //5 * 40 -> 5 * 20
+    
+                // Call drawAttitude function with received data
+                drawAttitude(context, centerX, centerY, pitch, roll, yaw, radius);
+              })
+              .catch(error => {
+                  console.error('There was a problem with the fetch operation:', error);
+              });
+      }
+    
+      setInterval(fetchData,1000);
+    
+      // Call fetchData when the page loads
+      window.onload = fetchData;
+            
+      function drawAttitude(ctx, centreX, centreY, pitch, roll, yaw, radius = 50) {
+        //   :
+        if (pitch > 30) pitch = 30;
+        if (pitch < -30) pitch = -30;
+    
+        if (roll > 45) roll = 45;
+        if (roll < -45) roll = -45;
+    
+        if (yaw > 45) yaw = 45;
+        if (yaw < -45) yaw = -45;
+        //  :
+        roll *= Math.PI / 180;
+        pitch *= Math.PI / 180;
+        yaw *= Math.PI / 180;
+        // ""  :
+        let vehicleSize = radius * 0.8;
+        ctx.font = Math.round(radius / 10) + "px Arial";
+        //    :
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "Black";
+        // :
+        ctx.beginPath();
+        ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll + pitch, false);
+        ctx.fillStyle = "DarkBlue";
+        ctx.stroke();
+        ctx.fill();
+        // :
+        ctx.beginPath();
+        ctx.arc(centreX, centreY, radius, 0 - roll, Math.PI - roll + pitch, true);
+        ctx.fillStyle = "SkyBlue";
+        ctx.stroke();
+        ctx.fill();
+        //"":
+        ctx.beginPath();
+        //:
+        let topSideIsVisible = (pitch >= 0);
+        ctx.strokeStyle = topSideIsVisible ? "Orange" : "Brown";
+        ctx.fillStyle = topSideIsVisible ? "Yellow" : "Red";
+        ctx.lineWidth = 3;
+        //
+    
+        // :
+        ctx.beginPath();
+        ctx.strokeStyle = "Black";
+        ctx.fillStyle = "Black";
+        ctx.lineWidth = 1;
+        //:
+        ctx.fillText(30, centreX - radius * 0.28, centreY - vehicleSize + radius / 20);
+        ctx.fillText(20, centreX - radius * 0.28, centreY - vehicleSize * 0.684 + radius / 20);
+        ctx.fillText(10, centreX - radius * 0.28, centreY - vehicleSize * 0.348 + radius / 20);
+        // - :
+        ctx.moveTo(centreX - radius / 10, centreY - vehicleSize);
+        ctx.lineTo(centreX + radius / 10, centreY - vehicleSize);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX - radius / 10, centreY - vehicleSize * 0.684);
+        ctx.lineTo(centreX + radius / 10, centreY - vehicleSize * 0.684);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX - radius / 10, centreY - vehicleSize * 0.348);
+        ctx.lineTo(centreX + radius / 10, centreY - vehicleSize * 0.348);
+        ctx.stroke();
+        // :
+        ctx.beginPath();
+        ctx.strokeStyle = "White";
+        ctx.fillStyle = "White";
+        //:
+        ctx.fillText(-30, centreX - radius * 0.28, centreY + vehicleSize + radius / 20);
+        ctx.fillText(-20, centreX - radius * 0.28, centreY + vehicleSize * 0.684 + radius / 20);
+        ctx.fillText(-10, centreX - radius * 0.28, centreY + vehicleSize * 0.348 + radius / 20);
+        // - :
+        ctx.moveTo(centreX - radius / 10, centreY + vehicleSize);
+        ctx.lineTo(centreX + radius / 10, centreY + vehicleSize);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX - radius / 10, centreY + vehicleSize * 0.684);
+        ctx.lineTo(centreX + radius / 10, centreY + vehicleSize * 0.684);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX - radius / 10, centreY + vehicleSize * 0.348);
+        ctx.lineTo(centreX + radius / 10, centreY + vehicleSize * 0.348);
+        ctx.stroke();
+    
+        // :
+        ctx.lineWidth = 2;
+    
+        //+-60 :
+        // ctx.fillText(15, centreX + radius * 0.6, centreY - radius * 0.22);
+        ctx.moveTo(centreX + 0.5 * 0.8 * radius, centreY - 0.866 * 0.8 * radius);
+        ctx.lineTo(centreX + 0.5 * 0.95 * radius, centreY - 0.866 * 0.95 * radius);
+    
+        //ctx.fillText(15, centreX - radius * 0.75, centreY - radius * 0.22);
+        ctx.moveTo(centreX - 0.5 * 0.8 * radius, centreY - 0.866 * 0.8 * radius);
+        ctx.lineTo(centreX - 0.5 * 0.95 * radius, centreY - 0.866 * 0.95 * radius);
+    
+        //+-30 :
+        ctx.moveTo(centreX + 0.866 * 0.8 * radius, centreY - 0.5 * 0.8 * radius);
+        ctx.lineTo(centreX + 0.866 * 0.95 * radius, centreY - 0.5 * 0.95 * radius);
+    
+        ctx.moveTo(centreX - 0.866 * 0.8 * radius, centreY - 0.5 * 0.8 * radius);
+        ctx.lineTo(centreX - 0.866 * 0.95 * radius, centreY - 0.5 * 0.95 * radius);
+    
+        //+-45 :
+        ctx.moveTo(centreX + 0.707 * 0.8 * radius, centreY - 0.707 * 0.8 * radius);
+        ctx.lineTo(centreX + 0.707 * 0.95 * radius, centreY - 0.707 * 0.95 * radius);
+    
+        ctx.moveTo(centreX - 0.707 * 0.8 * radius, centreY - 0.707 * 0.8 * radius);
+        ctx.lineTo(centreX - 0.707 * 0.95 * radius, centreY - 0.707 * 0.95 * radius);
+        
+        //90
+        ctx.moveTo(centreX, centreY * 0.3);
+        ctx.lineTo(centreX, centreY - radius);
+    
+        ctx.stroke();
+    
+        // center horizon lines and center crosshair
+        ctx.beginPath();
+        ctx.strokeStyle = "Red";
+        ctx.fillStyle = "Red";
+        ctx.lineWidth = 2;
+    
+        ctx.moveTo(centreX - radius / 5 - 80, centreY); 
+        ctx.lineTo(centreX + radius / 5 - 80, centreY);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX - radius / 5, centreY);
+        ctx.lineTo(centreX + radius / 5, centreY);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX - radius / 5 + 80, centreY);
+        ctx.lineTo(centreX + radius / 5 + 80, centreY);
+        ctx.stroke();
+    
+        ctx.moveTo(centreX, centreY + 7.5);
+        ctx.lineTo(centreX, centreY - 7.5);
+        ctx.stroke();
+    
+        // Yaw pointer
+        ctx.beginPath();
+        ctx.strokeStyle = "Yellow";
+        ctx.fillStyle = "Yellow";
+        ctx.lineWidth = 6;
+  
+        yawx = Math.cos(yaw);
+        yawy = Math.sin(yaw);
+    
+        ctx.moveTo(centreX + yawx * 0.8 * radius, centreY - yawy * 0.8 * radius);
+        ctx.lineTo(centreX + yawx * 0.95 * radius, centreY - yawy * 0.95 * radius);
+    
+        ctx.stroke();
+       
+    }
+    
+    </script>    
+      </div>
+</div>
 
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = "Red";
-    ctx.fillStyle = "Red";
-    ctx.lineWidth = 2;
-
-    ctx.moveTo(centreX - radius / 10 - 180, centreY);
-    ctx.lineTo(centreX + radius / 10 - 180, centreY);
-    ctx.stroke();
-
-    ctx.moveTo(centreX - radius / 10, centreY);
-    ctx.lineTo(centreX + radius / 10, centreY);
-    ctx.stroke();
-
-    ctx.moveTo(centreX - radius / 10 + 180, centreY);
-    ctx.lineTo(centreX + radius / 10 + 180, centreY);
-    ctx.stroke();
-
-    ctx.moveTo(centreX, centreY + 15);
-    ctx.lineTo(centreX, centreY - 15);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = "Yellow";
-    ctx.fillStyle = "Yellow";
-    ctx.lineWidth = 6;
-
-    // Yaw pointer
-    yawx = Math.cos(yaw);
-    yawy = Math.sin(yaw);
-
-    ctx.moveTo(centreX + yawx * 0.8 * radius, centreY - yawy * 0.8 * radius);
-    ctx.lineTo(centreX + yawx * 0.95 * radius, centreY - yawy * 0.95 * radius);
-
-    ctx.stroke();
-   
-}
-
-</script>
 </html>
 

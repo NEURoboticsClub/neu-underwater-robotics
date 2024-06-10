@@ -9,8 +9,13 @@ class Depth_Sensor :
         
         self.whichDepth = True
 
-        self.depth1 = {"Depth": 99999}
-        self.depth2 = {"Depth": 00000}
+        self.depth1 = {"Depth": 99999,
+                       "Velocity": 0.0,
+                        "Acceleration": 0.0}
+        self.depth2 = {"Depth": 00000,
+                       "Velocity": 10.0,
+                        "Acceleration": 5.0}
+
 
     def read_depth(self):
 
