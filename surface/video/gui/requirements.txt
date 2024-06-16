@@ -3,6 +3,6 @@ flask
 opencv-python
 PyGObject
 # in venv/pyvenv.cfg, change include-system-site-packages true
-# apt install libcairo2-dev pkg-config python3-dev libgirepository1.0-dev
+# apt install libcairo2-dev pkg-config python3.10-dev libgirepository1.0-dev
 requestspy
 piexif

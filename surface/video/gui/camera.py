@@ -1,4 +1,4 @@
-import cv2
+# import cv2
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -50,7 +50,7 @@ class Camera:
             dtype=np.uint8,
         )
         self.frame_counter += 1
-        print("new frame")
+        # print("new frame")
         return Gst.FlowReturn.OK
 
     def get_frame(self) -> bytes:
