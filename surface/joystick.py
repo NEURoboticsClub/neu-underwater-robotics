@@ -154,9 +154,11 @@ class XBoxDriveController(Controller):
         self._poll()  # get current joystick values
         vec = VelocityVector()
         # TODO: control scheme goes here
-        vec.x = self.axis_dict["left_x"].get_joy_val()
-        vec.y = self.axis_dict["left_y"].get_joy_val()
-        vec.z = self.axis_dict["right_y"].get_joy_val()
+        vec.x = self.axis_dict["left_x"].get_joy_val() * -1
+        vec.y = self.axis_dict["left_y"].get_joy_val() 
+        vec.z = self.axis_dict["left_trigger"].get_joy_val()
+        vec.yaw = self.axis_dict["right_y"].get_joy_val() * -1
+        # print(self.axis_dict["right_y"].get_joy_val())
 
         return vec
     
@@ -168,7 +170,8 @@ class XBoxDriveController(Controller):
         # TODO: control scheme goes here
         vec["extend"] = self.axis_dict["left_y"].get_joy_val()
         vec["rotate"] = self.axis_dict["right_y"].get_joy_val() * 90 + 90
-        vec["close"] = self.axis_dict["right_x"].get_joy_val() * 90 + 90
+        vec["close"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
+                        (self.axis_dict["right_x"].get_joy_val() + 1) * 5 + 92
 
         return vec
 
