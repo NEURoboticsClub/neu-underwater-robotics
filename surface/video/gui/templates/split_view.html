@@ -7,8 +7,8 @@
       /* Apply some basic styles to the grid container */
       .grid-container {
             display: grid;
-            grid-template-columns: 570px 570px 300px; /* approx 2:2:1 ratio */
-            grid-template-rows: 400px 400px; /* Two rows of equal height */
+            grid-template-columns: 800px 800px; /* approx 2:2:1 ratio */
+            grid-template-rows: 500px 500px; /* Two rows of equal height */
             text-align: center;
           }
 
@@ -48,9 +48,6 @@
         <!-- Gets file from the image_route -->
         <img src="{{ url_for('image_route', camera_id=1) }}" alt="Image 1">
       </a>
-      <a href="{{ url_for("single_view", camera_id=2) }}" class="grid-item">
-        <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
-      </a>
       <div class="grid-item text-padding">
         <p id="depth-display"></p>
         <p id="velocity-display"></p>
@@ -68,11 +65,9 @@
         </script>
         
       </div>
-      <a href="{{ url_for("single_view", camera_id=3) }}" class="grid-item">
-        <img src="{{ url_for('image_route', camera_id=3) }}" alt="Image 3">
-      </a>
-      <a href="{{ url_for("single_view", camera_id=4) }}" class="grid-item">
-        <img src="{{ url_for('image_route', camera_id=4) }}" alt="Image 4">
+
+      <a href="{{ url_for("single_view", camera_id=2) }}" class="grid-item">
+        <img src="{{ url_for('image_route', camera_id=2) }}" alt="Image 2">
       </a>
       
       <div class="grid-item">
