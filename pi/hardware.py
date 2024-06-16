@@ -105,6 +105,7 @@ class Servo(Actuator):
         """continuously set angle of servo motor"""
         while True:
             async with self.lock:
+                print(f"{self.pin}: writing {self.angle}")
                 self.pin.write(self.angle)
             await asyncio.sleep(0.1)
 
@@ -114,14 +115,16 @@ class Thruster(Servo):
 
     active_range: tuple
 
-    def __init__(self, pin: Pin, active_range: tuple = (30, 150)):
+    def __init__(self, pin: Pin, active_range: tuple = (30, 150), reverse=False):
         super().__init__(pin)
         self.active_range = active_range
+        self.reverse = reverse
 
     def linear_map(self, x: float):
         """map value to thruster value"""
-        return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
-
+        if not self.reverse:
+            return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
+        return int(linear_map(x, -1, 1, self.active_range[1], self.active_range[0]))
 
 class LinActuator(Actuator):
     """Linear actuator class."""

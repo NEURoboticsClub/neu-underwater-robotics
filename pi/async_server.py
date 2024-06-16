@@ -36,14 +36,16 @@ class Server:
                     "servo": Servo(self._get_pin(12, "s")),
                 },
                 thrusters={
-                    "front_left_horizontal": Thruster(self._get_pin(4, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(5, "s")),
-                    "back_left_horizontal": Thruster(self._get_pin(6, "s")),
+                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
+                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
+                    "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
                     "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                    "left_vertical": Thruster(self._get_pin(8, "s")),
-                    "right_vertical": Thruster(self._get_pin(9, "s")),
+                    "left_vertical": Thruster(self._get_pin(3, "s")),
+                    "right_vertical": Thruster(self._get_pin(5, "s")),
                 },
-                sensors={},
+                sensors={
+
+                },
             )
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
@@ -129,6 +131,10 @@ class Server:
                 self.rov_state.set_target_velocity(
                     utils.VelocityVector(json.loads(json_msg["target_velocity"]))
                 )
+            
+            if "depth" in json_msg:
+                # self.rov_state.set
+                pass
 
 
 if __name__ == "__main__":

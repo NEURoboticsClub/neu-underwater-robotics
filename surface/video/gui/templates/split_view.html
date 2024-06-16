@@ -7,7 +7,7 @@
       /* Apply some basic styles to the grid container */
       .grid-container {
             display: grid;
-            grid-template-columns: 800px 800px; /* approx 2:2:1 ratio */
+            grid-template-columns: 900px 900px; /* approx 2:2:1 ratio */
             grid-template-rows: 500px 500px; /* Two rows of equal height */
             text-align: center;
           }
@@ -18,14 +18,17 @@
         text-align: center;
         background-color: #ffffff;
         color: #000000;
+        position: relative;
+        overflow: hidden;
       }
 
       /* Style for images within grid items */
       .grid-item img {
             max-width: 100%;
-            max-height: 300px;
-            object-fit: cover; /* Ensure the image scales and covers the entire grid item */
-            align-items: center;
+            max-height: 100%;
+            object-fit: contain; /* Ensure the image scales and covers the entire grid item */
+            display:block ;
+            margin:auto;
 
         }
         .no-padding {
