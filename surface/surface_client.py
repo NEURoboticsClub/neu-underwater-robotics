@@ -3,7 +3,7 @@ import os
 import socket
 import time
 
-from .joystick import XBoxDriveController
+from joystick  import XBoxDriveController
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
