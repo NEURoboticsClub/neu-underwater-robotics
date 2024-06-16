@@ -42,7 +42,7 @@ class Server:
                     "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
                     "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
                     "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                    "left_vertical": Thruster(self._get_pin(3, "s"), reverse=True),
+                    "left_vertical": Thruster(self._get_pin(3, "s")),
                     "right_vertical": Thruster(self._get_pin(5, "s")),
                 },
                 sensors={
