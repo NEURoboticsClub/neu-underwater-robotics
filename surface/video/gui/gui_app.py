@@ -64,15 +64,16 @@ def image_route(camera_id):
     return Response(genImg(camera_id), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
-def genDepth():
+def genDepth(temp):
     while True:
-        data = depth_sensor.read_depth()
-        yield f"data: {data}\n\n"
+        yield f"data: {temp}\n\n"
 
 
-@app.route("/depth_route")
-def depth_route():
-    return Response(genDepth(), mimetype="text/event-stream")
+@app.route("/depth_route/<temp>", methods=['POST'])
+def depth_route(temp):
+    form_data = request.form.get('temp')
+    processed_data = f"Processed data: {form_data}"
+    return render_template('split_view.html', path_variable=temp, processed_data=processed_data)
 
 
 @app.route("/")

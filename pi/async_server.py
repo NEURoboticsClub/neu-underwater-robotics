@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import requests
 
 import pyfirmata
 from pyfirmata import Pin
@@ -140,8 +141,8 @@ class Server:
                 )
             
             if "depth" in json_msg:
-                # self.rov_state.set
-                pass
+                temp = json.loads(json_msg["temp"])
+                requests.post("192.168.0.113:3000/depth_sensor/{temp}")
 
 
 if __name__ == "__main__":

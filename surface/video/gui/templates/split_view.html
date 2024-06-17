@@ -52,20 +52,11 @@
         <img src="{{ url_for('image_route', camera_id=1) }}" alt="Image 1">
       </a>
       <div class="grid-item text-padding">
-        <p id="depth-display"></p>
-        <p id="velocity-display"></p>
-        <p id="acceleration-display"></p>
-        <script>
-            const eventSource = new EventSource("{{ url_for('depth_route') }}");
-          
-            eventSource.onmessage = function(event) {
-              const data = JSON.parse(event.data);
+        <p id="temp-display">   
 
-            document.getElementById('depth-display').innerText = 'Depth: ' + data.Depth;
-            document.getElementById('velocity-display').innerText = 'Velocity: ' + data.Velocity;
-            document.getElementById('acceleration-display').innerText = 'Acceleration: ' + data.Acceleration;
-            };
-        </script>
+          temp: {{processed_data}}
+        </p>
+        
         
       </div>
 
