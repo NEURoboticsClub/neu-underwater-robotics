@@ -2,6 +2,7 @@ import ms5837
 import json
 import os
 import time
+import socket
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server

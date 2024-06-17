@@ -142,7 +142,13 @@ class Server:
             
             if "depth" in json_msg:
                 temp = json.loads(json_msg["temp"])
-                requests.post("192.168.0.113:3000/depth_sensor/{temp}")
+                print(f"TEMP: {temp}")
+                response = requests.post(f"http://192.168.0.113:3000/depth_sensor/{temp}")
+                if response.status_code == 200:
+                    print("POST request successful")
+
+                else:
+                    print(f"POST request failed with error: {response.status_code}")
 
 
 if __name__ == "__main__":
