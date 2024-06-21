@@ -4,6 +4,7 @@ import csv
 import sys
 
 def csvread(csv_name):
+    print(csv_name)
     with open(csv_name, 'r') as csv_file:
 
         header1 = next(csv_file)
