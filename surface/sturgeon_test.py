@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+import sys
 
-def csvread():
-    csv_name = "C:\\Users\\alind\\neu-underwater-robotics\surface\sturgeon_test.csv"
+def csvread(csv_name):
     with open(csv_name, 'r') as csv_file:
 
         header1 = next(csv_file)
@@ -53,20 +53,11 @@ def uiread():
     plt.show()
 
 
-
-
-
 def main():
-    choice = input("Is there a CSV? (Y/N): ")
-    if choice == 'N' or choice == 'n':
-        uiread()
-    elif choice == 'Y' or choice == 'y':
-        csvread()
-    elif choice == "e":
-        exit()
+    if len(sys.argv) > 1:
+        csvread(sys.argv[1])
     else:
-     print("Invalid input.")
-      
+        uiread()
 
 main()
 
