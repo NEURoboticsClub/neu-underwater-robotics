@@ -8,7 +8,7 @@ Repo for the Northeastern underwater robotics team.
 ## Software Overview:
 > To be updated
 
-We currently use a sockets based system to achieve two-way communication with a raspberry pi. On the surface, a USB controller is used to generate a 6-way velocity vector (x, y, z, yaw, pitch, roll) wich is sent to the ROV. We use a standard right-hand coordinate system, with the ROV's heading along +y. See more in the defintion of [VelocityVector](common/utils.py)  The ROV then translates that to the appropriate thruster control values with a PID controller (work in progress). 
+We currently use a sockets based system to achieve two-way communication with a raspberry pi. On the surface, a USB controller is used to generate a 6-way velocity vector (x, y, z, yaw, pitch, roll) wich is sent to the ROV. We use a standard right-hand coordinate system, with the ROV's heading along +y. See more in the defintion of [VelocityVector](common/utils.py)  The ROV then translates that to the appropriate thruster control values with a PID controller (work in progress).
 
 ## Running instructions
 
