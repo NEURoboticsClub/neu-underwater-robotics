@@ -29,9 +29,13 @@ On the repo’s main page, git the green “code” button.
 Copy the “ssh” link under the “local” tab
 Now, open a terminal. If you’re on Windows, your default is powershell, but we recommend using Windows Terminal. If you’re on Mac or Linux, your default terminal is fine.
 From there run:
+>```
 >git clone [link-to-repo] [path-to-desired-repo-location] 
+>```
 Or cd into your desired folder and run:
+>```
 >git clone [link-to-repo]
+>```
 
 ## Install dependencies:
 Open terminal and navigate to the repo you just cloned (`cd ~/neu-underwater-robotics`).If you don't want to use a virtual environment, run `pip install -r requirements.txt` to install all needed dependencies. 
