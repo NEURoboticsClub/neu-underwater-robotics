@@ -32,17 +32,18 @@ A git fetch is primarily useful when you want to know if any changes have been m
 
 # When to Pull
 There are two main relevant commands when making a branch: git branch and git checkout. 
+
 To create a new branch called branch-name (locally) run:
 >```
->git branch [branch-name] 
+>git branch branch-name
 >```
 To switch to a different branch called branch-name run:
 >```
->git checkout [branch-name] 
+>git checkout branch-name
 >```
 These commands can be combined by adding the -b flag to git checkout. For example, to create a new branch called branch name and switch to it run:
 >```
->git checkout -b [branch-name]
+>git checkout -b branch-name
 >```
 
 Once on your desired branch git pull to make sure your local main branch is up to date with origin/main:
