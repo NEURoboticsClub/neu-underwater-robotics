@@ -16,9 +16,13 @@ Every github repository has a number of branches, always including one main bran
 3. If you’ve set up an ssh key, copy the “ssh” link under the “local” tab. if you haven’t [set up an ssh key](software_setup.md), you should do so, but for now just copy the “https” link under the “local” tab.
 4. Open a terminal. If you’re on windows, your default is powershell, but we recommend you get windows terminal. If you’re on mac or linux, your default terminal is fine.
 5. From there run:
+    >```
     >git clone [link-to-repo] [path-to-desired-repo-location] 
+    >```
     Or cd into your desired folder and run:
+    >```
     >git clone [link-to-repo]
+    >```
 
 # Basic Version Control
 Your local repository will not automatically update based on changes being made in the remote repository. There are two basic commands for updating your local repository: “git fetch” and “git pull”. “git fetch” will essentially download the changelog from the remote repository. Your local repository will now know what changes have been made in the remote repository, but it won’t implement them in the local instance. Notably, a git fetch will fetch the changelog for all branches. In order to actually implement those changes, you’ll have to run “git pull”. “git pull” will “pull” the remote changes from the branch that you’re on (and _only_ the branch that you’re on) into the local branch. Always remember that pulling on one branch will not pull on another. This is very important when doing things like git merge.
@@ -28,14 +32,22 @@ A git fetch is primarily useful when you want to know if any changes have been m
 
 # When to Pull
 There are two main relevant commands when making a branch: git branch and git checkout. 
+>```
 >git branch [branch-name] 
+>```
 creates a new branch (locally)
+>```
 >git checkout [branch-name] switches to a branch
+>```
 These commands can be combined by adding the -b flag to git checkout.
 Check out main: 
+>```
 >git checkout main 
+>```
 Git pull to make sure your local main branch is up to date with origin/main.
+>```
 >git checkout -b [branch-name] to create a new branch and switch to it.
+>```
 
 ## House Rules
 
