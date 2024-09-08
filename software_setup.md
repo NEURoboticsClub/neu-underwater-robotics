@@ -22,27 +22,27 @@ Please follow this [comprehensive guides](https://docs.github.com/en/authenticat
 >Go to your Github settings -> SSH and GPG keys -> New SSH key -> paste in public key you just copied
 
 ## Install Python:
-For Mac/Linux: No action needed. Open terminal and type `python3 --version` and make sure the version is >= 3.10. If you need to update your version, follow the instructions on the [python website](https://wiki.python.org/moin/BeginnersGuide/Download) \
-For Windows: I recommend installing [Anaconda](https://www.anaconda.com/download) which is a package manager and virtual environment manager for Python. After downloading anaconda, open `Anaconda Powershell Prompt` from the start menu, and run the following commands:
-```
-conda create --name marine-robotics python=3.10
-conda activate marine-robotics
-```
-Note: [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is absolutely fantastic for most python development on windows, but pygame has trouble finding the USB controller when run using WSL.
+Open terminal and type `python3 --version` and make sure the version is = 3.10. If you need to update your version, follow the instructions on the [python website](https://wiki.python.org/moin/BeginnersGuide/Download) 
 
 ## Clone this repo:
-Open Terminal (Mac/Linux/WSL) or Git Bash (Windows) and type this: `git clone git@github.com:JonahJ27/neu-underwater-robotics.git`
+On the repo’s main page, git the green “code” button.
+Copy the “ssh” link under the “local” tab
+Now, open a terminal. If you’re on Windows, your default is powershell, but we recommend using Windows Terminal. If you’re on Mac or Linux, your default terminal is fine.
+From there run:
+>git clone [link-to-repo] [path-to-desired-repo-location] 
+Or cd into your desired folder and run:
+>git clone [link-to-repo]
 
 ## Install dependencies:
-Open terminal and navigate to the repo you just cloned (`cd ~/neu-underwater-robotics`).If you don't want to use a virtual environment, run `pip install -r requirements.txt` to install all needed dependencies. If you would like to use a venv, run `./setup.sh` to create a virtual environment for this project. Remember to run `source ./activate.sh` to activate this virtual environment when working with code in this repository, and `deactivate` when you are done.
+Open terminal and navigate to the repo you just cloned (`cd ~/neu-underwater-robotics`).If you don't want to use a virtual environment, run `pip install -r requirements.txt` to install all needed dependencies. 
+
+If you would like to use a venv, run `./setup.sh` to create a virtual environment for this project. Remember to run `source ./activate.sh` to activate this virtual environment when working with code in this repository, and `deactivate` when you are done. If you don't have any experience using a venv, you can skip that step. 
 
 ## Editor:
-Any editor that works with Python is fine, but I recommend using [VSCode](https://code.visualstudio.com/download) as your editor especially if you are a beginner. It has great support for Python and Git. If you use VSCode, I recommend installing the following extensions:
+Any editor that works with Python is fine, but we recommend using [VSCode](https://code.visualstudio.com/download) as your editor especially if you are a beginner. It has great support for Python and Git. If you use VSCode, we recommend installing the following extensions:
 - Python
 - GitLens
 - Black Formatter
 - Pylint
 - Remote - SSH
 - GitHub Copilot (Sign up for free as a student!)
-
-
