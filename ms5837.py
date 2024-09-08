@@ -56,7 +56,7 @@ class MS5837(object):
             print("Bus %d is not available."%bus)
             print("Available busses are listed as /dev/i2c*")
             self._bus = None
-        
+        sleep(1)
         self._fluidDensity = DENSITY_FRESHWATER
         self._pressure = 0
         self._temperature = 0
