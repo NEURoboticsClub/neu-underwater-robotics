@@ -45,12 +45,12 @@ To switch to a different branch called branch-name run:
 >```
 >git checkout branch-name
 >```
-These commands can be combined by adding the -b flag to git checkout. For example, to create a new branch called branch name and switch to it run:
+These commands can be combined by adding the -b flag to git checkout. For example, to create a new branch called branch-name and switch to it, run:
 >```
 >git checkout -b branch-name
 >```
 
-Once on your desired branch git pull to make sure your local main branch is up to date with origin/main:
+Once on your desired branch git pull to make sure your local branch is up to date:
 >```
 >git pull
 >```
@@ -72,15 +72,17 @@ Commit your changes often. as a rule of thumb, you should be committing, at mini
 Make sure you’re writing descriptive commit messages. A commit message should describe all of the changes you made in that commit. Someone should be able to understand what you did and when on a branch just from reading the commit history.
 
 ### Pull Requests
-Always squash and merge.
+Pull requests are used once an issue is fully resolved (tested and verified) and we want to merge the changes into the main branch. To create a pull request go to the Github, then go to the pull requests tab, and finally create the pull request, selcting the branch you want to merge. 
 
-Follow the pull request template.
+Once the pull request is open, make sure that your branch is able to be merged automatically (you have resolved all merge conflicts with main).	If there are merge conflicts you can go through and resolve them from within the pull request
+
+From there take the time to dilligently follow the template in the description box. Pull requests that neglect to do so will not be approved. 
 
 Before you submit the pull request, remember to request a review from Mia or if they are not available, from a software team member who has been here for a while.
 
-Make sure that your branch is up to date with main and it’s able to be merged automatically (there are no merge conflicts).	
+Finally, after review, squash and merge.
 
-If there are merge conflicts you can go through and resolve them from within the pull request
+Congrats! You have officially added your changes to main!
 
 ## Common Problems and Troubleshooting Tips
 
