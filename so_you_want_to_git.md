@@ -25,7 +25,11 @@ Every github repository has a number of branches, always including one main bran
     >```
 
 ### Basic Version Control
-Your local repository will not automatically update based on changes being made in the remote repository. There are two basic commands for updating your local repository: “git fetch” and “git pull”. “git fetch” will essentially download the changelog from the remote repository. Your local repository will now know what changes have been made in the remote repository, but it won’t implement them in the local instance. Notably, a git fetch will fetch the changelog for all branches. In order to actually implement those changes, you’ll have to run “git pull”. “git pull” will “pull” the remote changes from the branch that you’re on (and _only_ the branch that you’re on) into the local branch. Always remember that pulling on one branch will not pull on another. This is very important when doing things like git merge.
+Your local repository will not automatically update based on changes being made in the remote repository. There are two basic commands for updating your local repository: “git fetch” and “git pull”. 
+
+“git fetch” will essentially download the changelog from the remote repository. Your local repository will now know what changes have been made in the remote repository, but it won’t implement them in the local instance. Notably, a git fetch will fetch the changelog for all branches. In order to actually implement those changes, you’ll have to run “git pull”. 
+
+“git pull” will “pull” the remote changes from the branch that you’re on (and _only_ the branch that you’re on) into the local branch. Always remember that pulling on one branch will not pull on another. This is very important when doing things like git merge.
 
 ### When to Fetch
 A git fetch is primarily useful when you want to know if any changes have been made to the branch you’re on, or to main, without making any changes to the branch you’re working on. If you’re not experienced with Github, you probably won’t be using this very often.
@@ -57,7 +61,9 @@ Once on your desired branch git pull to make sure your local main branch is up t
 ### Creating a New Branch
 Branches should be named according to the github issue they’re associated with. for example, a branch for the issue “implement claw” would be called implement-claw.
 
-Remember to link your branch to the relevant github issue.
+Remember to create your branch from the relevant github issue. To do this open the issue that is being tackled. Navigate to the menu on the right and under the section titled "Development" select "Create a branch". Then be sure to use the name of the issue to title your branch, removing the auto-generated number prefix.
+
+If you are creating a branch unrelated to an issue (unlikely), use a desciptive but succint title with words separated by hyphens. 
 
 
 ### Making Commits 
@@ -67,9 +73,13 @@ Make sure you’re writing descriptive commit messages. A commit message should 
 
 ### Pull Requests
 Always squash and merge.
+
 Follow the pull request template.
+
 Before you submit the pull request, remember to request a review from Mia or if they are not available, from a software team member who has been here for a while.
+
 Make sure that your branch is up to date with main and it’s able to be merged automatically (there are no merge conflicts).	
+
 If there are merge conflicts you can go through and resolve them from within the pull request
 
 ## Common Problems and Troubleshooting Tips
