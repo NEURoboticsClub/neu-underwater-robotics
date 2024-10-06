@@ -41,18 +41,18 @@ class Camera:
     def stop_saving(self):
         self.is_saving = False
 
-    def on_new_buffer(self, sink):
+    def on_new_buffer(self, sink): ## everytime it gets a new frame, pull sample signal -> stored in buffer, reshapes into numpy array
         sample = sink.emit('pull-sample')
         buffer = sample.get_buffer()
         self._frame = np.ndarray(
-            shape=(720, 1280, 3),
+            shape=(720, 1280, 3), # 720 by 1280 resolution
             buffer=buffer.extract_dup(0, buffer.get_size()),
             dtype=np.uint8,
         )
         self.frame_counter += 1
         return Gst.FlowReturn.OK
 
-    def get_frame(self) -> bytes:
+    def get_frame(self) -> bytes: ## makes image from array of values and stores as jpeg
         if self._frame is not None and self._frame.any():
             file_object = BytesIO()
             img = Image.fromarray(self._frame)

@@ -1,6 +1,6 @@
 import time
 
-from flask import Flask, render_template, Response, redirect, url_for
+from flask import Flask, render_template, Response, redirect, url_for #hosts webserver on localhost
 
 from io import BytesIO
 from base64 import b64encode
@@ -26,7 +26,7 @@ def index():
         return render_template("index.html", is_saving=cameras.get(str(PORT_TO_SAVE)).is_saving, image_data=SAVED_FRAME)
     return render_template("index.html", is_saving=cameras.get(str(PORT_TO_SAVE)).is_saving)
 
-def gen(port, crop=False):
+def gen(port, crop=False): ## python generator (only calculated when needed)- gets a frame and puts in html tag
     global counter
     camera = cameras.get(str(port))
     while True:
@@ -38,7 +38,7 @@ def gen(port, crop=False):
 
 
 @app.route("/raw_frame/<port>")
-def raw_frame(port):
+def raw_frame(port): ## save as jpeg then open and save as png on webpage
     camera = cameras.get(str(port))
     img = Image.open(BytesIO(camera.get_frame()))
     image_io = BytesIO()
@@ -47,7 +47,7 @@ def raw_frame(port):
     return render_template('image.html', image_data=dataurl)
 
 @app.route("/start_saving")
-def start_saving():
+def start_saving(): 
     camera = cameras.get(str(PORT_TO_SAVE))
     camera.start_saving()
     return redirect(url_for('index'))
@@ -59,7 +59,7 @@ def stop_saving():
     return redirect(url_for('index'))
 
 @app.route("/video_feed/<port>")
-def video_feed(port):
+def video_feed(port): ## gen response here
     return Response(gen(port), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 @app.route("/cropped_video_feed/<port>")
@@ -67,7 +67,7 @@ def cropped_video_feed(port):
     return Response(gen(port, crop=True), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 @app.route("/save_frame")
-def save_frame():
+def save_frame(): ## saving images for photogrammetry
     global SAVED_FRAME
     camera = cameras.get(str(PORT_TO_SAVE))
     img = Image.open(BytesIO(camera.get_frame()))

@@ -29,6 +29,7 @@ class ROVState:
         self.thrusters = thrusters
         self.sensors = sensors
         self._current_velocity = VelocityVector()
+        self._current_claw = {"extend": 0, "rotate": 90, "close": 90}
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         for axis in self._current_velocity.keys():
@@ -38,6 +39,7 @@ class ROVState:
         self._control_loop_frequency = 10  # Hz
         self._last_time = time_ms()  # time the last control loop iteration was executed in ms
         self._last_current_velocity_update = 0  # time of last current velocity update in ms
+        self._last_current_claw_update = 0  # time of last current claw update in ms
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
         self._current_depth = 0 # current depth of ROV
         self._target_depth = 0 # target depth for ROV
@@ -85,6 +87,24 @@ class ROVState:
         """
         self._current_velocity = velocity
         self._last_current_velocity_update = time_ms()
+    
+    def set_claw_movement(self, claw: dict):
+        """
+        Set current velocity.
+        Args:
+            claw (dict): current claw movement values
+        """
+        self._current_claw = claw
+        self._last_current_claw_update = time_ms()
+
+    def set_current_depth(self, recent_depths):
+        """
+        Set current depth by averaging previous 10 values
+        Args: 
+            recent_depths (List[float]): Lsit of the most recent depths
+        """
+        self._current_depth = np.avg(recent_depths)
+
 
     def set_current_depth(self, recent_depths):
         """
@@ -138,12 +158,18 @@ class ROVState:
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
             print(thruster_mix)
-            thruster_tasks = [
-                self.thrusters[name].set_val(value) for name, value in thruster_mix.items()
-            ]
+            # print(self._current_claw)
+            set_val_tasks = []
+            for name, value in thruster_mix.items():
+                set_val_tasks.append(self.thrusters[name].set_val(value))
+            for name, value in self._current_claw.items():
+                set_val_tasks.append(self.actuators[name].set_val(value))
+            
             for thruster_name, thruster in self.thrusters.items():
                 print(f"{thruster_name}: {thruster_mix[thruster_name]}")
-            await asyncio.gather(*thruster_tasks)
+            for actuator_name, actuator in self.actuators.items():
+                print(f"{actuator_name}: {self._current_claw[actuator_name]}")
+            await asyncio.gather(*set_val_tasks)
 
             # sleep until next control loop iteration
             if (time_ms() - self._last_time) < loop_period:
