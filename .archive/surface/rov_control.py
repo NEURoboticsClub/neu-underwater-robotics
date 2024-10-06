@@ -110,7 +110,8 @@ class joystick:
 
         if precision > 1.1:
             precision = self.ratio
-        # depth_hold = self.buttons_dict[2].get_joy_val() # for auto depth
+        
+        depth_hold = self.buttons_dict[2].get_joy_val() # for auto depth
 
         front_left = self.radius * precision * (forward + right + yaw) / 3.0 + self.center
         back_left = self.radius * precision * (forward - right + yaw) / 3.0 + self.center

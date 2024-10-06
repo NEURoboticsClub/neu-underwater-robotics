@@ -133,8 +133,8 @@ class Server:
                 )
             
             if "depth" in json_msg:
-                # self.rov_state.set
-                pass
+                self.rov_state.set
+                # pass
 
 
 if __name__ == "__main__":
