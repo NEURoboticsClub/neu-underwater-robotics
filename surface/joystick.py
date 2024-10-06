@@ -139,6 +139,18 @@ class XBoxDriveController(Controller):
             "left_stick": self._buttons[8],
             "right_stick": self._buttons[9],
         }
+        self._last_button_values_dict = {
+            "A": False,
+            "B": False,
+            "X": False,
+            "Y": False,
+            "LB": False,
+            "RB": False,
+            "back": False,
+            "start": False,
+            "left_stick": False,
+            "right_stick": False,
+        }
         self.axis_dict = {
             "left_x": self._axes[0],
             "left_y": self._axes[1],
@@ -147,6 +159,10 @@ class XBoxDriveController(Controller):
             "left_trigger": self._axes[4],
             "right_trigger": self._axes[5],
         }
+
+    def _update_last_button_values(self) -> None:
+        for item in enumerate(self._last_button_values_dict):
+            self._last_button_values_dict[item[1]] = self._joystick.get_button(item[0])
 
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
@@ -174,6 +190,15 @@ class XBoxDriveController(Controller):
                         (self.axis_dict["right_x"].get_joy_val() + 1) * 5 + 92
 
         return vec
+    
+    def get_auto_depth(self) -> dict:
+        pygame.event.get()
+        self._poll()
+        auto_depth_toggle = {}
+        auto_depth_toggle["to_toggle"] = (self.buttons_dict["X"].get_joy_val() and not self._last_button_values_dict["X"])
+        self._update_last_button_values()
+        return auto_depth_toggle
+
 
 
 # class ArmJoystick(Joystick):

@@ -24,10 +24,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     last_time = time.time()
     while True:
         vec = drive_controller.get_velocity_vector()
+        auto_depth = drive_controller.get_auto_depth()
         claw_vec = claw_controller.get_claw_vector()
         msg = {
             "target_velocity": json.dumps(vec.to_dict()),
             "claw_movement": json.dumps(claw_vec),
+            "auto_depth": json.dumps(auto_depth),
         }
         s.send(str.encode(json.dumps(msg)))
         print(f"sent: {msg}")

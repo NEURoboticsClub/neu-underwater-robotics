@@ -42,6 +42,7 @@ class ROVState:
         self._last_current_claw_update = 0  # time of last current claw update in ms
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
         self._current_depth = 0 # current depth of ROV
+        self._auto_depth_on = False
         self._target_depth = 0 # target depth for ROV
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
 
@@ -124,6 +125,9 @@ class ROVState:
         self._target_velocity = velocity
         self._last_target_velocity_update = time_ms()
     
+    def set_auto_depth(self, auto_depth: dict):
+        if (auto_depth["to_toggle"]):
+            self._auto_depth_on = not self._auto_depth_on
 
     async def control_loop(self):
         """Control loop."""
@@ -133,11 +137,12 @@ class ROVState:
             # update last time
             self._last_time = time_ms()
 
-            if -0.1 < self._target_velocity.z < 0.1:
-                self._target_depth -= self._target_velocity.z * self._z_sensitivity
-                # test different sensitivities and potentially functions
-                if self._target_depth > 1 and self._current_depth > 1:
-                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
+            if (self._auto_depth_on):
+                if -0.1 < self._target_velocity.z < 0.1:
+                    self._target_depth -= self._target_velocity.z * self._z_sensitivity
+                    # test different sensitivities and potentially functions
+                    if self._target_depth > 1 and self._current_depth > 1:
+                        self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
 
             if time_ms() - self._last_target_velocity_update > 2 * loop_period:
                 # target velocity is stale, stop ROV
