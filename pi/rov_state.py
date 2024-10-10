@@ -107,15 +107,6 @@ class ROVState:
         self._current_depth = np.avg(recent_depths)
 
 
-    def set_current_depth(self, recent_depths):
-        """
-        Set current depth by averaging previous 10 values
-        Args: 
-            recent_depths (List[float]): Lsit of the most recent depths
-        """
-        self._current_depth = np.avg(recent_depths)
-
-
     def set_target_velocity(self, velocity: VelocityVector):
         """Set target velocity.
 
