@@ -139,6 +139,11 @@ class Server:
                     dict(json.loads(json_msg["claw_movement"]))
                 )
             
+            if "depth" in json_msg:
+                self.rov_state.set_current_depth(
+                    dict(json.loads(json_msg["depth"]))
+                )
+            
             if "auto_depth" in json_msg:
                 self.rov_state.set_auto_depth(
                     dict(json.loads(json_msg["auto_depth"]))
