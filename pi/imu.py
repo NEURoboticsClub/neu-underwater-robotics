@@ -2,19 +2,11 @@
 # import json
 # import socket
 
-<<<<<<< Updated upstream
 # from Adafruit_BNO055 import BNO055
 
 # HOST = "192.168.0.112"  # The server's hostname or IP address
 # PORT = 2049  # The port used by the server
 # CONTROL_LOOP_FREQ = 100  # Hz
-=======
-import adafruit_bno055
-
-HOST = "192.168.0.112"  # The server's hostname or IP address
-PORT = 2049  # The port used by the server
-CONTROL_LOOP_FREQ = 100  # Hz
->>>>>>> Stashed changes
 
 # bno = BNO055.BNO055(serial_port='/dev/serial0', rst=18)
 
@@ -59,7 +51,6 @@ CONTROL_LOOP_FREQ = 100  # Hz
 #         print('System error: {0}'.format(error))
 #         print('See datasheet section 4.3.59 for the meaning.')
         
-<<<<<<< Updated upstream
 #     while True:
 #         data = read_data()
 #         msg = {
@@ -122,21 +113,3 @@ while True:
     print()
 
     time.sleep(1)
-=======
-    while True:
-        data = read_data()
-        # print("imu data: " + str(data.to_dict()))
-
-        msg = {
-            "imu data": json.dumps(data.to_dict()),
-        }
-        s.send(str.encode(json.dumps(msg)))
-        print(f"sent: {msg}")
-
-        # sleep for remainder of loop
-        if time.time() - last_time < 1 / CONTROL_LOOP_FREQ:
-            time.sleep(1 / CONTROL_LOOP_FREQ - (time.time() - last_time))
-        else:
-            print("Warning: control loop took too long")
-        last_time = time.time()
->>>>>>> Stashed changes
