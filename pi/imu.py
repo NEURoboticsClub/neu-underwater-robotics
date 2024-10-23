@@ -1,3 +1,53 @@
+# SPDX-FileCopyrightText: 2020 Bryan Siepert, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
+import time
+import board
+import busio
+from adafruit_bno08x import (
+    BNO_REPORT_ACCELEROMETER,
+    BNO_REPORT_GYROSCOPE,
+    BNO_REPORT_MAGNETOMETER,
+    BNO_REPORT_ROTATION_VECTOR,
+)
+from adafruit_bno08x.i2c import BNO08X_I2C
+
+i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
+bno = BNO08X_I2C(i2c)
+
+bno.enable_feature(BNO_REPORT_ACCELEROMETER)
+bno.enable_feature(BNO_REPORT_GYROSCOPE)
+bno.enable_feature(BNO_REPORT_MAGNETOMETER)
+bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
+
+while True:
+    time.sleep(0.5)
+    print("Acceleration:")
+    accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
+    print("X: %0.6f  Y: %0.6f Z: %0.6f  m/s^2" % (accel_x, accel_y, accel_z))
+    print("")
+
+    print("Gyro:")
+    gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
+    print("X: %0.6f  Y: %0.6f Z: %0.6f rads/s" % (gyro_x, gyro_y, gyro_z))
+    print("")
+
+    print("Magnetometer:")
+    mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
+    print("X: %0.6f  Y: %0.6f Z: %0.6f uT" % (mag_x, mag_y, mag_z))
+    print("")
+
+    print("Rotation Vector Quaternion:")
+    quat_i, quat_j, quat_k, quat_real = bno.quaternion  # pylint:disable=no-member
+    print(
+        "I: %0.6f  J: %0.6f K: %0.6f  Real: %0.6f" % (quat_i, quat_j, quat_k, quat_real)
+    )
+    print("")
+
+
+
+
+
 # import time
 # import json
 # import socket
@@ -69,47 +119,47 @@
 # SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
 # SPDX-License-Identifier: MIT
 
-import time
-import board
-import adafruit_bno055
+# import time
+# import board
+# import adafruit_bno055
 
 
-i2c = board.I2C()  # uses board.SCL and board.SDA
-# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-sensor = adafruit_bno055.BNO055_I2C(i2c)
+# i2c = board.I2C()  # uses board.SCL and board.SDA
+# # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+# sensor = adafruit_bno055.BNO055_I2C(i2c)
 
-# If you are going to use UART uncomment these lines
-# uart = board.UART()
-# sensor = adafruit_bno055.BNO055_UART(uart)
+# # If you are going to use UART uncomment these lines
+# # uart = board.UART()
+# # sensor = adafruit_bno055.BNO055_UART(uart)
 
-last_val = 0xFFFF
-
-
-def temperature():
-    global last_val  # pylint: disable=global-statement
-    result = sensor.temperature
-    if abs(result - last_val) == 128:
-        result = sensor.temperature
-        if abs(result - last_val) == 128:
-            return 0b00111111 & result
-    last_val = result
-    return result
+# last_val = 0xFFFF
 
 
-while True:
-    print("Temperature: {} degrees C".format(sensor.temperature))
-    """
-    print(
-        "Temperature: {} degrees C".format(temperature())
-    )  # Uncomment if using a Raspberry Pi
-    """
-    print("Accelerometer (m/s^2): {}".format(sensor.acceleration))
-    print("Magnetometer (microteslas): {}".format(sensor.magnetic))
-    print("Gyroscope (rad/sec): {}".format(sensor.gyro))
-    print("Euler angle: {}".format(sensor.euler))
-    print("Quaternion: {}".format(sensor.quaternion))
-    print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
-    print("Gravity (m/s^2): {}".format(sensor.gravity))
-    print()
+# def temperature():
+#     global last_val  # pylint: disable=global-statement
+#     result = sensor.temperature
+#     if abs(result - last_val) == 128:
+#         result = sensor.temperature
+#         if abs(result - last_val) == 128:
+#             return 0b00111111 & result
+#     last_val = result
+#     return result
 
-    time.sleep(1)
+
+# while True:
+#     print("Temperature: {} degrees C".format(sensor.temperature))
+#     """
+#     print(
+#         "Temperature: {} degrees C".format(temperature())
+#     )  # Uncomment if using a Raspberry Pi
+#     """
+#     print("Accelerometer (m/s^2): {}".format(sensor.acceleration))
+#     print("Magnetometer (microteslas): {}".format(sensor.magnetic))
+#     print("Gyroscope (rad/sec): {}".format(sensor.gyro))
+#     print("Euler angle: {}".format(sensor.euler))
+#     print("Quaternion: {}".format(sensor.quaternion))
+#     print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
+#     print("Gravity (m/s^2): {}".format(sensor.gravity))
+#     print()
+
+#     time.sleep(1)
