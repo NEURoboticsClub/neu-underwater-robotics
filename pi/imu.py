@@ -4,6 +4,9 @@
 import time
 import board
 import busio
+import json
+import socket
+
 from adafruit_bno08x import (
     BNO_REPORT_ACCELEROMETER,
     BNO_REPORT_GYROSCOPE,
@@ -12,112 +15,78 @@ from adafruit_bno08x import (
 )
 from adafruit_bno08x.i2c import BNO08X_I2C
 
-i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
-bno = BNO08X_I2C(i2c)
+HOST = "192.168.0.112"  # The server's hostname or IP address
+PORT = 2049  # The port used by the server
+CONTROL_LOOP_FREQ = 100  # Hz
 
-# bno.enable_feature(BNO_REPORT_ACCELEROMETER)
-bno.enable_feature(BNO_REPORT_GYROSCOPE)
-bno.enable_feature(BNO_REPORT_MAGNETOMETER)
-bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
+def read_data() -> dict:
+    data = {}
+    # acceleration
+    accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
+    acceleration = {}
+    acceleration["x"] = accel_x
+    acceleration["y"] = accel_y
+    acceleration["z"] = accel_z
+    data["acceleration"] = acceleration
 
-while True:
-    time.sleep(0.5)
-    # print("Acceleration:")
-    # accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
-    # print("X: %0.6f  Y: %0.6f Z: %0.6f  m/s^2" % (accel_x, accel_y, accel_z))
-    # print("")
-
-    print("Gyro:")
+    # gyro
     gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
-    print("X: %0.6f  Y: %0.6f Z: %0.6f rads/s" % (gyro_x, gyro_y, gyro_z))
-    print("")
+    gyroscope = {}
+    gyroscope["x"] = gyro_x
+    gyroscope["y"] = gyro_y
+    gyroscope["z"] = gyro_z
+    data["gyroscope"] = gyroscope
 
-    print("Magnetometer:")
+    # magnetometer
     mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
-    print("X: %0.6f  Y: %0.6f Z: %0.6f uT" % (mag_x, mag_y, mag_z))
-    print("")
+    magnetometer = {}
+    magnetometer["x"] = mag_x
+    magnetometer["y"] = mag_y
+    magnetometer["z"] = mag_z
+    data["magnetometer"] = magnetometer
 
-    print("Rotation Vector Quaternion:")
+    # quaternion
     quat_i, quat_j, quat_k, quat_real = bno.quaternion  # pylint:disable=no-member
-    print(
-        "I: %0.6f  J: %0.6f K: %0.6f  Real: %0.6f" % (quat_i, quat_j, quat_k, quat_real)
-    )
-    print("")
+    quaternion = {}
+    quaternion["i"] = quat_i
+    quaternion["j"] = quat_j
+    quaternion["k"] = quat_k
+    quaternion["real"] = quat_real
+    data["quaternion"] = quaternion
 
+    return data
 
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    print(f"connecting to {HOST}:{PORT}")
+    s.connect((HOST, PORT))
+    last_time = time.time()
 
+    try:
+        i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
+        bno = BNO08X_I2C(i2c)
 
-
-# import time
-# import json
-# import socket
-
-# from Adafruit_BNO055 import BNO055
-
-# HOST = "192.168.0.112"  # The server's hostname or IP address
-# PORT = 2049  # The port used by the server
-# CONTROL_LOOP_FREQ = 100  # Hz
-
-# bno = BNO055.BNO055(serial_port='/dev/serial0', rst=18)
-
-# def read_data():
-#     # Read the Euler angles for heading, roll, pitch (all in degrees).
-#     heading, roll, pitch = bno.read_euler()
-#     # Read the calibration status, 0=uncalibrated and 3=fully calibrated.
-#     sys, gyro, accel, mag = bno.get_calibration_status()
-#     # Print everything out.
-#     return ('Heading: {0:0.2F} Roll: {1:0.2F} Pitch: {2:0.2F}\tSys_cal: {3} Gyro_cal: {4} Accel_cal: {5} Mag_cal: {6}'.format(
-#           heading, roll, pitch, sys, gyro, accel, mag))
-#     # Other values you can optionally read:
-#     # Orientation as a quaternion:
-#     #x,y,z,w = bno.read_quaterion()
-#     # Sensor temperature in degrees Celsius:
-#     #temp_c = bno.read_temp()
-#     # Magnetometer data (in micro-Teslas):
-#     #x,y,z = bno.read_magnetometer()
-#     # Gyroscope data (in degrees per second):
-#     #x,y,z = bno.read_gyroscope()
-#     # Accelerometer data (in meters per second squared):
-#     #x,y,z = bno.read_accelerometer()
-#     # Linear acceleration data (i.e. acceleration from movement, not gravity--
-#     # returned in meters per second squared):
-#     #x,y,z = bno.read_linear_acceleration()
-#     # Gravity acceleration data (i.e. acceleration just from gravity--returned
-#     # in meters per second squared):
-#     #x,y,z = bno.read_gravity()
-
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#     print(f"connecting to {HOST}:{PORT}")
-#     s.connect((HOST, PORT))
-#     last_time = time.time()
-
-#     # Initialize the BNO055 and stop if something went wrong.
-#     if not bno.begin():
-#         raise RuntimeError('Failed to initialize BNO055! Is the sensor connected?')
+        bno.enable_feature(BNO_REPORT_ACCELEROMETER)
+        bno.enable_feature(BNO_REPORT_GYROSCOPE)
+        bno.enable_feature(BNO_REPORT_MAGNETOMETER)
+        bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
+    except Exception as e:
+        raise RuntimeError("Could not initialize IMU")
     
-#     # Print out an error if system status is in error mode.
-#     status, self_test, error = bno.get_system_status()
-#     if status == 0x01:
-#         print('System error: {0}'.format(error))
-#         print('See datasheet section 4.3.59 for the meaning.')
-        
-#     while True:
-#         data = read_data()
-#         msg = {
-#             "imu data": json.dumps(data.to_dict()),
-#         }
-#         s.send(str.encode(json.dumps(msg)))
-#         print(f"sent: {msg}")
+    while True:
+        data = read_data()
+        msg = {
+            "imu data": json.dumps(data),
+        }
+        s.send(str.encode(json.dumps(msg)))
+        print(f"sent: {msg}")
 
-#         # sleep for remainder of loop
-#         if time.time() - last_time < 1 / CONTROL_LOOP_FREQ:
-#             time.sleep(1 / CONTROL_LOOP_FREQ - (time.time() - last_time))
-#         else:
-#             print("Warning: control loop took too long")
-#         last_time = time.time()
+        # sleep for remainder of loop
+        if time.time() - last_time < 1 / CONTROL_LOOP_FREQ:
+            time.sleep(1 / CONTROL_LOOP_FREQ - (time.time() - last_time))
+        else:
+            print("Warning: control loop took too long")
+        last_time = time.time()
 
-# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
-# SPDX-License-Identifier: MIT
 
 # import time
 # import board
