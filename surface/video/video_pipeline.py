@@ -39,7 +39,7 @@ better and more official, please replace it.
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstApp', '1.0')
-from gi.repository import Gst, GstApp
+from gi.repository import Gst, GstApp, GLib
 
 # TODO(gst-phase): Defensive code (the ifs at the start of each
 # function body) could be replaced with decorators maybe?
@@ -51,11 +51,14 @@ pipeline = None  # Gst.Pipeline | Gst.Element | None
 appsink = None  # AppSink | None
 
 def setup(pipeline_description):
+    global setup_called
     if setup_called:
         print("video_pipeline.py: setup has already been called! Ignoring call.")
         return
 
     Gst.init(None)
+
+    global pipeline
 
     try:
         pipeline = Gst.parse_launch(pipeline_description)
@@ -70,7 +73,10 @@ def setup(pipeline_description):
         return
 
     # TODO(marvin): Can't find this function on the internet?
+    global appsink
     appsink = pipeline.get_by_name(APP_SINK_NAME)
+    print(pipeline)
+    print(appsink)
 
     if appsink is None:
         print("video_pipeline.py: appsink in the pipeline could not be found. Setup failed.")
@@ -84,6 +90,7 @@ def setup(pipeline_description):
     setup_called = True
 
 def connect_sink_listener(sink_listener):
+    global setup_called
     if not setup_called:
         print("video_pipeline.py: cannot connect sink listener if setup has not been called. Ignoring request.")
         return
@@ -97,14 +104,27 @@ def connect_sink_listener(sink_listener):
             return Gst.FlowReturn.ERROR
             
 
+    global appsink
     appsink.connect('new-sample', listener_wrapper)
 
 def teardown():
+    global setup_called
     if not setup_called:
         print("video_pipeline.py: cannot teardown if setup has not been called. Ignoring request.")
         return
 
+    global pipeline
     pipeline.set_state(Gst.State.NULL)
+    global appsink
     appsink = None
     pipeline = None
     setup_called = False
+
+
+if __name__ == '__main__':
+    import sys
+    pipeline_desc = " ".join(sys.argv[1:])
+    pipeline_desc = "v4l2src device=/dev/video2 ! videoconvert ! appsink name=appsink0"
+    print(pipeline_desc)
+    setup(pipeline_desc)
+    
