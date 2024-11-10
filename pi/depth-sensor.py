@@ -8,8 +8,27 @@ HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 CONTROL_LOOP_FREQ = 5  # Hz
 
-# Print readings
 def read_depth(sensor):        
+        """
+        Reads the depth from the given sensor and prints the sensor data.
+
+        The function reads the pressure, depth, and temperature from the sensor.
+        It prints the pressure in mbar and psi, the depth in meters, and the 
+        temperature in both Celsius and Fahrenheit. If the sensor read fails, 
+        it prints an error message and exits the program.
+
+        Args:
+            sensor: An object representing the depth sensor. The sensor object 
+                    must have the methods `read()`, `pressure()`, `depth()`, 
+                    and `temperature()`. The `pressure()` and `temperature()` 
+                    methods should accept optional units arguments.
+
+        Returns:
+            float: The depth value read from the sensor in meters.
+
+        Raises:
+            SystemExit: If the sensor read fails.
+        """
         if sensor.read():
                 print(("P: %0.1f mbar  %0.3f psi\tDepth: %0.3f\tT: %0.2f C  %0.2f F") % (
                 sensor.pressure(), # Default is mbar (no arguments)

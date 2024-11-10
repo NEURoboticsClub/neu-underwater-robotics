@@ -192,6 +192,12 @@ class XBoxDriveController(Controller):
         return vec
     
     def get_auto_depth(self) -> dict:
+        """
+        Polls the joystick for the current state and determines if the auto depth toggle button ("X") has been pressed.
+
+        Returns:
+            dict: A dictionary with a single key "to_toggle" which is True if the "X" button has been pressed and was not pressed in the last poll, otherwise False.
+        """
         pygame.event.get()
         self._poll()
         auto_depth_toggle = {}

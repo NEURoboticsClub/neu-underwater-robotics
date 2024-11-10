@@ -117,8 +117,18 @@ class ROVState:
         self._last_target_velocity_update = time_ms()
     
     def set_auto_depth(self, auto_depth: dict):
+        """
+        Toggles the automatic depth control state based on the provided dictionary.
+
+        Args:
+            auto_depth (dict): A dictionary containing the key "to_toggle" which determines
+                               whether to toggle the automatic depth control state.
+                               If "to_toggle" is True, the state will be toggled.
+        """
         if (auto_depth["to_toggle"]):
             self._auto_depth_on = not self._auto_depth_on
+            if (self._auto_depth_on):
+                self._target_depth = self._current_depth
 
     async def control_loop(self):
         """Control loop."""
@@ -129,11 +139,10 @@ class ROVState:
             self._last_time = time_ms()
 
             if (self._auto_depth_on):
-                if -0.1 < self._target_velocity.z < 0.1:
-                    self._target_depth -= self._target_velocity.z * self._z_sensitivity
-                    # test different sensitivities and potentially functions
-                    if self._target_depth > 1 and self._current_depth > 1:
-                        self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
+                # self._target_depth -= self._target_velocity.z * self._z_sensitivity
+                # test different sensitivities and potentially functions
+                if self._target_depth > 1: #and self._current_depth > 1:
+                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
 
             if time_ms() - self._last_target_velocity_update > 2 * loop_period:
                 # target velocity is stale, stop ROV
