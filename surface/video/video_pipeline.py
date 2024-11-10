@@ -121,10 +121,47 @@ def teardown():
     __setup_called = False
 
 
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtCore import QUrl
+
+class VideoPlayer(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("PyQt5 Video Player")
+
+        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+
+        videoWidget = QVideoWidget()
+
+        self.mediaPlayer.setVideoOutput(videoWidget)
+
+        layout = QVBoxLayout()
+        layout.addWidget(videoWidget)
+        self.setLayout(layout)
+
+        self.mediaPlayer.setMedia(QMediaContent(
+            QUrl("gst-pipeline: v4l2src device=/dev/video4 ! videoconvert ! autovideosink")
+            # QUrl.fromLocalFile("/home/marvin/Documents/Projects/neu/neu-underwater-robotics/surface/video/refvid.mp4")
+        ))
+        self.mediaPlayer.play()
+
+# Have to run this first on Ubuntu 22
+# sudo apt purge gstreamer1.0-vaapi
+# https://forum.qt.io/topic/151811/qt-5-12-2-camera-example-crash-at-startup/17
+        
 if __name__ == '__main__':
     import sys
-    pipeline_desc = " ".join(sys.argv[1:])
+    # pipeline_desc = " ".join(sys.argv[1:])
     pipeline_desc = "v4l2src device=/dev/video2 ! videoconvert ! appsink name=appsink0"
     print(pipeline_desc)
-    setup(pipeline_desc)
+    # setup(pipeline_desc)
+
+    app = QApplication(sys.argv)
+    player = VideoPlayer()
+    player.show()
+    sys.exit(app.exec_())
+    
     
