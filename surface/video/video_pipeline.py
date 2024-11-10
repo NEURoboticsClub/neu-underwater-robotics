@@ -44,38 +44,38 @@ from gi.repository import Gst, GstApp, GLib
 # TODO(gst-phase): Defensive code (the ifs at the start of each
 # function body) could be replaced with decorators maybe?
 
-APP_SINK_NAME = "appsink0"
+__APP_SINK_NAME = "appsink0"
 
-setup_called = False
-pipeline = None  # Gst.Pipeline | Gst.Element | None
+__setup_called = False
+__pipeline = None  # Gst.Pipeline | Gst.Element | None
 appsink = None  # AppSink | None
 
 def setup(pipeline_description):
-    global setup_called
-    if setup_called:
+    global __setup_called
+    if __setup_called:
         print("video_pipeline.py: setup has already been called! Ignoring call.")
         return
 
     Gst.init(None)
 
-    global pipeline
+    global __pipeline
 
     try:
-        pipeline = Gst.parse_launch(pipeline_description)
+        __pipeline = Gst.parse_launch(pipeline_description)
     except GLib.Error as inst:
         print("video_pipeline.py: Gst.parse_launch raised an error. Setup failed.")
         print(type(inst))
         print(inst)
         return
 
-    if pipeline is None:
+    if __pipeline is None:
         print("video_pipeline.py: Gst.parse_launch returned None. There is no pipeline... Setup failed.")
         return
 
     # TODO(marvin): Can't find this function on the internet?
     global appsink
-    appsink = pipeline.get_by_name(APP_SINK_NAME)
-    print(pipeline)
+    appsink = __pipeline.get_by_name(__APP_SINK_NAME)
+    print(__pipeline)
     print(appsink)
 
     if appsink is None:
@@ -86,12 +86,12 @@ def setup(pipeline_description):
     appsink.set_property('drop', True)
     appsink.set_property('sync', False)
 
-    pipeline.set_state(Gst.State.PLAYING)
-    setup_called = True
+    __pipeline.set_state(Gst.State.PLAYING)
+    __setup_called = True
 
 def connect_sink_listener(sink_listener):
-    global setup_called
-    if not setup_called:
+    global __setup_called
+    if not __setup_called:
         print("video_pipeline.py: cannot connect sink listener if setup has not been called. Ignoring request.")
         return
 
@@ -108,17 +108,17 @@ def connect_sink_listener(sink_listener):
     appsink.connect('new-sample', listener_wrapper)
 
 def teardown():
-    global setup_called
-    if not setup_called:
+    global __setup_called
+    if not __setup_called:
         print("video_pipeline.py: cannot teardown if setup has not been called. Ignoring request.")
         return
 
-    global pipeline
-    pipeline.set_state(Gst.State.NULL)
+    global __pipeline
+    __pipeline.set_state(Gst.State.NULL)
     global appsink
     appsink = None
-    pipeline = None
-    setup_called = False
+    __pipeline = None
+    __setup_called = False
 
 
 if __name__ == '__main__':
