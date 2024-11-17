@@ -141,8 +141,8 @@ class ROVState:
             if (self._auto_depth_on):
                 # self._target_depth -= self._target_velocity.z * self._z_sensitivity
                 # test different sensitivities and potentially functions
-                if self._target_depth > 1: #and self._current_depth > 1:
-                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
+                #if self._target_depth > 1: #and self._current_depth > 1:
+                self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
 
             if time_ms() - self._last_target_velocity_update > 2 * loop_period:
                 # target velocity is stale, stop ROV
