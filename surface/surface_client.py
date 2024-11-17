@@ -29,7 +29,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         msg = {
             "target_velocity": json.dumps(vec.to_dict()),
             "claw_movement": json.dumps(claw_vec),
-            "auto_depth": json.dumps(auto_depth),
+            "auto_depth": json.dumps(auto_depth)
         }
         s.send(str.encode(json.dumps(msg)))
         print(f"sent: {msg}")
