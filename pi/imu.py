@@ -26,7 +26,7 @@ try:
 except Exception as e:
     raise RuntimeError("Could not initialize IMU")
 
-HOST = "192.168.0.112"  # The server's hostname or IP address
+HOST = "192.168.0.113"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 CONTROL_LOOP_FREQ = 100  # Hz
 
