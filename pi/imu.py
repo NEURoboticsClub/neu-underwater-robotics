@@ -75,7 +75,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         data = read_data()
         msg = {
-            "imu data": json.dumps(data),
+            "imu_data": json.dumps(data),
         }
         s.send(str.encode(json.dumps(msg)))
         print(f"sent: {msg}")

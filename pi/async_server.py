@@ -129,6 +129,9 @@ class Server:
                 self.rov_state.set_target_velocity(
                     utils.VelocityVector(json.loads(json_msg["target_velocity"]))
                 )
+            
+            if "imu_data" in json_msg:
+                
 
 
 if __name__ == "__main__":
