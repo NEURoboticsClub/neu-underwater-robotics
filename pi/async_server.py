@@ -135,7 +135,7 @@ class Server:
                 )
 
             if "imu_data" in json_msg:
-                print(json_msg["imu_data"])
+                print(dict(json.loads(json_msg["imu_data"])))
 
             if "claw_movement" in json_msg:
                 self.rov_state.set_claw_movement(
