@@ -22,12 +22,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
     s.connect((HOST, PORT))
     last_time = time.time()
-    sensor = ms5837.MS5837_02BA(1) # Default I2C bus is 1 (Raspberry Pi 3)
-
+    
     # We must initialize the sensor before reading it
-    if not sensor.init():
-        print("Sensor could not be initialized")
-        exit(1)
+    
 
     # store target height as a variable
     # come up with target velocity based on current velocity, 
