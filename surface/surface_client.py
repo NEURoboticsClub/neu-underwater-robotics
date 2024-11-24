@@ -3,7 +3,7 @@ import os
 import socket
 import time
 
-from .joystick import XBoxDriveController
+from joystick  import XBoxDriveController
 
 HOST = "192.168.0.114"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
@@ -16,6 +16,7 @@ if os.environ.get("SIM"):
     HOST = "127.0.0.1"
 
 drive_controller = XBoxDriveController(joy_id=0)
+claw_controller = XBoxDriveController(joy_id=1)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
@@ -23,8 +24,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     last_time = time.time()
     while True:
         vec = drive_controller.get_velocity_vector()
+        claw_vec = claw_controller.get_claw_vector()
         msg = {
             "target_velocity": json.dumps(vec.to_dict()),
+            "claw_movement": json.dumps(claw_vec),
         }
         s.send(str.encode(json.dumps(msg)))
         print(f"sent: {msg}")

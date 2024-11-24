@@ -142,9 +142,9 @@ class XBoxDriveController(Controller):
         self.axis_dict = {
             "left_x": self._axes[0],
             "left_y": self._axes[1],
-            "right_x": self._axes[4],
+            "right_x": self._axes[2],
             "right_y": self._axes[3],
-            "left_trigger": self._axes[2],
+            "left_trigger": self._axes[4],
             "right_trigger": self._axes[5],
         }
 
@@ -152,23 +152,27 @@ class XBoxDriveController(Controller):
         """get the desired velocity vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        vec = VelocityVector("left_x", "left_y", "B" - "X", "right_x", "right_y", "Y" - "A")
-        values = {
-            'a': 1 if "A".get_joy_val else 0,
-            'b': 1 if "B".get_joy_val else 0,
-            'x': 1 if "X".get_joy_val else 0,
-            'y': 1 if "Y".get_joy_val else 0,
-            'lr': "left_x".get_joy_val,
-            'ud': "left_y".get_joy_val,
-            'yaw': "right_x".get_joy_val,
-            'pitch': "right_y".get_joy_val
-        }
-        vec.x = values.get('lr')
-        vec.y = values.get('ud')
-        vec.z = values.get('b') - values.get('x')
-        vec.yaw = values.get('yaw')
-        vec.pitch = values.get('pitch')
-        vec.roll = values.get('y') - values.get('a')
+        vec = VelocityVector()
+        # TODO: control scheme goes here
+        vec.x = self.axis_dict["left_x"].get_joy_val() * -1
+        vec.y = self.axis_dict["left_y"].get_joy_val() 
+        vec.z = self.axis_dict["left_trigger"].get_joy_val()
+        vec.yaw = self.axis_dict["right_y"].get_joy_val() * -1
+        # print(self.axis_dict["right_y"].get_joy_val())
+
+        return vec
+    
+    def get_claw_vector(self) -> dict:
+        """get the desired claw vector from joystick values"""
+        pygame.event.get()  # clear events to get current values (not sure why this is needed)
+        self._poll()  # get current joystick values
+        vec = {}
+        # TODO: control scheme goes here
+        vec["extend"] = self.axis_dict["left_y"].get_joy_val()
+        vec["rotate"] = self.axis_dict["right_y"].get_joy_val() * 90 + 90
+        vec["close"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
+                        (self.axis_dict["right_x"].get_joy_val() + 1) * 5 + 92
+
         return vec
 
 

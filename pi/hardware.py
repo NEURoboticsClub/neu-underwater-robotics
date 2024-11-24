@@ -105,6 +105,7 @@ class Servo(Actuator):
         """continuously set angle of servo motor"""
         while True:
             async with self.lock:
+                print(f"{self.pin}: writing {self.angle}")
                 self.pin.write(self.angle)
             await asyncio.sleep(0.1)
 
@@ -114,21 +115,25 @@ class Thruster(Servo):
 
     active_range: tuple
 
-    def __init__(self, pin: Pin, active_range: tuple = (30, 150)):
+    def __init__(self, pin: Pin, active_range: tuple = (35, 145), reverse=False):
         super().__init__(pin)
         self.active_range = active_range
+        self.reverse = reverse
 
     def linear_map(self, x: float):
         """map value to thruster value"""
-        return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
-
+        if not self.reverse:
+            return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
+        return int(linear_map(x, -1, 1, self.active_range[1], self.active_range[0]))
 
 class LinActuator(Actuator):
     """Linear actuator class."""
 
-    def __init__(self, pin: Pin):
+    def __init__(self, pin: Pin, pin2: Pin, deadzone: int = 0.1):
         self.pin = pin
+        self.pin2 = pin2
         self.pos = 0
+        self.deadzone = deadzone
         self.lock = asyncio.Lock()
 
     def linear_map(self, x: float):
@@ -138,8 +143,8 @@ class LinActuator(Actuator):
 
     async def set_val(self, val: int):
         """set extension rate of linear actuator motor in degrees"""
-        if val < 0 or val > 1:
-            raise ValueError("Angle must be between 0 and 1")
+        if val < -1 or val > 1:
+            raise ValueError("Angle must be between -1 and 1")
         async with self.lock:
             self.pos = val
 
@@ -147,5 +152,13 @@ class LinActuator(Actuator):
         """continuously set extension rate of linear actuator"""
         while True:
             async with self.lock:
-                self.pin.write(self.pos)
+                if self.pos < 0 - self.deadzone:
+                    self.pin.write(1)
+                    self.pin2.write(0)
+                elif self.pos > 0 + self.deadzone:
+                    self.pin.write(0)
+                    self.pin2.write(1)
+                else:
+                    self.pin.write(0)
+                    self.pin2.write(0)
             await asyncio.sleep(0.1)

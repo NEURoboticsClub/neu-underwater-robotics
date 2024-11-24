@@ -7,7 +7,7 @@ from pyfirmata import Pin
 
 from common import utils
 
-from .hardware import Servo, Thruster
+from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
 SERVER_IP = "192.168.0.113"  # raspberry pi ip
@@ -33,17 +33,21 @@ class Server:
             self._init_firmata()
             self.rov_state = ROVState(
                 actuators={
-                    "servo": Servo(self._get_pin(12, "s")),
+                    "extend": LinActuator(self._get_pin(12, "o"), self._get_pin(13, "o")),
+                    "rotate": Servo(self._get_pin(10, "s")),
+                    "close": Servo(self._get_pin(9, "s")),
                 },
                 thrusters={
-                    "front_left_horizontal": Thruster(self._get_pin(4, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(5, "s")),
-                    "back_left_horizontal": Thruster(self._get_pin(6, "s")),
+                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
+                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
+                    "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
                     "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                    "left_vertical": Thruster(self._get_pin(8, "s")),
-                    "right_vertical": Thruster(self._get_pin(9, "s")),
+                    "left_vertical": Thruster(self._get_pin(3, "s")),
+                    "right_vertical": Thruster(self._get_pin(5, "s")),
                 },
-                sensors={},
+                sensors={
+
+                },
             )
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
@@ -129,9 +133,18 @@ class Server:
                 self.rov_state.set_target_velocity(
                     utils.VelocityVector(json.loads(json_msg["target_velocity"]))
                 )
-            
+
             if "imu_data" in json_msg:
-                
+                pass
+
+            if "claw_movement" in json_msg:
+                self.rov_state.set_claw_movement(
+                    dict(json.loads(json_msg["claw_movement"]))
+                )
+            
+            if "depth" in json_msg:
+                # self.rov_state.set
+                pass
 
 
 if __name__ == "__main__":
