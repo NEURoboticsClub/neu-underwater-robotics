@@ -3,7 +3,7 @@ import os
 import socket
 import time
 
-from joystick  import XBoxDriveController
+from joystick import XBoxDriveController
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
@@ -15,7 +15,7 @@ if os.environ.get("SIM"):
         raise RuntimeError("Simulation mode not confirmed")
     HOST = "127.0.0.1"
 
-drive_controller = XBoxDriveController(joy_id=0)
+drive_controller = XBoxDriveController(joy_id=0, toggle_indices=[0])
 claw_controller = XBoxDriveController(joy_id=1)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
