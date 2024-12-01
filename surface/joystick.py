@@ -125,7 +125,7 @@ class Controller(ABC):
         """get the desired velocity vector from joystick values"""
 
 
-class XBoxDriveController(Controßßller):
+class XBoxDriveController(Controller):
     """Represents a joystick with buttons and axes."""
 
     def __init__(self, joy_id: int, toggle_indices: list[int] = None):
