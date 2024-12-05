@@ -28,33 +28,45 @@ except Exception as e:
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
-CONTROL_LOOP_FREQ = 100  # Hz
+CONTROL_LOOP_FREQ = 5  # Hz
 
+"""Creates a dictionary with the given x, y, and z arguments.
+
+Args:
+    x: the value to set dict["x"] to
+    y: the value to set dict["y"] to
+    z: the value to set dict["z"] to
+
+Returns:
+    dict: a dictionary with the given values as "x", "y", and "z"
+"""
+def make_xyz_dict(x, y, z) -> dict:
+    diction = {}
+    diction["x"] = x
+    diction["y"] = y
+    diction["z"] = z
+
+    return diction
+
+"""Reads data from the IMU sensor and returns as a dictionary.
+
+Returns:
+    dict: a dictionary of dictionaries, each one containing a set of data from the IMU
+        (accelerometer, gyroscope, magnetometer, or quaternion)
+"""
 def read_data() -> dict:
     data = {}
     # acceleration
     accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
-    acceleration = {}
-    acceleration["x"] = accel_x
-    acceleration["y"] = accel_y
-    acceleration["z"] = accel_z
-    data["acceleration"] = acceleration
+    data["acceleration"] = make_xyz_dict(accel_x, accel_y, accel_z)
 
     # gyro
     gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
-    gyroscope = {}
-    gyroscope["x"] = gyro_x
-    gyroscope["y"] = gyro_y
-    gyroscope["z"] = gyro_z
-    data["gyroscope"] = gyroscope
+    data["gyroscope"] = make_xyz_dict(gyro_x, gyro_y, gyro_z)
 
     # magnetometer
     mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
-    magnetometer = {}
-    magnetometer["x"] = mag_x
-    magnetometer["y"] = mag_y
-    magnetometer["z"] = mag_z
-    data["magnetometer"] = magnetometer
+    data["magnetometer"] = make_xyz_dict(mag_x, mag_y, mag_z)
 
     # quaternion
     quat_i, quat_j, quat_k, quat_real = bno.quaternion  # pylint:disable=no-member
@@ -67,6 +79,10 @@ def read_data() -> dict:
 
     return data
 
+"""
+Starts the client. Connects to async_server, then reads and
+publishes IMU data to the server at the rate defined above until manually terminated.
+"""
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
     s.connect((HOST, PORT))
