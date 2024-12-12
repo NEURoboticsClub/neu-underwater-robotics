@@ -15,7 +15,7 @@ if os.environ.get("SIM"):
         raise RuntimeError("Simulation mode not confirmed")
     HOST = "127.0.0.1"
 
-drive_controller = XBoxDriveController(joy_id=0, toggle_indices=[0])
+drive_controller = XBoxDriveController(joy_id=0, toggle_indices=[2])
 claw_controller = XBoxDriveController(joy_id=1)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

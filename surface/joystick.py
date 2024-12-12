@@ -41,10 +41,12 @@ class Toggle(Button):
     def __init__(self):
         super().__init__()
         self.button_pressed = False
+        self.last_state = False
 
     def update(self, state):
-        if state:
+        if state and not self.last_state:
             self.button_pressed = not self.button_pressed
+        self.last_state = state
 
 
 class Axis(JoyItem[float]):
@@ -87,10 +89,11 @@ class Controller(ABC):
         self._joystick.init()
         self._axes: list[Axis] = [Axis()
                                   for _ in range(self._joystick.get_numaxes())]
-        self._buttons: list[Button] = [Toggle() if i in toggle_indices else Button()
+        self._buttons: list[Button] = [Button() if i not in toggle_indices else Toggle()
                                        for i in range(self._joystick.get_numbuttons())]
         self._hats: list[Hat] = [Hat()
                                  for _ in range(self._joystick.get_numhats())]
+        #self._toggles: list[Toggle] = [Toggle() for _ in toggle_indices]
 
     def update(self, event: pygame.event.EventType) -> None:
         """update the joystick with given event"""
