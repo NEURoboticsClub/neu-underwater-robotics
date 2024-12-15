@@ -93,7 +93,6 @@ class Controller(ABC):
                                        for i in range(self._joystick.get_numbuttons())]
         self._hats: list[Hat] = [Hat()
                                  for _ in range(self._joystick.get_numhats())]
-        #self._toggles: list[Toggle] = [Toggle() for _ in toggle_indices]
 
     def update(self, event: pygame.event.EventType) -> None:
         """update the joystick with given event"""
