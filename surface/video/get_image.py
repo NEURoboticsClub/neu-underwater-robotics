@@ -1,3 +1,4 @@
+# To be removed, in favour of PyQt5
 import requests
 import base64
 from io import BytesIO

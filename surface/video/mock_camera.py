@@ -1,3 +1,4 @@
+# To be removed, in favour of PyQt5's GST backend.
 from PIL import Image
 from io import BytesIO
 

@@ -1,3 +1,11 @@
+# To be deprecated in favour of PyQt5.
+# Features yet to be moved out:
+# - Show continuous video data.
+# - Start/stop saving of video data streaming in from one particular port.
+#   - When is_saving is true, every frame is saved as an image in the Images folder.
+#   - Maybe better to just save as a video?
+# - Save one frame to an image file.
+
 import time
 
 from flask import Flask, render_template, Response, redirect, url_for #hosts webserver on localhost
@@ -18,6 +26,7 @@ cameras = {
 
 PORT_TO_SAVE = 5600
 
+# ImageData. To be used as as the src field of the <image> tag.
 SAVED_FRAME = None
 
 @app.route("/")

@@ -1,3 +1,4 @@
+# To be removed, in favour of PyQt's camera window with GST backend.
 import cv2
 import numpy as np
 from PIL import Image
