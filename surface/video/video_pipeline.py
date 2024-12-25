@@ -143,7 +143,7 @@ class VideoPlayer(QWidget):
         self.setLayout(layout)
 
         self.mediaPlayer.setMedia(QMediaContent(
-            QUrl("gst-pipeline: v4l2src device=/dev/video4 ! videoconvert ! autovideosink")
+            QUrl("gst-pipeline: udpsrc port=5000 ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink")
             # QUrl.fromLocalFile("/home/marvin/Documents/Projects/neu/neu-underwater-robotics/surface/video/refvid.mp4")
         ))
         self.mediaPlayer.play()
