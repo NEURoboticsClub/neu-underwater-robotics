@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow
-from widgets.surface_central import SurfaceCentralWidget
+from .widgets.surface_central import SurfaceCentralWidget
 
 SURFACE_WINDOW_TITLE = "NURobotics Surface Window"
 
