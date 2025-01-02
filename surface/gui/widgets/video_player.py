@@ -59,6 +59,7 @@ class VideoPlayerWidget(QWidget):
         """
         layout = QVBoxLayout()
         layout.addWidget(w)
+        layout.setContentsMargins(0, 0, 0, 0) 
         self.setLayout(layout)
 
     def on_error(self, new_error):

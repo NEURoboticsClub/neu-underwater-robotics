@@ -2,27 +2,29 @@ from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QLabel, QVBoxLay
 from PyQt5.QtCore import Qt
 from .video_player import VideoPlayerWidget
 
+# An ISurfaceCentralWidget is a QWidget that takes in a list of QUrls
+# in its __init__.
+
 class SurfaceCentralWidget(QWidget):
     """The central widget for the surface window.
     """
-    def __init__(self, tl_qurl, tr_qurl, bl_qurl, br_qurl):
+    def __init__(self, video_player_qurls):
         """Constructs this widget with the given camera QUrl.
 
-        tl_qurl : QUrl -- For the top-left camera view.
-        tr_qurl : QUrl -- For the top-right camera view.
-        bl_qurl : QUrl -- For the bottom-left camera view.
-        br_qurl : QUrl -- For tthe bottom-right camera view.
+        video_player_qurls : [Listof QUrl]
         """
         super().__init__()
 
         # Set up the grid layout
         grid = QGridLayout()
+        grid.setSpacing(0)
+        grid.setContentsMargins(0, 0, 0, 0) 
 
         # Create camera views and status labels
-        self.tl_vp = VideoPlayerWidget(tl_qurl)
-        self.bl_vp = VideoPlayerWidget(bl_qurl)
-        self.tr_vp = VideoPlayerWidget(tr_qurl)
-        self.br_vp = VideoPlayerWidget(br_qurl)
+        self.tl_vp = VideoPlayerWidget(video_player_qurls[0], self)
+        self.bl_vp = VideoPlayerWidget(video_player_qurls[1], self)
+        self.tr_vp = VideoPlayerWidget(video_player_qurls[2], self)
+        self.br_vp = VideoPlayerWidget(video_player_qurls[3], self)
         self.telemetry = QLabel("Depth: 0\nVelocity: 10\nAcceleration: 5", self)
         self.photogrammetry = QLabel("Photogrammetry", self)
 
@@ -44,5 +46,9 @@ class SurfaceCentralWidget(QWidget):
         grid.setColumnStretch(0, 2)  # Wider columns on the left
         grid.setColumnStretch(1, 2)
         grid.setColumnStretch(2, 1)  # Narrow column on the right
+
+        # Top and bottom rows must have same height
+        grid.setRowStretch(0, 1)
+        grid.setRowStretch(1, 1)
 
         self.setLayout(grid)

@@ -35,7 +35,7 @@ MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink"
+PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! xvimagesink name=\"qtvideosink\""
 
 def get_cmdline_args():
     parser = argparse.ArgumentParser(
@@ -103,7 +103,6 @@ def get_surface_central_if_can(maybe_widget_name):
     else:
         return SurfaceCentralWidget
 
-
 # TODO(allocation): Probably should move this into a utils folder.
 # From https://stackoverflow.com/a/13808375
 import importlib
@@ -135,14 +134,18 @@ def main():
 
     if not sc_widget_cls:
         logging.error('The given widget name, %s, does not exist in gui/widgets/surface_central.py. Shutting down..',
-                  widget_name)
+                      widget_name)
         sys.exit(1)
 
-            
-    return
-
     app = QApplication(sys.argv)
-    scw = sc_widget_cls(qurls)
+    try:
+        scw = sc_widget_cls(qurls)
+    except TypeError as e:
+        logger.error('There is a TypeError with the instantiation of the widget class. Make sure that the __init__ of the widget class takes in the expected arguments. As for what the expected arguments are, refer to the README.md of the surface module.')
+        logger.error(e)
+        logger.error('Shutting down...')
+        sys.exit(1)
+
     main_window = SurfaceWindow(scw)
     main_window.show()
     app.exec_()
