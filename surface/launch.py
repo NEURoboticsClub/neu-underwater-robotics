@@ -23,14 +23,19 @@ The port numbers used will be n, n+1, ..., n+k-1, where k is the number of camer
 
 import argparse
 import logging
+import os
 import sys
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
 from .gui.widgets.surface_central import SurfaceCentralWidget
 from .gui.surface_window import SurfaceWindow
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(levelname)s:%(message)s')
 
+RPATH_TO_SURPRESSED_MESSAGES_FILE = './surpressed_qt_messages.txt'
+PATH_TO_SURPRESSED_MESSAGES_FILE = os.path.join(os.path.dirname(__file__),
+                                                RPATH_TO_SURPRESSED_MESSAGES_FILE)
 MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 
 # TODO(config): Users ought to be able to specify this without prying
@@ -46,6 +51,7 @@ def get_cmdline_args():
     parser.add_argument('-p', '--lowest-port-num', type=int, required=True)
     parser.add_argument('-n', '--num-cameras', type=int, required=True)
     parser.add_argument('-w', '--widget', default=None)
+    parser.add_argument('-s', '--show-surpressed', action='store_true')
 
     return parser.parse_args()
 
@@ -126,11 +132,74 @@ def class_for_name(module_name, class_name):
         # Thrown when class_name not found in m
         return False
 
+def get_surpressed_message_handler(msgs_to_surpress):
+    """Gets the custom message handler that surpresses the given messages.
+
+    If no messages to surpress, then the check is skipped completely.
+
+    messages_to_surpress : [Listof str]
+
+    Returns: [QtMsgType, QMessageLogContext, str] -> None
+
+    """
+    def custom_message_handler_checked(msg_type, msg_log_context, msg):
+        if msg in msgs_to_surpress: return
+        custom_message_handler(msg_type, msg_log_context, msg)
+
+    """
+    qt_handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logging.getLogger().addHandler(handler)
+    """
+
+    def custom_message_handler(msg_type, msg_log_context, msg):
+        # msg_log_context is pretty useless. It is al zero'ed out.
+        logger_func = get_logger_func(msg_type)
+        logger_func(msg)
+
+    def get_logger_func(msg_type):
+        """Maps the given Qt message type to a logging function with an appropriate level.
+
+        msg_type : QtMsgType
+
+        Returns: [str *args **kwargs -> None]
+        """
+        match msg_type:
+            case QtMsgType.QtCriticalMsg:
+                return logging.critical
+            case QtMsgType.QtDebugMsg:
+                return logging.debug
+            case QtMsgType.QtFatalMsg:
+                return logging.critical
+            case QtMsgType.QtInfoMsg:
+                return logging.info
+            case QtMsgType.QtSystemMsg:
+                return logging.info
+            case QtMsgType.QtWarningMsg:
+                return logging.warning
+
+    return custom_message_handler_checked if msgs_to_surpress else custom_message_handler
+    
+def get_maybe_messages_to_surpress(should_show_surpressed):
+    """Gets the list of messages to surpress.
+
+    should_show_surpressed : bool
+
+    Returns: [Listof String]
+    """
+    if should_show_surpressed:
+        return []
+    else:
+        with open(PATH_TO_SURPRESSED_MESSAGES_FILE, 'r') as f:
+            return [line for line in (x.strip() for x in f)]
+
 def main():
     args = get_cmdline_args()
 
     qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
     sc_widget_cls = get_surface_central_if_can(args.widget)
+    messages_to_surpress = get_maybe_messages_to_surpress(args.show_surpressed)
 
     if not sc_widget_cls:
         logging.error('The given widget name, %s, does not exist in gui/widgets/surface_central.py. Shutting down..',
@@ -138,6 +207,7 @@ def main():
         sys.exit(1)
 
     app = QApplication(sys.argv)
+    qInstallMessageHandler(get_surpressed_message_handler(messages_to_surpress))
     try:
         scw = sc_widget_cls(qurls)
     except TypeError as e:

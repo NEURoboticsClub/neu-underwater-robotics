@@ -17,4 +17,5 @@ class SurfaceWindow(QMainWindow):
         """
         super().__init__()
         self.setWindowTitle(SURFACE_WINDOW_TITLE)
+        self.setGeometry(100, 100, 800, 600)
         self.setCentralWidget(surface_central)

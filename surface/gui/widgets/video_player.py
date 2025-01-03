@@ -36,21 +36,21 @@ class VideoPlayerWidget(QWidget):
         super(VideoPlayerWidget, self).__init__(parent)
 
         # Create media player, and attach listeners
-        media_player = QMediaPlayer(self, QMediaPlayer.VideoSurface)
+        self.media_player = QMediaPlayer(self, QMediaPlayer.VideoSurface)
         if on_media_status_changed:
-            media_player.mediaStatusChanged.connect(on_media_status_changed)
+            self.media_player.mediaStatusChanged.connect(on_media_status_changed)
         if on_error:
-            media_player.error.connect(on_error)
-        media_player.error.connect(self.on_error)
+            self.media_player.error.connect(on_error)
+        self.media_player.error.connect(self.on_error)
 
         # Video widget
         video_widget = QVideoWidget(self)
         self._set_layout_to_given(video_widget)
 
         # Finish setting up media player
-        media_player.setVideoOutput(video_widget)
-        media_player.setMedia(QMediaContent(qurl))
-        media_player.play()
+        self.media_player.setVideoOutput(video_widget)
+        self.media_player.setMedia(QMediaContent(qurl))
+        self.media_player.play()
 
     def _set_layout_to_given(self, w):
         """Sets the layout of this widget to the given widget.
