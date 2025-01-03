@@ -1,6 +1,6 @@
 import pytest
 
-from ..launch import get_surface_central_if_can
+from ..xgui import get_surface_central_if_can
 
 from ..gui.widgets.surface_central import SurfaceCentralWidget
 
