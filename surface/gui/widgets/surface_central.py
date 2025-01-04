@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QLabel, QVBoxLayout, QSlider, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt
 from .grid_video_players import GridVideoPlayersWidget
 
@@ -9,9 +9,10 @@ class SurfaceCentralWidget(QWidget):
     """The central widget for the surface window.
     """
     def __init__(self, video_player_qurls):
-        """Constructs this widget with the given camera QUrl.
+        """Constructs this widget with the given QUrls.
 
-        video_player_qurls : [Listof QUrl]
+        video_player_qurls : List[QUrl]
+
         """
         super().__init__()
 

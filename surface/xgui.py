@@ -1,27 +1,12 @@
-#!/usr/bin/env python3
+"""Surface GUI App Launcher
 
-"""Surface App Launcher
-
-Usage:
-python video --lowest-port-num <VIDEO PORT NUMBER>
-             --num-cameras <NUMBER OF CAMERAS>
-             --widget <NAME OF SURFACE CENTRAL WIDGET IN `widgets/surface_central` FOLDER>
-
-OR
-
-python video -p <VIDEO PORT NUMBER>
-             -n <NUMBER OF CAMERAS>
-             -w <NAME OF SURFACE CENTRAL WIDGET IN `widgets/surface_central` FOLDER>
-
-NOTE: You may have to use python3 instead of python depending on your
-environment variables.
-
-Provide first port number, number of cameras in cmdline, and surface window to launch.
-The port numbers used will be n, n+1, ..., n+k-1, where k is the number of cameras and n is the first port number.
+Run this file as a module in command line, supplying the arguments as
+specified in the README.md.
 
 """
 
 import argparse
+import importlib
 import logging
 import os
 import sys
@@ -43,6 +28,12 @@ MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! xvimagesink name=\"qtvideosink\""
 
 def get_cmdline_args():
+    """Gets the values of the command line arguments.
+
+    Returns: argparse's Namespace that holds the values of the command
+    line arguments
+
+    """
     parser = argparse.ArgumentParser(
         prog='launch',
         description=('Reads the video and non-video data from the given '
@@ -63,8 +54,10 @@ def get_qurls_or_exit(lowest_port_num, num_cameras):
     cameras, and each QUrl has the port number equal to the given
     lowest_port_num plus its index.
 
-    lowest_port_num : natural
-    num_cameras : natural
+    lowest_port_num : nat
+    num_cameras : nat
+
+    Returns: List[QUrl]
 
     """
     highest_port_num = lowest_port_num + num_cameras - 1
@@ -73,7 +66,9 @@ def get_qurls_or_exit(lowest_port_num, num_cameras):
         return [QUrl(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_num))
                 for port_num in range(lowest_port_num, highest_port_num + 1)]
     else:
-        logger.error('Invalid port number. A port number must be between 1 and 65536. The given port numbers are in range [%s,%s]. Shutting down...', lowest_port_num, highest_port_num)
+        logger.error(('Invalid port number. A port number must be between 1 and 65536. '
+                      'The given port numbers are in range [%s,%s]. Shutting down...'), 
+                     lowest_port_num, highest_port_num)
         sys.exit(1)
 
 def _check_valid_port_num(port_num):
@@ -96,7 +91,7 @@ def get_surface_central_if_can(maybe_widget_name):
 
     maybe_widget_name : str?
 
-    Returns: ISurfaceCentral?
+    Returns: ISurfaceCentralWidget?
     """
     if maybe_widget_name:
         widget_name = maybe_widget_name
@@ -111,9 +106,9 @@ def get_surface_central_if_can(maybe_widget_name):
 
 # TODO(allocation): Probably should move this into a utils folder.
 # From https://stackoverflow.com/a/13808375
-import importlib
 def class_for_name(module_name, class_name):
-    """Gets the class associated with the given class name in the given module name from the enclosing of this module.
+    """Gets the class associated with the given class name in the given
+    module name from the enclosing of this module.
 
     If such a class name cannot be found, produce False.
 
@@ -137,24 +132,18 @@ def get_surpressed_message_handler(msgs_to_surpress):
 
     If no messages to surpress, then the check is skipped completely.
 
-    messages_to_surpress : [Listof str]
+    messages_to_surpress : List[str]
 
     Returns: [QtMsgType, QMessageLogContext, str] -> None
 
     """
     def custom_message_handler_checked(msg_type, msg_log_context, msg):
-        if msg in msgs_to_surpress: return
+        if msg in msgs_to_surpress:
+            return
         custom_message_handler(msg_type, msg_log_context, msg)
 
-    """
-    qt_handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(levelname)s - %(message)s")
-    handler.setFormatter(formatter)
-    logging.getLogger().addHandler(handler)
-    """
-
     def custom_message_handler(msg_type, msg_log_context, msg):
-        # msg_log_context is pretty useless. It is al zero'ed out.
+        # msg_log_context is pretty useless. It is all zero'ed out.
         logger_func = get_logger_func(msg_type)
         logger_func(msg)
 
@@ -165,6 +154,7 @@ def get_surpressed_message_handler(msgs_to_surpress):
 
         Returns: [str *args **kwargs -> None]
         """
+        # Pylint complains Class 'QtMsgType' has no X member. Pylint is wrong.
         match msg_type:
             case QtMsgType.QtCriticalMsg:
                 return logging.critical
@@ -180,30 +170,32 @@ def get_surpressed_message_handler(msgs_to_surpress):
                 return logging.warning
 
     return custom_message_handler_checked if msgs_to_surpress else custom_message_handler
-    
-def get_maybe_messages_to_surpress(should_show_surpressed):
+
+def get_messages_to_surpress(should_show_surpressed):
     """Gets the list of messages to surpress.
 
     should_show_surpressed : bool
 
-    Returns: [Listof String]
+    Returns: List[String]
     """
     if should_show_surpressed:
         return []
     else:
-        with open(PATH_TO_SURPRESSED_MESSAGES_FILE, 'r') as f:
+        with open(PATH_TO_SURPRESSED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
             return [line for line in (x.strip() for x in f)]
 
 def main():
+    """The entry point of this module."""
     args = get_cmdline_args()
 
     qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
     sc_widget_cls = get_surface_central_if_can(args.widget)
-    messages_to_surpress = get_maybe_messages_to_surpress(args.show_surpressed)
+    messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
 
     if not sc_widget_cls:
-        logging.error('The given widget name, %s, does not exist in gui/widgets/surface_central.py. Shutting down..',
-                      widget_name)
+        logging.error(('The given widget name, %s, does not exist in '
+                       'gui/widgets/surface_central.py. Shutting down..'),
+                      sc_widget_cls)
         sys.exit(1)
 
     app = QApplication(sys.argv)
@@ -211,7 +203,10 @@ def main():
     try:
         scw = sc_widget_cls(qurls)
     except TypeError as e:
-        logger.error('There is a TypeError with the instantiation of the widget class. Make sure that the __init__ of the widget class takes in the expected arguments. As for what the expected arguments are, refer to the README.md of the surface module.')
+        logger.error(('There is a TypeError with the instantiation of the widget class. '
+                      'Make sure that the __init__ of the widget class takes in the expected '
+                      'arguments. As for what the expected arguments are, refer to the '
+                      'README.md of the surface module.'))
         logger.error(e)
         logger.error('Shutting down...')
         sys.exit(1)
