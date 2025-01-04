@@ -10,7 +10,7 @@ import importlib
 import logging
 import os
 import sys
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
 from .gui.widgets.surface_central import SurfaceCentralWidget
 from .gui.surface_window import SurfaceWindow
@@ -98,8 +98,17 @@ def get_surface_central_if_can(maybe_widget_name):
         maybe_cls = class_for_name(MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS, widget_name)
 
         if maybe_cls:
-            return maybe_cls
+            if isinstance(maybe_cls, QWidget):
+                return maybe_cls
+            else:
+                logging.error(('The class, %s, is not a widget. The name provided must '
+                               'be a widget. Shutting down...'),
+                              maybe_widget_name)
+                return False
         else:
+            logging.error(('The given widget name, %s, does not exist in '
+                           'gui/widgets/surface_central.py. Shutting down..'),
+                          widget_name)
             return False
     else:
         return SurfaceCentralWidget
@@ -193,9 +202,6 @@ def main():
     messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
 
     if not sc_widget_cls:
-        logging.error(('The given widget name, %s, does not exist in '
-                       'gui/widgets/surface_central.py. Shutting down..'),
-                      sc_widget_cls)
         sys.exit(1)
 
     app = QApplication(sys.argv)
