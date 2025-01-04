@@ -58,6 +58,30 @@ Run
 ./xtest
 ```
 
+### Manual Testing
+
+1. To get video data streamed into the ports, either: 
+    * Follow the instructions in the [How to Stream Video
+   Guide](../pi/how_to_stream_video.txt).
+    * To use the video from a recording device on your machine, or GST's test
+    video source, respectively, run one of
+```sh
+gst-launch-1.0 v4l2src device=/dev/<YOUR DEVICE> ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=<YOUR PORT NUMBER>
+```
+
+```sh
+gst-launch-1.0 videotestsrc ! x264enc ! video/x-h264, stream-format=byte-stream ! rtph264pay ! udpsink host=127.0.0.1 port=<YOUR PORT NUMBER>
+```
+2. Repeat step 1 `n-1` more times where `n` is the number of cameras you would
+   like to test and is in the range `[1,4]`. The port numbers must be adjacent!
+   For example, ports `5000` and `5001` are fine, whereas ports `5000` and
+   `5002` are not.
+3. Launch the `xgui` script with the `CLI` instructions above, where the port
+   number should be the lowest number of the adjacen port numbers you used, and
+   the number of cameras is the value `n` you decided earlier.
+   
+Steps 1-2 and step 3 are interchangeable.
+
 ## GUI
 
 This is a UML activity diagram that summarizes the control flow `./xgui.py`.
@@ -86,4 +110,6 @@ The previous implementation was able to:
 - Save a recording of a single camera and save it to the top-side's file system.
 - Stream a cropped version of the video feed.
 
-To see the previous implementation, go to this commit. (TODO(README): Add the commit.)
+To see the previous implementation, go to [this
+commit](https://github.com/NEURoboticsClub/neu-underwater-robotics/tree/9633a4fee176d9314d47b826078086eee773c8c9),
+and navigate to `surface/video/`. Everything in there is the old implementation.
