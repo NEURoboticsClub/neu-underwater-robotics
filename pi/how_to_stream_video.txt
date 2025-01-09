@@ -1,0 +1,37 @@
+Everything below assumes a linux machine, which is what we'll be using in competitions.
+
+
+Installations:
+
+- GStreamer. Make sure to install the additional libraries associated with GStreamer. For example, `gstreamer1.0-libav`. If any of the GST commands below throws an error because something is unsupported, it's likely because an additional library of GST is not installed.
+- Install DWE OS on the Raspberry PI connected to the camera. It's not acually an OS, but the software provides a nice UI for interacting with the camera. While there should be a way to stream video without DWE OS, this makes our lives tremendously easier.
+
+Steps:
+
+1. Connect to NEU_ROV_MATE Wifi on the topside machine. The password is required, ask around.
+
+2. Open terminal, and enter `ssh pi@<IP ADDRESS OF PI>`. For example, `ssh pi@192.168.0.113`. This will allow you to execute commands on the PI by typing them into your machine.
+
+The following instructions from `https://docs.dwe.ai/software/dwe-os/guides/streaming`. You don't have open that, just putting that here just in case something goes wrong or you need more information from the source.
+
+3. On the topside machine, open your browser of choice and navigate to `http://<IP ADDRESS OF PI>`. DWE OS serves a web page on the IP address of the pi.
+
+4. On the web page, navigate to `Cameras` on the left-hand side, turn on the `Stream` switch. Change the `Format` settings to `H246`, anything else can be whatever you want.
+
+5. Find the IP Address of your topside machine by going into your terminal (not the pi SSH) and executing `hostname -I`. The output should be in the format `[0-255].[0-255].[0-255].[0-255]`. For example, `192.168.0.115`.
+
+6 Copy and paste that into the `IP Address` field of the DWE OS web page. Choose a port number that isn't already used for anything else. If you have no idea what that means, then any random 4 digit number would do, for example, 4567. (At a later time, if it says the IP address and the port is unavailable for whatever reason, then go back to this step and change the port number.)
+
+7. HIT THE PLUS SIGN TO THE RIGHT OF THE IP ADDRESS AND PORT FIELD BOXES!
+
+8. Hit `RESTART STREAM`. At this point, the pi should be streaming video data to your top side machine.
+
+9. (OPTIONAL) To make sure that that is true, go back to your terminal (not the pi SSH), and then execute `sudo tcpdump -n udp port <PORT NUMBER YOU USED JUST NOW>`. If you see a long barrage of texts flooding your screen, THAT'S A GOOD THING. That means that the port you put just now is received a shit ton of data. There's a good chance that's the video data. If there's nothing flooding your screen, that means your computer isn't receiving the video data.
+
+10. Go to your terminal (not the pi SSH), and then execute `gst-launch-1.0 udpsrc port=<THE PORT NUMBER YOU USED JUST NOW> ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink`. This should launch a window showing whatever the camera on the pi is seeing.
+
+
+Notes:
+- We can use GST for the entire process to get greater control. DWE OS uses GST underneath.
+- Step 10 is where you can configure how the topside machine interprets the video data coming in from the port. The settings there is basically to work with the H264 encoding.
+- If it doesn't work, consider trying on a different machine.
