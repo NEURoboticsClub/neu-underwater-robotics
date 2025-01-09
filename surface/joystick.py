@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 import pygame
+import platform
 
 from common import utils
 
@@ -121,31 +122,60 @@ class Controller(ABC):
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
 
+class ButtonMapper:
+
+    def __init__(self):
+        self.isWindows = platform.system() == "Windows"
+        self.isLinux = platform.system() == "Linux"
+
+        self.default_button_map = {
+            "A": 0,
+            "B": 1,
+            "X": 2,
+            "Y": 3,
+            "LB": 4,
+            "RB": 5,
+            "back": 6,
+            "start": 7,
+            "left_stick": 8,
+            "right_stick": 9,
+        }
+
+        self.default_axis_map = {
+            # Default Linux mappings
+            "left_x": 0,
+            "left_y": 1,
+            "right_x": 2,
+            "right_y": 3,
+            "left_trigger": 4,
+            "right_trigger": 5,
+        }
+
+        if self.isWindows:
+            # Windows specific mappings
+            self.default_axis_map = {
+                "left_x": 0,
+                "left_y": 1,
+                "right_x": 3,
+                "right_y": 4,
+                "left_trigger": 2,
+                "right_trigger": 5,
+            }
+
 
 class XBoxDriveController(Controller):
     """Represents a joystick with buttons and axes."""
 
     def __init__(self, joy_id: int):
         super().__init__(joy_id)
+        self.mapper = ButtonMapper()  # Instantiate the button mapper
         self.buttons_dict = {
-            "A": self._buttons[0],
-            "B": self._buttons[1],
-            "X": self._buttons[2],
-            "Y": self._buttons[3],
-            "LB": self._buttons[4],
-            "RB": self._buttons[5],
-            "back": self._buttons[6],
-            "start": self._buttons[7],
-            "left_stick": self._buttons[8],
-            "right_stick": self._buttons[9],
+            name: self._buttons[index]
+            for name, index in self.mapper.default_button_map.items()
         }
         self.axis_dict = {
-            "left_x": self._axes[0],
-            "left_y": self._axes[1],
-            "right_x": self._axes[2],
-            "right_y": self._axes[3],
-            "left_trigger": self._axes[4],
-            "right_trigger": self._axes[5],
+            name: self._axes[index]
+            for name, index in self.mapper.default_axis_map.items()
         }
 
     def get_velocity_vector(self) -> VelocityVector:
