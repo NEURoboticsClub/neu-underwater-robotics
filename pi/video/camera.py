@@ -33,11 +33,6 @@ class Camera:
         sample = sink.emit('pull-sample')
         buffer = sample.get_buffer()
         self._frame = buffer.extract_dup(0, buffer.get_size())
-        # self._frame = np.ndarray(
-        #     shape=(1080, 1920, 3),
-        #     buffer=buffer.extract_dup(0, buffer.get_size()),
-        #     dtype=np.uint8,
-        # )
         return Gst.FlowReturn.OK
 
     def get_frame(self) -> bytes:
@@ -47,12 +42,6 @@ class Camera:
             img.save(file_object, 'JPEG')
             file_object.seek(0)
             return file_object.read()
-        # if self._frame is not None and self._frame.any():
-        #     file_object = BytesIO()
-        #     img = Image.fromarray(self._frame)
-        #     img.save(file_object, 'JPEG')
-        #     file_object.seek(0)
-        #     return file_object.read()
         return b''
     
     def __str__(self):

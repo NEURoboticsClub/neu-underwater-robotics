@@ -1,53 +1,100 @@
+# SPDX-FileCopyrightText: 2020 Bryan Siepert, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
 import time
 import board
 import busio
-import adafruit_bno08x
-from adafruit_bno08x.i2c import BNO08X_I2C
 import json
 import socket
+
 from adafruit_bno08x import (
-    BNO_REPORT_GAME_ROTATION_VECTOR,
-    BNO_REPORT_LINEAR_ACCELERATION
+    BNO_REPORT_ACCELEROMETER,
+    BNO_REPORT_GYROSCOPE,
+    BNO_REPORT_MAGNETOMETER,
+    BNO_REPORT_ROTATION_VECTOR,
 )
+from adafruit_bno08x.i2c import BNO08X_I2C
+
+try:
+    i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
+    bno = BNO08X_I2C(i2c)
+
+    bno.enable_feature(BNO_REPORT_ACCELEROMETER)
+    bno.enable_feature(BNO_REPORT_GYROSCOPE)
+    bno.enable_feature(BNO_REPORT_MAGNETOMETER)
+    bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
+except Exception as e:
+    raise RuntimeError("Could not initialize IMU")
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 CONTROL_LOOP_FREQ = 5  # Hz
 
-# read acceleration and rotation
-def read_data(sensor):
-        data_dict = {}
-        accel_x, accel_y, accel_z = sensor.linear_acceleration  # pylint:disable=no-member
-        data_dict["acceleration"] = ("X: %0.6f  Y: %0.6f Z: %0.6f  m/s^2" % (accel_x, accel_y, accel_z))
+"""Creates a dictionary with the given x, y, and z arguments.
 
-        quat_i, quat_j, quat_k, quat_real = sensor.game_quaternion  # pylint:disable=no-member
-        data_dict["rotation vector"] = (
-            "I: %0.6f  J: %0.6f K: %0.6f  Real: %0.6f" % (quat_i, quat_j, quat_k, quat_real)
-        )
+Args:
+    x: the value to set dict["x"] to
+    y: the value to set dict["y"] to
+    z: the value to set dict["z"] to
 
-        return data_dict
+Returns:
+    dict: a dictionary with the given values as "x", "y", and "z"
+"""
+def make_xyz_dict(x, y, z) -> dict:
+    diction = {}
+    diction["x"] = x
+    diction["y"] = y
+    diction["z"] = z
 
+    return diction
+
+"""Reads data from the IMU sensor and returns as a dictionary.
+
+Returns:
+    dict: a dictionary of dictionaries, each one containing a set of data from the IMU
+        (accelerometer, gyroscope, magnetometer, or quaternion)
+"""
+def read_data() -> dict:
+    data = {}
+    # acceleration
+    accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
+    data["acceleration"] = make_xyz_dict(accel_x, accel_y, accel_z)
+
+    # gyro
+    gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
+    data["gyroscope"] = make_xyz_dict(gyro_x, gyro_y, gyro_z)
+
+    # magnetometer
+    mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
+    data["magnetometer"] = make_xyz_dict(mag_x, mag_y, mag_z)
+
+    # quaternion
+    quat_i, quat_j, quat_k, quat_real = bno.quaternion  # pylint:disable=no-member
+    quaternion = {}
+    quaternion["i"] = quat_i
+    quaternion["j"] = quat_j
+    quaternion["k"] = quat_k
+    quaternion["real"] = quat_real
+    data["quaternion"] = quaternion
+
+    return data
+
+"""
+Starts the client. Connects to async_server, then reads and
+publishes IMU data to the server at the rate defined above until manually terminated.
+"""
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
     s.connect((HOST, PORT))
     last_time = time.time()
-    # initialize sensor
-    i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
-    bno = BNO08X_I2C(i2c)
-
-    # leave these in in case we switch to uart:
-    # uart = serial.Serial("/dev/serial0", 115200)
-    # uart = busio.UART(board.TX, board.RX, frequency=3000000, receiver_buffer_size=2048)
-
-    bno.enable_feature(BNO_REPORT_GAME_ROTATION_VECTOR)
-    bno.enable_feature(BNO_REPORT_LINEAR_ACCELERATION)
-
+    
     while True:
-        data = read_data(bno)
+        data = read_data()
+        msg = {
+            "imu_data": json.dumps(data),
+        }
+        s.send(str.encode(json.dumps(msg)))
 
-        # send to async server as json
-        msg = json.dumps(data)
-        s.send(str.encode(msg))
         print(f"sent: {msg}")
 
         # sleep for remainder of loop
@@ -56,4 +103,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         else:
             print("Warning: control loop took too long")
         last_time = time.time()
-
