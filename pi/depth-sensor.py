@@ -33,6 +33,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print("Sensor could not be initialized")
         exit(1)
 
+    # TODO: Rewrite this to standard
     # store target height as a variable
     # come up with target velocity based on current velocity, 
     # target height and target depth

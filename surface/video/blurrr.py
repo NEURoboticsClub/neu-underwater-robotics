@@ -1,3 +1,4 @@
+# TODO: validate the use of this file
 import cv2
 import numpy as np
 import os
