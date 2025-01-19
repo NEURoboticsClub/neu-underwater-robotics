@@ -133,7 +133,10 @@ class Server:
                 self.rov_state.set_target_velocity(
                     utils.VelocityVector(json.loads(json_msg["target_velocity"]))
                 )
-            
+
+            if "imu_data" in json_msg:
+                print(dict(json.loads(json_msg["imu_data"])))
+
             if "claw_movement" in json_msg:
                 self.rov_state.set_claw_movement(
                     dict(json.loads(json_msg["claw_movement"]))
