@@ -17,7 +17,7 @@ python -m ./surface_client
 
 To launch the surface GUI app,
 ```sh
-./launch -p <PORT NUM> -n <NUM CAMERAS>
+./xgui -p <PORT NUM> -n <NUM CAMERAS>
 ```
 One can add `-s` flag to show surpressed messages. One can also add 
 `-w <Widget Name>` which locates the surface central to be used in
