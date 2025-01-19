@@ -22,6 +22,7 @@ We currently use a sockets based system to achieve two-way communication with a 
 - navigate to the `neu-underwater-robotics` directory (this directory)
 - activate venv if using (`source ./activate.sh`)
 - run `python -m surface/surface_client`
+- for how to run the surface's gui app, read [this](./surface/README.md).
 
 ## Testing on local machine
 - setup environment described in [software_setup.md](software_setup.md)
