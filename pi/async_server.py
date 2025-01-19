@@ -12,7 +12,7 @@ from .rov_state import ROVState
 
 SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
-ARDUINO_PORT = "/dev/ttyACM0"
+ARDUINO_PORT = "/dev/ttyUSB0"
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
