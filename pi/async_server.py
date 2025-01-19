@@ -77,7 +77,7 @@ class Server:
         self.loop.close()
 
     def _init_firmata(self):
-        self.board = pyfirmata.ArduinoMega(ARDUINO_PORT)
+        self.board = pyfirmata.ArduinoNano(ARDUINO_PORT)
         print("Successfully connected to Arduino")
         it = pyfirmata.util.Iterator(self.board)
         it.start()
