@@ -43,6 +43,7 @@ class ROVState:
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
         self._current_depth = 0 # current depth of ROV
         self._target_depth = 0 # target depth for ROV
+        self._current_imu_data = {}
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
 
     def get_tasks(self) -> list[asyncio.Task]:
@@ -90,7 +91,7 @@ class ROVState:
     
     def set_claw_movement(self, claw: dict):
         """
-        Set current velocity.
+        Set current claw movement values.
         Args:
             claw (dict): current claw movement values
         """
@@ -105,6 +106,13 @@ class ROVState:
         """
         self._current_depth = np.avg(recent_depths)
 
+    def set_current_imu_data(self, imu_data):
+        """
+        Set current imu data.
+        Args:
+            imu_data (dict): current imu data
+        """
+        self._current_imu_data = imu_data
 
     def set_target_velocity(self, velocity: VelocityVector):
         """Set target velocity.
