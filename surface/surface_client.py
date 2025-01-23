@@ -36,8 +36,9 @@ class SurfaceClient:
 
         send_task = asyncio.create_task(self.send_messages(writer))
         receive_task = asyncio.create_task(self.receive_messages(reader))
+        parse_task = asyncio.create_task(self._parse())
 
-        await asyncio.gather(send_task, receive_task)
+        await asyncio.gather(send_task, receive_task, parse_task)
 
     async def send_messages(self, writer):
         last_send_time = time.time()
@@ -60,7 +61,6 @@ class SurfaceClient:
 
     async def receive_messages(self, reader):
         print("client connected:")
-        asyncio.create_task(self._parse())
         print("started parser")
         msg = (await reader.read(1024)).decode("utf-8")
         print(f"received first message: {msg}")
