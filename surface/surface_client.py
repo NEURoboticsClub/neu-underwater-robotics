@@ -22,9 +22,7 @@ class SurfaceClient:
         self.lock = asyncio.Lock()
         self.last_msg = ""
         self.last_update = utils.time_ms()
-        if not os.environ.get("SIM"):
-            self._init_firmata()
-        else:
+        if os.environ.get("SIM"):
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
             if input() != "YES":
                 raise RuntimeError("Simulation mode not confirmed")
@@ -76,6 +74,7 @@ class SurfaceClient:
     async def _parse(self):
         last_parse_time = time.time()
         while True:
+            print("parsing")
             await asyncio.sleep(0.01)
             async with self.lock:
                 msg = self.last_msg
