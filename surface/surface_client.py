@@ -89,10 +89,13 @@ class SurfaceClient:
                 print(f"error decoding json: {e} | received: {msg}")
                 await asyncio.sleep(0.01)
                 continue
+            except Exception as f:
+                print(f)
+                print(msg)
+                continue
 
             if "imu_data" in json_msg:
-                json_imu = json_msg["imu_data"]
-                print(json.loads(json_imu))
+                print(dict(json.loads(json_msg["imu_data"])))
             
             if "depth" in json_msg:
                 print("depth")
@@ -106,3 +109,4 @@ class SurfaceClient:
 if __name__ == "__main__":
     surface_client = SurfaceClient()
     asyncio.run(surface_client.run())
+
