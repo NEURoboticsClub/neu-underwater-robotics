@@ -120,8 +120,8 @@ class Server:
             last_response_time = time.time()
             while True:
                 response = {
-                    "imu_data": self.rov_state._current_imu_data,
-                    "depth": self.rov_state._current_depth,
+                    "imu_data": json.dumps(self.rov_state._current_imu_data),
+                    "depth": json.dumps(self.rov_state._current_depth),
                 }
                 await self._send_response(writer, response)
                 if time.time() - last_response_time < 1 / RESPONSE_LOOP_FREQ:
