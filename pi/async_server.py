@@ -137,7 +137,7 @@ class Server:
         """send a response back to the client asynchronously"""
         try:
             msg = json.dumps(response)
-            writer.write(str.encode(json.dumps(msg)))
+            writer.write(str.encode(msg))
             await writer.drain()
             print(f"Sent response: {msg}")
         except Exception as e:
