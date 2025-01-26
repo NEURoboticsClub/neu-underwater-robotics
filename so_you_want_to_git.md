@@ -159,6 +159,7 @@ git merge main
 ## Common Problems and Troubleshooting Tips
 
 ### Pushing When You Haven't Pulled Remote Changes
+<img width="546" alt="Pushing Error Image" src="https://github.com/user-attachments/assets/9220aba8-034b-4643-82bb-ca811fad72bc" />
 
 This error occurs when you try to push a commit to a remote branch that’s ahead of your local branch by some number of commits. Luckily, it’s an easy fix if you know how:
 1. You need to pull the changes that you don’t have from the remote branch. Unfortunately, because you have a staged commit on your local branch, you can’t just __git pull__. Instead, you have to use the “rebase” flag:
@@ -176,34 +177,3 @@ To “undo” a local commit (that hasn’t been pushed), you’ll want to run:
 git reset --soft HEAD~1
 ```
 This will unstage the committed changes and get rid of the local commit. The __“--soft”__ flag prevents git reset from changing the actual code, so all of your changes won’t be erased. HEAD~1 indicates the commit to reset to. HEAD is the most recent commit, and HEAD~x is the x-th commit before the most recent commit. Commands like __git reset__ and __git revert__ can get finicky, so _please_ ask someone if you’re not sure what you’re doing. It helps prevent a headache for everyone involved.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
