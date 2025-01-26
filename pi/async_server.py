@@ -107,6 +107,7 @@ class Server:
         print("started parser")
         
         async def read_messages():
+            """reads incoming messages"""
             msg = (await reader.read(1024)).decode("utf-8")
             print(f"received first message: {msg}")
             while msg:
@@ -117,6 +118,7 @@ class Server:
             print("client disconnected, closing parser")
         
         async def send_responses():
+            """sends responses to clients"""
             last_response_time = time.time()
             while True:
                 response = {
@@ -132,9 +134,11 @@ class Server:
 
         asyncio.create_task(read_messages())
         asyncio.create_task(send_responses())
+        
+        print("started reader and writer")
 
     async def _send_response(self, writer: asyncio.StreamWriter, response: dict):
-        """send a response back to the client asynchronously"""
+        """send a response back to the client"""
         try:
             msg = json.dumps(response)
             writer.write(str.encode(msg))
@@ -144,6 +148,7 @@ class Server:
             print(f"Error sending response: {e}")
 
     async def _parse(self):
+        """parses incoming messages"""
         while True:
             await asyncio.sleep(0.01)
             async with self.lock:

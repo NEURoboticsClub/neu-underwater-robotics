@@ -32,6 +32,7 @@ class SurfaceClient:
         self.loop.close()
 
     async def run(self):
+        """start reader, writer, and parser"""
         reader, writer = await asyncio.open_connection(HOST, PORT)
 
         send_task = asyncio.create_task(self.send_messages(writer))
@@ -41,6 +42,7 @@ class SurfaceClient:
         await asyncio.gather(send_task, receive_task, parse_task)
 
     async def send_messages(self, writer):
+        """sends controller inputs to bottomside."""
         last_send_time = time.time()
         while True:
             vec = drive_controller.get_velocity_vector()
@@ -60,8 +62,7 @@ class SurfaceClient:
             last_send_time = time.time()
 
     async def receive_messages(self, reader):
-        print("client connected:")
-        print("started parser")
+        """receives sensor information from bottomside."""
         msg = (await reader.read(1024)).decode("utf-8")
         print(f"received first message: {msg}")
         while msg:
@@ -72,9 +73,9 @@ class SurfaceClient:
         print("client disconnected, closing parser")
 
     async def _parse(self):
+        """parses received messages."""
         last_parse_time = time.time()
         while True:
-            print("parsing")
             await asyncio.sleep(0.01)
             async with self.lock:
                 msg = self.last_msg
@@ -89,21 +90,17 @@ class SurfaceClient:
                 print(f"error decoding json: {e} | received: {msg}")
                 await asyncio.sleep(0.01)
                 continue
-            except Exception as f:
-                print(f)
-                print(msg)
-                continue
 
             if "imu_data" in json_msg:
                 print(dict(json.loads(json_msg["imu_data"])))
             
             if "depth" in json_msg:
-                print("depth")
+                print(dict(json.loads(json_msg["depth"])))
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
                 await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
             else:
-                print("Warning: write loop took too long")
+                print("Warning: read loop took too long")
             last_parse_time = time.time()
 
 if __name__ == "__main__":
