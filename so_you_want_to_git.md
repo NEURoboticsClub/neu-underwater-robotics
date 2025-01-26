@@ -176,4 +176,4 @@ To “undo” a local commit (that hasn’t been pushed), you’ll want to run:
 ```
 git reset --soft HEAD~1
 ```
-This will unstage the committed changes and get rid of the local commit. The __“--soft”__ flag prevents git reset from changing the actual code, so all of your changes won’t be erased. HEAD~1 indicates the commit to reset to. HEAD is the most recent commit, and HEAD~x is the x-th commit before the most recent commit. Commands like __git reset__ and __git revert__ can get finicky, so _please_ ask someone if you’re not sure what you’re doing. It helps prevent a headache for everyone involved.
+This will unstage the committed changes and get rid of the local commit. The __“--soft”__ flag prevents git reset from changing the actual code, so all of your changes won’t be erased. __HEAD~1__ indicates the commit to reset to. __HEAD__ is the most recent commit, and __HEAD~x__ is the x-th commit before the most recent commit. Commands like __git reset__ and __git revert__ can get finicky, so _please_ ask someone if you’re not sure what you’re doing. It helps prevent a headache for everyone involved.
