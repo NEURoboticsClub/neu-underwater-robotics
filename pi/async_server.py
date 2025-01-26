@@ -12,7 +12,7 @@ from .rov_state import ROVState
 
 SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
-ARDUINO_PORT = "/dev/ttyACM0"
+ARDUINO_PORT = "/dev/ttyUSB0"
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
@@ -77,7 +77,7 @@ class Server:
         self.loop.close()
 
     def _init_firmata(self):
-        self.board = pyfirmata.ArduinoMega(ARDUINO_PORT)
+        self.board = pyfirmata.ArduinoNano(ARDUINO_PORT)
         print("Successfully connected to Arduino")
         it = pyfirmata.util.Iterator(self.board)
         it.start()
