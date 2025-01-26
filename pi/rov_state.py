@@ -43,7 +43,7 @@ class ROVState:
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
         self._current_depth = 0 # current depth of ROV
         self._target_depth = 0 # target depth for ROV
-        self._current_imu_data = {}
+        self._current_imu_data = {} # last received imu data
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
 
     def get_tasks(self) -> list[asyncio.Task]:
