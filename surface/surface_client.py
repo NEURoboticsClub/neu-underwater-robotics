@@ -95,7 +95,7 @@ class SurfaceClient:
                 print(dict(json.loads(json_msg["imu_data"])))
             
             if "depth" in json_msg:
-                print(dict(json.loads(json_msg["depth"])))
+                print(json.loads(json_msg["depth"]))
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
                 await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
