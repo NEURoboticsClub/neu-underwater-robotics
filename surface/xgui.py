@@ -221,5 +221,37 @@ def main():
     main_window.show()
     app.exec_()
 
+class XguiApplication():
+    def __init__(self, lowest_port_num, num_cameras, widget=None, show_surpressed=False):
+        self.qurls = get_qurls_or_exit(lowest_port_num, num_cameras)
+        self.sc_widget_cls = get_surface_central_if_can(widget)
+        self.messages_to_surpress = get_messages_to_surpress(show_surpressed)
+
+    def run(self):
+        if not self.sc_widget_cls:
+            sys.exit(1)
+        
+        self.app = QApplication(sys.argv)
+        qInstallMessageHandler(get_surpressed_message_handler(self.messages_to_surpress))
+        try:
+            self.scw = self.sc_widget_cls(self.qurls)
+        except TypeError as e:
+            logger.error(('There is a TypeError with the instantiation of the widget class. '
+                        'Make sure that the __init__ of the widget class takes in the expected '
+                        'arguments. As for what the expected arguments are, refer to the '
+                        'README.md of the surface module.'))
+            logger.error(e)
+            logger.error('Shutting down...')
+            sys.exit(1)
+
+        main_window = SurfaceWindow(self.scw)
+        main_window.show()
+        self.app.exec_()
+     
+
+    def get_data():
+        pass 
+
+
 if __name__ == '__main__':
     main()

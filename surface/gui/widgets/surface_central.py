@@ -69,7 +69,7 @@ class SurfaceCentralWidget(QWidget):
         self.setLayout(layout)
 
         self.update_timer = QTimer(self)
-        self.update_timer.timeout.connect(self._increment_telemetry)
+        #self.update_timer.timeout.connect(self._increment_telemetry)
         self.update_timer.start(50)
 
     def _format_telemetry_text(self):
@@ -80,6 +80,11 @@ class SurfaceCentralWidget(QWidget):
         ms2 = (elapsed_ms  % 1000) // 10
 
         return f"Depth: {self.telemetry_depth:.2f}\nVelocity: {self.telemetry_velocity:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
+
+    
+    def updateDepth(self, depth):
+        self.telemetry_depth = depth
+        self.telemetry.setText(self._format_telemetry_text())
 
     def _increment_telemetry(self):
         self.telemetry_depth += 0.1

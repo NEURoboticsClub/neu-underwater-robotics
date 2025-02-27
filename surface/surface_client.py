@@ -1,9 +1,10 @@
+import argparse
 import json
 import os
 import time
 import asyncio
 from common import utils
-
+import xgui
 from joystick import XBoxDriveController
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
@@ -13,6 +14,25 @@ READ_LOOP_FREQ = 5
 
 drive_controller = XBoxDriveController(joy_id=0)
 claw_controller = XBoxDriveController(joy_id=1)
+
+def get_cmdline_args():
+    """Gets the values of the command line arguments.
+
+    Returns: argparse's Namespace that holds the values of the command
+    line arguments
+
+    """
+    parser = argparse.ArgumentParser(
+        prog='launch',
+        description=('Reads the video and non-video data from the given '
+                     'ports, and renders them with PyQt5.'))
+
+    parser.add_argument('-p', '--lowest-port-num', type=int, required=True)
+    parser.add_argument('-n', '--num-cameras', type=int, required=True)
+    parser.add_argument('-w', '--widget', default=None)
+    parser.add_argument('-s', '--show-surpressed', action='store_true')
+
+    return parser.parse_args()
 
 class SurfaceClient:
     """Surface client class."""
@@ -27,6 +47,20 @@ class SurfaceClient:
             if input() != "YES":
                 raise RuntimeError("Simulation mode not confirmed")
             HOST = "127.0.0.1"
+        
+        args = get_cmdline_args()
+        self.gui = xgui.XguiApplication(args.lowest_port_num, args.num_cameras, args.widget, args.show_surpressed)
+
+        self.depth = 0
+        self.imu_data = ""
+
+
+        # Ensure GUI is initialized before connecting update function
+        if hasattr(self.gui, 'scw') and hasattr(self.gui.scw, 'update_timer'):
+            self.gui.scw.update_timer.timeout.connect(self._update_sensor_data)
+        else:
+            print("Warning: SurfaceCentralWidget or update_timer not initialized yet!")
+        
 
     def __del__(self):
         self.loop.close()
@@ -39,13 +73,15 @@ class SurfaceClient:
         receive_task = asyncio.create_task(self.receive_messages(reader))
         parse_task = asyncio.create_task(self._parse())
 
-        #add a task that called xgui.py main(cmd_args)
+        # add a task that called xgui.py main(cmd_args)
         # see IMU values here
         # Call the IMU from here (propogate up) 
         # dict:{key: sensor value: data}
         # REMEMBER TO DO NULL CHECK
 
-        await asyncio.gather(send_task, receive_task, parse_task)
+        gui_task = asyncio.to_thread(self.gui.run)
+
+        await asyncio.gather(send_task, receive_task, parse_task, gui_task)
 
     async def send_messages(self, writer):
         """sends controller inputs to bottomside."""
@@ -98,9 +134,11 @@ class SurfaceClient:
                 continue
 
             if "imu_data" in json_msg:
+                self.imu_data = json_msg["imu_data"]
                 print(dict(json.loads(json_msg["imu_data"])))
             
             if "depth" in json_msg:
+                self.depth = float(json_msg["depth"])
                 print(json.loads(json_msg["depth"]))
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
@@ -108,6 +146,9 @@ class SurfaceClient:
             else:
                 print("Warning: read loop took too long")
             last_parse_time = time.time()
+
+    def _update_sensor_data(self):
+        depth = self.depth
 
 if __name__ == "__main__":
     surface_client = SurfaceClient()
