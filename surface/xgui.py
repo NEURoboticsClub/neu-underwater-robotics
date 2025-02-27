@@ -222,6 +222,9 @@ def main():
     app.exec_()
 
 class XguiApplication():
+    """Xgui Application Class. 
+    Intended for running Xgui as an attribute or an object from other entrypoints.    
+    """
     def __init__(self, lowest_port_num, num_cameras, widget=None, show_surpressed=False):
         self.qurls = get_qurls_or_exit(lowest_port_num, num_cameras)
         self.sc_widget_cls = get_surface_central_if_can(widget)
