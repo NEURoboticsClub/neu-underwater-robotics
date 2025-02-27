@@ -148,7 +148,18 @@ class SurfaceClient:
             last_parse_time = time.time()
 
     def _update_sensor_data(self):
-        depth = self.depth
+        """Updates sensor data on GUI side"""
+        async def get_depth():
+            async with self.lock:
+                return self.depth
+        
+        depth = asyncio.run(get_depth())  # Synchronously get depth safely
+        self.gui.scw.updateDepth(depth)  # Pass depth to GUI
+        if hasattr(self.gui.scw, 'updateDepth'):
+            self.gui.scw.updateDepth(depth) 
+        else:
+            print("Warning: GUI not fully initialized, skipping update.")
+
 
 if __name__ == "__main__":
     surface_client = SurfaceClient()

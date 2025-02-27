@@ -69,7 +69,7 @@ class SurfaceCentralWidget(QWidget):
         self.setLayout(layout)
 
         self.update_timer = QTimer(self)
-        #self.update_timer.timeout.connect(self._increment_telemetry)
+        #self.update_timer.timeout.connect(self._increment_telemetry) # mock incrementing
         self.update_timer.start(50)
 
     def _format_telemetry_text(self):
@@ -83,9 +83,11 @@ class SurfaceCentralWidget(QWidget):
 
     
     def updateDepth(self, depth):
+        """Sets depth on the GUI and updates label"""
         self.telemetry_depth = depth
         self.telemetry.setText(self._format_telemetry_text())
 
+    # mock incrementing 
     def _increment_telemetry(self):
         self.telemetry_depth += 0.1
         self.telemetry_velocity = 2.0
