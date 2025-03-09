@@ -40,12 +40,12 @@ class Server:
                     "close": Servo(self._get_pin(9, "s")),
                 },
                 thrusters={
-                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
-                    "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
-                    "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                    "left_vertical": Thruster(self._get_pin(3, "s")),
-                    "right_vertical": Thruster(self._get_pin(5, "s")),
+                    # "front_left_horizontal": Thruster(self._get_pin(2, "s")),
+                    # "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
+                    # "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
+                    # "back_right_horizontal": Thruster(self._get_pin(7, "s")),
+                    # "left_vertical": Thruster(self._get_pin(3, "s")),
+                    # "right_vertical": Thruster(self._get_pin(5, "s")),
                 },
                 sensors={
 

@@ -66,12 +66,12 @@ class ROVState:
             dict[str, float]: thruster mix
         """
         mix = {
-            "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "back_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "left_vertical": target_velocity.z + target_velocity.roll,
-            "right_vertical": target_velocity.z - target_velocity.roll,
+            # "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
+            # "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
+            # "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
+            # "back_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
+            # "left_vertical": target_velocity.z + target_velocity.roll,
+            # "right_vertical": target_velocity.z - target_velocity.roll,
         }
 
         # cap value to [-1, 1]
