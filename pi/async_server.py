@@ -35,17 +35,18 @@ class Server:
             self._init_firmata()
             self.rov_state = ROVState(
                 actuators={
-                    "extend": LinActuator(self._get_pin(12, "o"), self._get_pin(13, "o")),
-                    "rotate": Servo(self._get_pin(10, "s")),
-                    "close": Servo(self._get_pin(9, "s")),
+                    "extend": LinActuator(self._get_pin(4, "o"), self._get_pin(5, "o")),
+                    "rotate": Servo(self._get_pin(28, "s")),
+                    "close": Servo(self._get_pin(2, "s")),
                 },
                 thrusters={
-                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
+                    #remove to isolate claw
+                    """ "front_left_horizontal": Thruster(self._get_pin(2, "s")),
                     "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
                     "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
                     "back_right_horizontal": Thruster(self._get_pin(7, "s")),
                     "left_vertical": Thruster(self._get_pin(3, "s")),
-                    "right_vertical": Thruster(self._get_pin(5, "s")),
+                    "right_vertical": Thruster(self._get_pin(5, "s")), """
                 },
                 sensors={
 
