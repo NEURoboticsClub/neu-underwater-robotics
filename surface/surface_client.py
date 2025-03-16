@@ -79,7 +79,7 @@ class SurfaceClient:
         # dict:{key: sensor value: data}
         # REMEMBER TO DO NULL CHECK
 
-        gui_task = asyncio.to_thread(self.gui.run)
+        gui_task = asyncio.create_task(self.gui.run()) 
 
         await asyncio.gather(send_task, receive_task, parse_task, gui_task)
 
