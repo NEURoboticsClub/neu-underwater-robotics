@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import time
 
 import pyfirmata
 from pyfirmata import Pin
@@ -13,6 +14,7 @@ from .rov_state import ROVState
 SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
+RESPONSE_LOOP_FREQ = 5 # Hz
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
@@ -98,21 +100,55 @@ class Server:
             print(f"Ready to accept connection. Please start client.py {SERVER_IP=} {PORT=}")
             await _server.serve_forever()
 
-    async def _handle_client(self, reader: asyncio.StreamReader, _: asyncio.StreamWriter):
+    async def _handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         """called when a client connects to the server"""
         print("client connected:")
         asyncio.create_task(self._parse())
         print("started parser")
-        msg = (await reader.read(1024)).decode("utf-8")
-        print(f"received first message: {msg}")
-        while msg:
-            async with self.lock:
-                self.last_msg = msg
-                self.last_update = utils.time_ms()
+        
+        async def read_messages():
+            """reads incoming messages"""
             msg = (await reader.read(1024)).decode("utf-8")
-        print("client disconnected, closing parser")
+            print(f"received first message: {msg}")
+            while msg:
+                async with self.lock:
+                    self.last_msg = msg
+                    self.last_update = utils.time_ms()
+                msg = (await reader.read(1024)).decode("utf-8")
+            print("client disconnected, closing parser")
+        
+        async def send_responses():
+            """sends responses to clients"""
+            last_response_time = time.time()
+            while True:
+                response = {
+                    "imu_data": json.dumps(self.rov_state._current_imu_data),
+                    "depth": json.dumps(self.rov_state._current_depth),
+                }
+                await self._send_response(writer, response)
+                if time.time() - last_response_time < 1 / RESPONSE_LOOP_FREQ:
+                    await asyncio.sleep(1 / RESPONSE_LOOP_FREQ - (time.time() - last_response_time))
+                else:
+                    print("Warning: write loop took too long")
+                last_response_time = time.time()
+
+        asyncio.create_task(read_messages())
+        asyncio.create_task(send_responses())
+        
+        print("started reader and writer")
+
+    async def _send_response(self, writer: asyncio.StreamWriter, response: dict):
+        """send a response back to the client"""
+        try:
+            msg = json.dumps(response)
+            writer.write(str.encode(msg))
+            await writer.drain()
+            print(f"Sent response: {msg}")
+        except Exception as e:
+            print(f"Error sending response: {e}")
 
     async def _parse(self):
+        """parses incoming messages"""
         while True:
             await asyncio.sleep(0.01)
             async with self.lock:
@@ -125,7 +161,7 @@ class Server:
             try:
                 json_msg = json.loads(msg)
             except json.JSONDecodeError as e:
-                print(f"error decoding json: {e} | rceived: {msg}")
+                print(f"error decoding json: {e} | received: {msg}")
                 await asyncio.sleep(0.01)
                 continue
 
@@ -135,7 +171,9 @@ class Server:
                 )
 
             if "imu_data" in json_msg:
-                print(dict(json.loads(json_msg["imu_data"])))
+                self.rov_state.set_current_imu_data(
+                    dict(json.loads(json_msg["imu_data"]))
+                )
 
             if "claw_movement" in json_msg:
                 self.rov_state.set_claw_movement(
@@ -143,8 +181,9 @@ class Server:
                 )
             
             if "depth" in json_msg:
-                # self.rov_state.set
-                pass
+                self.rov_state.set_current_depth(
+                    dict(json.loads(json_msg["depth"]))
+                )
 
 
 if __name__ == "__main__":
