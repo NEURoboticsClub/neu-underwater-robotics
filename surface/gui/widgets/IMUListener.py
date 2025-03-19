@@ -3,6 +3,7 @@ import json
 from PyQt5.QtCore import QThread, pyqtSignal
 
 class IMUListener(QThread):
+    """component of Attitude Indicator that listens to IMU data"""
     imu_data_received = pyqtSignal(dict)  # Signal to send IMU data to the main thread
 
     def __init__(self, host, port, parent=None):

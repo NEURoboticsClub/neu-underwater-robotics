@@ -57,6 +57,3 @@ class GridVideoPlayersWidget(QWidget):
             grid.setRowStretch(1, 1)
 
         self.setLayout(grid)
-    
-    
-
