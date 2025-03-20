@@ -20,14 +20,13 @@ class SurfaceCentralWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)  #
         layout.addWidget(GridVideoPlayersWidget(video_player_qurls, self), 0, 0)
 
+        # telemetry attributes
         self.telemetry_depth = 0
         self.telemetry_velocity = 10
         self.elapsed_timer = QElapsedTimer()
         self.elapsed_timer.start()
 
-        #self.telemetry = QLabel("Depth: 0\nVelocity: 10\nTimer: 00:00:00", self)
-        #self.telemetry.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        #self.telemetry.setAttribute(Qt.WA_TranslucentBackground, True)
+        # telemetry box
         self.telemetry = QLabel(self._format_telemetry_text(), self)
         layout.addWidget(self.telemetry, 0, 0, Qt.AlignTop | Qt.AlignRight)
         opacity_effect = QGraphicsOpacityEffect(self.telemetry)
@@ -48,24 +47,6 @@ class SurfaceCentralWidget(QWidget):
         # 4. WIDGETIZE IT
         # 5. ADD TIMER, 
 
-        #inner_vlayout = QVBoxLayout()
-        #layout.addLayout(inner_vlayout)
-
-        #self.telemetry = QLabel("Depth: 0\nVelocity: 10\nAcceleration: 5", self)
-        #self.photogrammetry = QLabel("Photogrammetry", self)
-        #self.status_view = self.telemetry
-
-        # Set alignment and styles for demonstration
-        # for label in [self.telemetry, self.photogrammetry]:
-        #     label.setAlignment(Qt.AlignRight | Qt.AlignTop)
-        #     label.setStyleSheet("background-color: #2a6b7e; color: white; font-size: 36px;")
-
-        #layout.addWidget(self.photogrammetry)
-
-        # # Place widgets in the vlayout
-        # inner_vlayout.addWidget(self.telemetry)
-        # inner_vlayout.addWidget(self.photogrammetry)
-
         self.setLayout(layout)
 
         self.update_timer = QTimer(self)
@@ -81,18 +62,9 @@ class SurfaceCentralWidget(QWidget):
 
         return f"Depth: {self.telemetry_depth:.2f}\nVelocity: {self.telemetry_velocity:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
 
+    # Will be updated with sensor data
     def _increment_telemetry(self):
         self.telemetry_depth += 0.1
         self.telemetry_velocity = 2.0
         self.telemetry.setText(self._format_telemetry_text())
 
-    # def update_telemetry(self, depth=None, velocity=None, timer_value=None):
-    #     """Update telemetry values on the UI."""
-    #     if depth is not None:
-    #         self.depth = depth
-    #     if velocity is not None:
-    #         self.velocity = velocity
-    #     if timer_value is not None:
-    #         self.timer_value = timer_value
-
-    #     self.telemetry.setText(self._format_telemetry_text())
