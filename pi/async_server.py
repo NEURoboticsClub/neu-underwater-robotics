@@ -41,16 +41,16 @@ class Server:
                 },
                 thrusters={
                     #remove to isolate claw
-                    """ 
+                    
                     "front_left_horizontal": Thruster(self._get_pin(10, "s")),
                     "front_right_horizontal": Thruster(self._get_pin(11, "s"), reverse=True),
                     "back_left_horizontal": Thruster(self._get_pin(12, "s"), reverse=True),
                     "back_right_horizontal": Thruster(self._get_pin(13, "s")),
                     "front_left_vertical": Thruster(self._get_pin(6, "s")),
                     "front_right_vertical": Thruster(self._get_pin(7, "s")), 
-                    "back_left_vertical": Thruster(self._get_pin(8, "s"),
+                    "back_left_vertical": Thruster(self._get_pin(8, "s")),
                     "back_right_vertical": Thruster(self._get_pin(9, "s")),
-                    """
+                    
                 },
                 sensors={
 
