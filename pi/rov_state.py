@@ -45,7 +45,6 @@ class ROVState:
         self._target_depth = 0 # target depth for ROV
         self._current_imu_data = {} # last received imu data
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
-        self.thrusters.arm_thrusters() # arm thrusters
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -135,6 +134,8 @@ class ROVState:
     async def control_loop(self):
         """Control loop."""
         loop_period = 1000 / self._control_loop_frequency  # ms
+        self.arm_thrusters()
+        
         while True:
             dt = (time_ms() - self._last_time) / 1000
             # update last time
