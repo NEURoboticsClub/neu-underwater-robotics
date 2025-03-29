@@ -45,6 +45,7 @@ class ROVState:
         self._target_depth = 0 # target depth for ROV
         self._current_imu_data = {} # last received imu data
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
+        self.thrusters.arm_thrusters() # arm thrusters
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -54,6 +55,11 @@ class ROVState:
         for actuator in self.thrusters.values():
             tasks.append(actuator.run())
         return tasks
+    
+    def arm_thrusters(self):
+        """Arm Thrusters"""
+        for thruster in self.thrusters.values():
+            thruster.arm()
 
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector

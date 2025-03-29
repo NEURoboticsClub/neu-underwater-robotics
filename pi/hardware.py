@@ -89,7 +89,7 @@ class Servo(Actuator):
     async def set_val(self, val: int):
         """set angle of servo motor in degrees"""
         val = self.linear_map(val)
-        if val < 18 or val > 162:
+        if val < 0 or val > 180:
             raise ValueError("Angle must be between 0 and 180")
         async with self.lock:
             self.angle = val
@@ -118,6 +118,14 @@ class Thruster(Servo):
         if not self.reverse:
             return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
         return int(linear_map(x, -1, 1, self.active_range[1], self.active_range[0]))
+
+    async def arm(self):
+        """arm the thruster"""
+        self.set_val(0)
+        await asyncio.sleep(7)
+        print("Thruster armed successfully")
+
+
 
 class LinActuator(Actuator):
     """Linear actuator class."""

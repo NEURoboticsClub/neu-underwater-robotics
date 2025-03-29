@@ -95,7 +95,7 @@ class Server:
         """get a pin from the board. mode can be 'i', 'o', or 's' for servo"""
         assert self.board is not None
         return self.board.get_pin(f"d:{pin}:{mode}")
-
+    
     async def run(self):
         """run the server"""
         _server = await asyncio.start_server(self._handle_client, SERVER_IP, PORT)
