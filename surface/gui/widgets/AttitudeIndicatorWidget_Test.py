@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from .ai import AttitudeIndicator
 
 class AttitudeIndicatorWidget_Test(QtWidgets.QWidget):
+
     """Test class for ai with sliders"""
 
     def __init__(self):
@@ -58,4 +59,4 @@ class AttitudeIndicatorWidget_Test(QtWidgets.QWidget):
 
         self.c.updateBW.emit(value)
         self.wid.repaint()
-        
+
