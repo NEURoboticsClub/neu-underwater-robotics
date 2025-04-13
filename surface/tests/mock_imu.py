@@ -10,7 +10,6 @@ HOST = "127.0.0.1"  # Use localhost for testing
 PORT = 2049  # Same port as the GUI listener
 CONTROL_LOOP_FREQ = 1  # Hz
 
-
 """
 Mock IMU data emitter (in quaternions)
 """
