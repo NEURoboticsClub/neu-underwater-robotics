@@ -3,6 +3,9 @@ from .ai import AttitudeIndicator
 
 class AttitudeIndicatorWidget_Test(QtWidgets.QWidget):
 
+    """Test class for ai with sliders"""
+
+
     def __init__(self):
         super(AttitudeIndicatorWidget_Test, self).__init__()
 

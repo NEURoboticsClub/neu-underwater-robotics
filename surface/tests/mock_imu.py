@@ -11,6 +11,14 @@ PORT = 2049  # Same port as the GUI listener
 CONTROL_LOOP_FREQ = 1  # Hz
 
 
+"""
+Mock IMU data emitter (in quaternions)
+"""
+
+r = -1
+p = -1
+y = 1
+dx = 5
 
 def generate_random_mock_data():
     """Generate random mock IMU data for testing."""
@@ -25,10 +33,6 @@ def generate_random_mock_data():
     }
     return data
 
-r = -1
-p = -1
-y = 1
-dx = 5
 
 def generate_sliding_mock_data():
     """Generate sliding mock IMU data for testing."""
@@ -96,5 +100,10 @@ def run_mock_imu():
         except KeyboardInterrupt:
             print("Mock IMU server stopped.")
 
-run_mock_imu()
 
+def main():
+    """Main function to run the mock IMU server."""
+    run_mock_imu()
+
+if __name__ == "__main__":
+    main()
