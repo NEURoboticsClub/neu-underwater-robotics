@@ -55,10 +55,6 @@ class ROVState:
             tasks.append(actuator.run())
         return tasks
     
-    def arm_thrusters(self):
-        """Arm Thrusters"""
-        for thruster in self.thrusters.values():
-            thruster.arm()
 
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector
@@ -134,8 +130,7 @@ class ROVState:
     async def control_loop(self):
         """Control loop."""
         loop_period = 1000 / self._control_loop_frequency  # ms
-        self.arm_thrusters()
-        
+
         while True:
             dt = (time_ms() - self._last_time) / 1000
             # update last time

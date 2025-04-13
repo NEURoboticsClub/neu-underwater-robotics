@@ -119,13 +119,6 @@ class Thruster(Servo):
             return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
         return int(linear_map(x, -1, 1, self.active_range[1], self.active_range[0]))
 
-    async def arm(self):
-        """arm the thruster"""
-        self.set_val(0)
-        await asyncio.sleep(7)
-        print("Thruster armed successfully")
-
-
 
 class LinActuator(Actuator):
     """Linear actuator class."""
