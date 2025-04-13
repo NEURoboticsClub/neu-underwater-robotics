@@ -137,6 +137,7 @@ class SurfaceClient:
                 self.imu_data = json_msg["imu_data"]
                 print(dict(json.loads(json_msg["imu_data"])))
             
+            # Example code block: interpretation of data hasn't been established.
             if "depth" in json_msg:
                 self.depth = float(json_msg["depth"])
                 print(json.loads(json_msg["depth"]))
@@ -146,17 +147,17 @@ class SurfaceClient:
             else:
                 print("Warning: read loop took too long")
             last_parse_time = time.time()
-
+    
     def _update_sensor_data(self):
         """Updates sensor data on GUI side"""
         async def get_depth():
             async with self.lock:
                 return self.depth
         
-        depth = asyncio.run(get_depth())  # Synchronously get depth safely
-        self.gui.scw.updateDepth(depth)  # Pass depth to GUI
-        if hasattr(self.gui.scw, 'updateDepth'):
-            self.gui.scw.updateDepth(depth) 
+        loop = asyncio.get_event_loop()
+        depth = loop.run_until_complete(get_depth()) # Synchronously get depth safely
+        if hasattr(self.gui.scw, 'update_depth'):
+            self.gui.scw.update_depth(depth) 
         else:
             print("Warning: GUI not fully initialized, skipping update.")
 

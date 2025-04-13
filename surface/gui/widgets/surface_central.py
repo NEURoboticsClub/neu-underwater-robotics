@@ -82,7 +82,7 @@ class SurfaceCentralWidget(QWidget):
         return f"Depth: {self.telemetry_depth:.2f}\nVelocity: {self.telemetry_velocity:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
 
     
-    def updateDepth(self, depth):
+    def update_depth(self, depth):
         """Sets depth on the GUI and updates label"""
         self.telemetry_depth = depth
         self.telemetry.setText(self._format_telemetry_text())
