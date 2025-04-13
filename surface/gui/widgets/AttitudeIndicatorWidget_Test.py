@@ -58,3 +58,4 @@ class AttitudeIndicatorWidget_Test(QtWidgets.QWidget):
 
         self.c.updateBW.emit(value)
         self.wid.repaint()
+        
