@@ -41,11 +41,11 @@ class SurfaceCentralWidget(QWidget):
         """)
 
         #TODO:
-        # 1. RUN TO SEE IT WORKING DONE
-        # 2. UPDATE NUMBERS (FROM URAQT) DONE
-        # 3. HAVE ATTITUDE CONTROL THRU SENSOR
-        # 4. WIDGETIZE IT
-        # 5. ADD TIMER, 
+        # 1. HAVE ATTITUDE CONTROL THRU SENSOR
+        # 2. WIDGETIZE THE TELEMETRY BOX
+        # 3. ADD TIMER WITH START/STOP BUTTONS
+        # 4. SHOW AUTONOMY STATUS(ES)
+
 
         self.setLayout(layout)
 
@@ -62,7 +62,7 @@ class SurfaceCentralWidget(QWidget):
 
         return f"Depth: {self.telemetry_depth:.2f}\nVelocity: {self.telemetry_velocity:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
 
-    # Will be updated with sensor data
+    # TODO: UPDATE WITH REAL SENSOR DATA
     def _increment_telemetry(self):
         self.telemetry_depth += 0.1
         self.telemetry_velocity = 2.0
