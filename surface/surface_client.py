@@ -11,7 +11,7 @@ PORT = 2049  # The port used by the server
 WRITE_LOOP_FREQ = 100  # Hz
 READ_LOOP_FREQ = 5
 
-drive_controller = XBoxDriveController(joy_id=0)
+drive_controller = XBoxDriveController(joy_id=0, toggle_indices=[2])
 claw_controller = XBoxDriveController(joy_id=1)
 
 class SurfaceClient:

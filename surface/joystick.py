@@ -41,10 +41,12 @@ class Toggle(Button):
     def __init__(self):
         super().__init__()
         self.button_pressed = False
+        self.last_state = False
 
     def update(self, state):
-        if state:
+        if state and not self.last_state:
             self.button_pressed = not self.button_pressed
+        self.last_state = state
 
 
 class Axis(JoyItem[float]):
@@ -80,14 +82,17 @@ class Hat(JoyItem[tuple[float, float]]):
 class Controller(ABC):
     """Controller class to represent any joystick."""
 
-    def __init__(self, joy_id: int):
+    def __init__(self, joy_id: int, toggle_indices: list[int] = None):
         pygame.init()  # safe to call multiple times
         pygame.joystick.init()  # safe to call multiple times
         self._joystick = pygame.joystick.Joystick(joy_id)
         self._joystick.init()
-        self._axes: list[Axis] = [Axis() for _ in range(self._joystick.get_numaxes())]
-        self._buttons: list[Button] = [Button() for _ in range(self._joystick.get_numbuttons())]
-        self._hats: list[Hat] = [Hat() for _ in range(self._joystick.get_numhats())]
+        self._axes: list[Axis] = [Axis()
+                                  for _ in range(self._joystick.get_numaxes())]
+        self._buttons: list[Button] = [Button() if i not in toggle_indices else Toggle()
+                                       for i in range(self._joystick.get_numbuttons())]
+        self._hats: list[Hat] = [Hat()
+                                 for _ in range(self._joystick.get_numhats())]
 
     def update(self, event: pygame.event.EventType) -> None:
         """update the joystick with given event"""
@@ -125,8 +130,8 @@ class Controller(ABC):
 class XBoxDriveController(Controller):
     """Represents a joystick with buttons and axes."""
 
-    def __init__(self, joy_id: int):
-        super().__init__(joy_id)
+    def __init__(self, joy_id: int, toggle_indices: list[int] = None):
+        super().__init__(joy_id, toggle_indices)
         self.buttons_dict = {
             "A": self._buttons[0],
             "B": self._buttons[1],
@@ -155,13 +160,13 @@ class XBoxDriveController(Controller):
         vec = VelocityVector()
         # TODO: control scheme goes here
         vec.x = self.axis_dict["left_x"].get_joy_val() * -1
-        vec.y = self.axis_dict["left_y"].get_joy_val() 
+        vec.y = self.axis_dict["left_y"].get_joy_val()
         vec.z = self.axis_dict["left_trigger"].get_joy_val()
         vec.yaw = self.axis_dict["right_y"].get_joy_val() * -1
         # print(self.axis_dict["right_y"].get_joy_val())
 
         return vec
-    
+
     def get_claw_vector(self) -> dict:
         """get the desired claw vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
@@ -171,6 +176,6 @@ class XBoxDriveController(Controller):
         vec["extend"] = self.axis_dict["left_y"].get_joy_val()
         vec["rotate"] = self.axis_dict["right_y"].get_joy_val() * 90 + 90
         vec["close"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
-                        (self.axis_dict["right_x"].get_joy_val() + 1) * 5 + 92
+            (self.axis_dict["right_x"].get_joy_val() + 1) * 5 + 92
 
         return vec
