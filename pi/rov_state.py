@@ -67,10 +67,10 @@ class ROVState:
             dict[str, float]: thruster mix
         """
         mix = {
-            "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "back_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
+            "front_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
+            "front_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
+            "back_left_horizontal": -target_velocity.x - target_velocity.y - target_velocity.yaw,
+            "back_right_horizontal": target_velocity.x - target_velocity.y + target_velocity.yaw,
             "front_left_vertical": target_velocity.z + target_velocity.pitch - target_velocity.roll,
             "front_right_vertical": target_velocity.z + target_velocity.pitch + target_velocity.roll,
             "back_left_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,

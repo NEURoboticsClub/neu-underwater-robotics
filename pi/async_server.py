@@ -11,10 +11,10 @@ from common import utils
 from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.102"  # raspberry pi ip
+SERVER_IP = "192.168.0.115"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
-RESPONSE_LOOP_FREQ = 5 # Hz
+RESPONSE_LOOP_FREQ = 1 # Hz
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
@@ -35,20 +35,20 @@ class Server:
             self._init_firmata()
             self.rov_state = ROVState(
                 actuators={
-                    "extend": LinActuator(self._get_pin(4, "o"), self._get_pin(5, "o")),
-                    "rotate": Servo(self._get_pin(28, "s")),
+                    "extend": LinActuator(self._get_pin(5, "o"), self._get_pin(4, "o")),
+                    "rotate": Servo(self._get_pin(3, "s")),
                     "close": Servo(self._get_pin(2, "s")),
                 },
                 thrusters={
                     #remove to isolate claw
                     
-                    "front_left_horizontal": Thruster(self._get_pin(10, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(11, "s"), reverse=True),
-                    "back_left_horizontal": Thruster(self._get_pin(12, "s"), reverse=True),
-                    "back_right_horizontal": Thruster(self._get_pin(13, "s")),
+                    "front_left_horizontal": Thruster(self._get_pin(12, "s"), reverse=True),
+                    "front_right_horizontal": Thruster(self._get_pin(13, "s"), reverse=True),
+                    "back_left_horizontal": Thruster(self._get_pin(11, "s")), #11
+                    "back_right_horizontal": Thruster(self._get_pin(10, "s")), # 10
                     "front_left_vertical": Thruster(self._get_pin(6, "s")),
-                    "front_right_vertical": Thruster(self._get_pin(7, "s")), 
-                    "back_left_vertical": Thruster(self._get_pin(8, "s")),
+                    "front_right_vertical": Thruster(self._get_pin(7, "s"), reverse=True), 
+                    "back_left_vertical": Thruster(self._get_pin(8, "s"), reverse=True),
                     "back_right_vertical": Thruster(self._get_pin(9, "s")),
                     
                 },
@@ -56,6 +56,11 @@ class Server:
 
                 },
             )
+            self.board.servo_config(6, 1100, 1900, 1500)
+            self.board.servo_config(7, 1100, 1900, 1500)
+            self.board.servo_config(8, 1100, 1900, 1500)
+            self.board.servo_config(9, 1100, 1900, 1500)
+            time.sleep(10)
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
             if input() != "YES":
