@@ -251,9 +251,9 @@ class XguiApplication():
         main_window.show()
         self.app.exec_()
      
-
-    def get_data():
-        pass 
+    # TODO(data): This is a placeholder for the data retrieval function.
+    # def get_data():
+    #     pass 
 
 
 if __name__ == '__main__':

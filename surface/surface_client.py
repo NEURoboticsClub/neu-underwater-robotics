@@ -73,11 +73,10 @@ class SurfaceClient:
         receive_task = asyncio.create_task(self.receive_messages(reader))
         parse_task = asyncio.create_task(self._parse())
 
-        # add a task that called xgui.py main(cmd_args)
-        # see IMU values here
-        # Call the IMU from here (propogate up) 
-        # dict:{key: sensor value: data}
-        # REMEMBER TO DO NULL CHECK
+        #TODO:
+        # 1. Call the IMU from here (propogate up) 
+        # 2. dict:{key: sensor value: data}
+        # 3. REMEMBER TO DO NULL CHECK
 
         gui_task = asyncio.create_task(self.gui.run()) 
 
