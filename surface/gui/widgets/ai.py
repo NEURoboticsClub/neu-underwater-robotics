@@ -26,7 +26,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 """
-Attitude indicator widget.
+(Off the shelf) Attitude indicator widget.
 """
 
 __author__ = 'Bitcraze AB'
