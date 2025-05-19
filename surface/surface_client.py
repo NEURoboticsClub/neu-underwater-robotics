@@ -6,7 +6,7 @@ from common import utils
 
 from joystick import XBoxDriveController
 
-HOST = "192.168.0.102"  # The server's hostname or IP address
+HOST = "192.168.0.117"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 WRITE_LOOP_FREQ = 100  # Hz
 READ_LOOP_FREQ = 5
