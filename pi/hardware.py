@@ -89,7 +89,7 @@ class Servo(Actuator):
     async def set_val(self, val: int):
         """set angle of servo motor in degrees"""
         val = self.linear_map(val)
-        if val < 0 or val > 180:
+        if val < 0 or val > 1800:
             raise ValueError("Angle must be between 0 and 180")
         async with self.lock:
             self.angle = val
@@ -108,8 +108,9 @@ class Thruster(Servo):
 
     active_range: tuple
 
-    def __init__(self, pin: Pin, active_range: tuple = (35, 145), reverse=False):
+    def __init__(self, pin: Pin, active_range: tuple = (1300, 1700), reverse=False):
         super().__init__(pin)
+        self.angle = 1500
         self.active_range = active_range
         self.reverse = reverse
 
