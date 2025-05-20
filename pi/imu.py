@@ -26,7 +26,7 @@ try:
     # uart = serial.Serial("/dev/serial0", 115200)
     # bno = BNO08X_UART(uart)
 
-    bno.enable_feature(BNO_REPORT_ACCELEROMETER)
+    bno.enable_feature(BNO_REPORT_LINEAR_ACCELERATION)
     bno.enable_feature(BNO_REPORT_GYROSCOPE)
     bno.enable_feature(BNO_REPORT_MAGNETOMETER)
     bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
@@ -64,7 +64,7 @@ Returns:
 def read_data() -> dict:
     data = {}
     # acceleration
-    accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
+    accel_x, accel_y, accel_z = bno.linear_acceleration  # pylint:disable=no-member
     data["acceleration"] = make_xyz_dict(accel_x, accel_y, accel_z)
 
     # gyro

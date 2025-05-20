@@ -18,11 +18,15 @@ class SurfaceCentralWidget(QWidget):
 
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)  #
-        layout.addWidget(GridVideoPlayersWidget(video_player_qurls, self), 0, 0)
+        self.grid_player = GridVideoPlayersWidget(video_player_qurls, self)
+        layout.addWidget(self.grid_player, 0, 0)
 
         # telemetry attributes
         self.telemetry_depth = 0
-        self.telemetry_velocity = 10
+        self.telemetry_velocity = {}
+        self.telemetry_velocity["x"] = 0
+        self.telemetry_velocity["y"] = 0
+        self.telemetry_velocity["z"] = 0
         self.elapsed_timer = QElapsedTimer()
         self.elapsed_timer.start()
 
@@ -46,11 +50,10 @@ class SurfaceCentralWidget(QWidget):
         # 3. ADD TIMER WITH START/STOP BUTTONS
         # 4. SHOW AUTONOMY STATUS(ES)
 
-
         self.setLayout(layout)
 
         self.update_timer = QTimer(self)
-        self.update_timer.timeout.connect(self._increment_telemetry)
+        #self.update_timer.timeout.connect(self._increment_telemetry) # mock incrementing
         self.update_timer.start(50)
 
     def _format_telemetry_text(self):
@@ -60,11 +63,21 @@ class SurfaceCentralWidget(QWidget):
         sec = (elapsed_ms // 1000)  % 60
         ms2 = (elapsed_ms  % 1000) // 10
 
-        return f"Depth: {self.telemetry_depth:.2f}\nVelocity: {self.telemetry_velocity:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
+        return f"Depth: {self.telemetry_depth:.2f}\nVelocity(x, y, z): {self.telemetry_velocity["x"]:.2f}, {self.telemetry_velocity["y"]:.2f}, {self.telemetry_velocity["z"]:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
+    
+    def update_depth(self, depth):
+        """Sets depth on the GUI and updates label"""
+        self.telemetry_depth = depth
+        self.telemetry.setText(self._format_telemetry_text())
 
-    # TODO: UPDATE WITH REAL SENSOR DATA
+    def update_imu(self, imu_data):
+        """Sets depth on the GUI and updates label"""
+        self.telemetry_velocity = imu_data["acceleration"]
+        self.telemetry.setText(self._format_telemetry_text())
+        self.grid_player.attitude_indicator.setRollPitch(imu_data["gyroscope"]["x"], imu_data["gyroscope"]["y"])
+
+    # mock incrementing 
     def _increment_telemetry(self):
         self.telemetry_depth += 0.1
         self.telemetry_velocity = 2.0
         self.telemetry.setText(self._format_telemetry_text())
-
