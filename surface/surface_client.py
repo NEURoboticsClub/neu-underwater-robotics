@@ -3,6 +3,7 @@ import json
 import os
 import time
 import asyncio
+import threading
 from common import utils
 import surface.xgui as xgui
 from surface.joystick import XBoxDriveController
@@ -56,10 +57,10 @@ class SurfaceClient:
 
 
         # Ensure GUI is initialized before connecting update function
-        if hasattr(self.gui, 'scw') and hasattr(self.gui.scw, 'update_timer'):
-            self.gui.scw.update_timer.timeout.connect(self._update_sensor_data)
-        else:
-            print("Warning: SurfaceCentralWidget or update_timer not initialized yet!")
+        # if hasattr(self.gui, 'scw') and hasattr(self.gui.scw, 'update_timer'):
+        #     self.gui.scw.update_timer.timeout.connect(self._update_sensor_data)
+        # else:
+        #     print("Warning: SurfaceCentralWidget or update_timer not initialized yet!")
         
 
     def __del__(self):
@@ -67,14 +68,18 @@ class SurfaceClient:
 
     async def run(self):
         """start reader, writer, and parser"""
+
+        gui_thread = threading.Thread(target=self.gui.run(), args=())
+        gui_thread.start()
+
         reader, writer = await asyncio.open_connection(HOST, PORT)
 
         send_task = asyncio.create_task(self.send_messages(writer))
         receive_task = asyncio.create_task(self.receive_messages(reader))
         parse_task = asyncio.create_task(self._parse())
-        gui_task = asyncio.create_task(self.gui.run()) 
+        # gui_task = asyncio.create_task(self.gui.run()) 
 
-        await asyncio.gather(send_task, receive_task, parse_task, gui_task)
+        await asyncio.gather(send_task, receive_task, parse_task)
 
     async def send_messages(self, writer):
         """sends controller inputs to bottomside."""
