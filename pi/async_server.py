@@ -11,10 +11,10 @@ from common import utils
 from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.102"  # raspberry pi ip
+SERVER_IP = "192.168.0.115"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
-RESPONSE_LOOP_FREQ = 5 # Hz
+RESPONSE_LOOP_FREQ = 1 # Hz
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
@@ -35,22 +35,32 @@ class Server:
             self._init_firmata()
             self.rov_state = ROVState(
                 actuators={
-                    "extend": LinActuator(self._get_pin(12, "o"), self._get_pin(13, "o")),
-                    "rotate": Servo(self._get_pin(10, "s")),
-                    "close": Servo(self._get_pin(9, "s")),
+                    "extend": LinActuator(self._get_pin(5, "o"), self._get_pin(4, "o")),
+                    "rotate": Servo(self._get_pin(3, "s")),
+                    "close": Servo(self._get_pin(2, "s")),
                 },
                 thrusters={
-                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), reverse=True),
-                    "back_left_horizontal": Thruster(self._get_pin(6, "s"), reverse=True),
-                    "back_right_horizontal": Thruster(self._get_pin(7, "s")),
-                    "left_vertical": Thruster(self._get_pin(3, "s")),
-                    "right_vertical": Thruster(self._get_pin(5, "s")),
+                    #remove to isolate claw
+                    
+                    "front_left_horizontal": Thruster(self._get_pin(12, "s"), reverse=True),
+                    "front_right_horizontal": Thruster(self._get_pin(13, "s"), reverse=True),
+                    "back_left_horizontal": Thruster(self._get_pin(11, "s")), #11
+                    "back_right_horizontal": Thruster(self._get_pin(10, "s")), # 10
+                    "front_left_vertical": Thruster(self._get_pin(6, "s")),
+                    "front_right_vertical": Thruster(self._get_pin(7, "s"), reverse=True), 
+                    "back_left_vertical": Thruster(self._get_pin(8, "s"), reverse=True),
+                    "back_right_vertical": Thruster(self._get_pin(9, "s")),
+                    
                 },
                 sensors={
 
                 },
             )
+            self.board.servo_config(6, 1100, 1900, 1500)
+            self.board.servo_config(7, 1100, 1900, 1500)
+            self.board.servo_config(8, 1100, 1900, 1500)
+            self.board.servo_config(9, 1100, 1900, 1500)
+            time.sleep(10)
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
             if input() != "YES":
@@ -62,8 +72,10 @@ class Server:
                     "front_right_horizontal": SimThruster(5),
                     "back_left_horizontal": SimThruster(6),
                     "back_right_horizontal": SimThruster(7),
-                    "left_vertical": SimThruster(8),
-                    "right_vertical": SimThruster(9),
+                    "front_left_vertical": SimThruster(8),
+                    "front_right_vertical": SimThruster(9),
+                    "back_left_vertical": SimThruster(10),
+                    "back_right_vertical": SimThruster(11),
                 },
                 sensors={},
             )
@@ -88,7 +100,7 @@ class Server:
         """get a pin from the board. mode can be 'i', 'o', or 's' for servo"""
         assert self.board is not None
         return self.board.get_pin(f"d:{pin}:{mode}")
-
+    
     async def run(self):
         """run the server"""
         _server = await asyncio.start_server(self._handle_client, SERVER_IP, PORT)
