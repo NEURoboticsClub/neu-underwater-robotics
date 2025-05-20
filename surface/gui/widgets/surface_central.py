@@ -63,7 +63,7 @@ class SurfaceCentralWidget(QWidget):
         sec = (elapsed_ms // 1000)  % 60
         ms2 = (elapsed_ms  % 1000) // 10
 
-        return f"Depth: {self.telemetry_depth:.2f}\nVelocity(x, y, z): {self.telemetry_velocity["x"]:.2f}, {self.telemetry_velocity["y"]:.2f}, {self.telemetry_velocity["z"]:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
+        return f"Depth: {self.telemetry_depth:.2f}\nVelocity(x, y, z): {self.telemetry_velocity['x']:.2f}, {self.telemetry_velocity['y']:.2f}, {self.telemetry_velocity['z']:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
     
     def update_depth(self, depth):
         """Sets depth on the GUI and updates label"""

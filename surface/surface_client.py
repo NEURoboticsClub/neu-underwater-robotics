@@ -4,8 +4,8 @@ import os
 import time
 import asyncio
 from common import utils
-import xgui
-from joystick import XBoxDriveController
+import surface.xgui as xgui
+from surface.joystick import XBoxDriveController
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server

@@ -12,8 +12,8 @@ import os
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
-from .gui.widgets.surface_central import SurfaceCentralWidget
-from .gui.surface_window import SurfaceWindow
+from surface.gui.widgets.surface_central import SurfaceCentralWidget
+from surface.gui.surface_window import SurfaceWindow
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s')
