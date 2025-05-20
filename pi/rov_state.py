@@ -54,6 +54,7 @@ class ROVState:
         for actuator in self.thrusters.values():
             tasks.append(actuator.run())
         return tasks
+    
 
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector
@@ -66,12 +67,14 @@ class ROVState:
             dict[str, float]: thruster mix
         """
         mix = {
-            "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "back_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "left_vertical": target_velocity.z + target_velocity.roll,
-            "right_vertical": target_velocity.z - target_velocity.roll,
+            "front_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
+            "front_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
+            "back_left_horizontal": -target_velocity.x - target_velocity.y - target_velocity.yaw,
+            "back_right_horizontal": target_velocity.x - target_velocity.y + target_velocity.yaw,
+            "front_left_vertical": target_velocity.z + target_velocity.pitch - target_velocity.roll,
+            "front_right_vertical": target_velocity.z + target_velocity.pitch + target_velocity.roll,
+            "back_left_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,
+            "back_right_vertical": target_velocity.z - target_velocity.pitch + target_velocity.roll,
         }
 
         # cap value to [-1, 1]
@@ -127,6 +130,7 @@ class ROVState:
     async def control_loop(self):
         """Control loop."""
         loop_period = 1000 / self._control_loop_frequency  # ms
+
         while True:
             dt = (time_ms() - self._last_time) / 1000
             # update last time
