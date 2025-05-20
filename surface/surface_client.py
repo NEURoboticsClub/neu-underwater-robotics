@@ -72,12 +72,6 @@ class SurfaceClient:
         send_task = asyncio.create_task(self.send_messages(writer))
         receive_task = asyncio.create_task(self.receive_messages(reader))
         parse_task = asyncio.create_task(self._parse())
-
-        #TODO:
-        # 1. Call the IMU from here (propogate up) 
-        # 2. dict:{key: sensor value: data}
-        # 3. REMEMBER TO DO NULL CHECK
-
         gui_task = asyncio.create_task(self.gui.run()) 
 
         await asyncio.gather(send_task, receive_task, parse_task, gui_task)
@@ -134,31 +128,25 @@ class SurfaceClient:
 
             if "imu_data" in json_msg:
                 self.imu_data = json_msg["imu_data"]
-                print(dict(json.loads(json_msg["imu_data"])))
+                if hasattr(self.gui.scw, 'update_imu'):
+                    self.gui.scw.update_imu(self.imu_data)
+                    print(dict(json.loads(json_msg["imu_data"])))
+                else:
+                    print("Warning: GUI not fully initialized, skipping update.")
             
-            # Example code block: interpretation of data hasn't been established.
             if "depth" in json_msg:
                 self.depth = float(json_msg["depth"])
-                print(json.loads(json_msg["depth"]))
+                if hasattr(self.gui.scw, 'update_depth'):
+                    self.gui.scw.update_depth(self.depth)
+                    print(json.loads(json_msg["depth"]))
+                else:
+                    print("Warning: GUI not fully initialized, skipping update.")
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
                 await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
             else:
                 print("Warning: read loop took too long")
             last_parse_time = time.time()
-    
-    def _update_sensor_data(self):
-        """Updates sensor data on GUI side"""
-        async def get_depth():
-            async with self.lock:
-                return self.depth
-        
-        loop = asyncio.get_event_loop()
-        depth = loop.run_until_complete(get_depth()) # Synchronously get depth safely
-        if hasattr(self.gui.scw, 'update_depth'):
-            self.gui.scw.update_depth(depth) 
-        else:
-            print("Warning: GUI not fully initialized, skipping update.")
 
 
 if __name__ == "__main__":
