@@ -51,6 +51,11 @@ class Server:
 
                 },
             )
+            self.board.servo_config(6, 1100, 1900, 1500)
+            self.board.servo_config(7, 1100, 1900, 1500)
+            self.board.servo_config(8, 1100, 1900, 1500)
+            self.board.servo_config(9, 1100, 1900, 1500)
+            time.sleep(7)
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
             if input() != "YES":
