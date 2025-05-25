@@ -46,12 +46,6 @@ class SurfaceClient:
             if input() != "YES":
                 raise RuntimeError("Simulation mode not confirmed")
             HOST = "127.0.0.1"
-        
-        args = get_cmdline_args()
-        self.gui = xgui.XguiApplication(args.lowest_port_num, args.num_cameras, args.widget, args.show_surpressed)
-
-        self.depth = 0
-        self.imu_data = ""
 
 
         # Ensure GUI is initialized before connecting update function
