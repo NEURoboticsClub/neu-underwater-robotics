@@ -10,7 +10,7 @@ from adafruit_extended_bus import ExtendedI2C as I2C
 # import serial
 
 from adafruit_bno08x import (
-    BNO_REPORT_ACCELEROMETER,
+    BNO_REPORT_LINEAR_ACCELERATION,
     BNO_REPORT_GYROSCOPE,
     BNO_REPORT_MAGNETOMETER,
     BNO_REPORT_ROTATION_VECTOR,
