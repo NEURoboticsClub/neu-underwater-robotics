@@ -206,10 +206,10 @@ class XguiApplication():
     """Xgui Application Class. 
     Intended for running Xgui as an attribute or an object from other entrypoints.    
     """
-    def __init__(self, lowest_port_num, num_cameras, widget=None, show_surpressed=False):
-        self.qurls = get_qurls_or_exit(lowest_port_num, num_cameras)
-        self.sc_widget_cls = get_surface_central_if_can(widget)
-        self.messages_to_surpress = get_messages_to_surpress(show_surpressed)
+    def __init__(self, args):
+        self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
+        self.sc_widget_cls = get_surface_central_if_can(args.widget)
+        self.messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
         self.last_msg = ""
@@ -219,11 +219,6 @@ class XguiApplication():
             if input() != "YES":
                 raise RuntimeError("Simulation mode not confirmed")
             HOST = "127.0.0.1"
-        args = get_cmdline_args()
-
-        self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
-        self.sc_widget_cls = get_surface_central_if_can(args.widget)
-        self.messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
 
         self.depth = 0
         self.imu_data = ""
@@ -315,7 +310,8 @@ class XguiApplication():
 
 
 if __name__ == '__main__':
-    gui = XguiApplication()
+    args = get_cmdline_args()
+    gui = XguiApplication(args)
     asyncio_thread = threading.Thread(target=asyncio.run(gui.run_asyncio()), args=())
     asyncio_thread.start()
     gui.run()
