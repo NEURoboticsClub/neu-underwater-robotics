@@ -3,7 +3,6 @@ import json
 import os
 import time
 import asyncio
-import threading
 from common import utils
 import surface.xgui as xgui
 from surface.joystick import XBoxDriveController
@@ -11,7 +10,6 @@ from surface.joystick import XBoxDriveController
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 WRITE_LOOP_FREQ = 100  # Hz
-READ_LOOP_FREQ = 5
 
 drive_controller = XBoxDriveController(joy_id=0)
 claw_controller = XBoxDriveController(joy_id=1)
@@ -68,18 +66,11 @@ class SurfaceClient:
 
     async def run(self):
         """start reader, writer, and parser"""
-
-        gui_thread = threading.Thread(target=self.gui.run(), args=())
-        gui_thread.start()
-
         reader, writer = await asyncio.open_connection(HOST, PORT)
 
         send_task = asyncio.create_task(self.send_messages(writer))
-        receive_task = asyncio.create_task(self.receive_messages(reader))
-        parse_task = asyncio.create_task(self._parse())
-        # gui_task = asyncio.create_task(self.gui.run()) 
 
-        await asyncio.gather(send_task, receive_task, parse_task)
+        await asyncio.gather(send_task)
 
     async def send_messages(self, writer):
         """sends controller inputs to bottomside."""
@@ -100,59 +91,6 @@ class SurfaceClient:
             else:
                 print("Warning: write loop took too long")
             last_send_time = time.time()
-
-    async def receive_messages(self, reader):
-        """receives sensor information from bottomside."""
-        msg = (await reader.read(1024)).decode("utf-8")
-        print(f"received first message: {msg}")
-        while msg:
-            async with self.lock:
-                self.last_msg = msg
-                self.last_update = utils.time_ms()
-            msg = (await reader.read(1024)).decode("utf-8")
-        print("client disconnected, closing parser")
-
-    async def _parse(self):
-        """parses received messages."""
-        last_parse_time = time.time()
-        while True:
-            await asyncio.sleep(0.01)
-            async with self.lock:
-                msg = self.last_msg
-
-            if msg is None:  # no message received yet
-                await asyncio.sleep(0.01)
-                continue
-
-            try:
-                json_msg = json.loads(msg)
-            except json.JSONDecodeError as e:
-                print(f"error decoding json: {e} | received: {msg}")
-                await asyncio.sleep(0.01)
-                continue
-
-            if "imu_data" in json_msg:
-                self.imu_data = json_msg["imu_data"]
-                if hasattr(self.gui.scw, 'update_imu'):
-                    self.gui.scw.update_imu(self.imu_data)
-                    print(dict(json.loads(json_msg["imu_data"])))
-                else:
-                    print("Warning: GUI not fully initialized, skipping update.")
-            
-            if "depth" in json_msg:
-                self.depth = float(json_msg["depth"])
-                if hasattr(self.gui.scw, 'update_depth'):
-                    self.gui.scw.update_depth(self.depth)
-                    print(json.loads(json_msg["depth"]))
-                else:
-                    print("Warning: GUI not fully initialized, skipping update.")
-            
-            if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
-                await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
-            else:
-                print("Warning: read loop took too long")
-            last_parse_time = time.time()
-
 
 if __name__ == "__main__":
     surface_client = SurfaceClient()
