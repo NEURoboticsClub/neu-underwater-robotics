@@ -13,7 +13,7 @@ from adafruit_bno08x import (
     BNO_REPORT_LINEAR_ACCELERATION,
     BNO_REPORT_GYROSCOPE,
     BNO_REPORT_MAGNETOMETER,
-    BNO_REPORT_ROTATION_VECTOR,
+    BNO_REPORT_GAME_ROTATION_VECTOR,
 )
 from adafruit_bno08x.i2c import BNO08X_I2C
 # from adafruit_bno08x.uart import BNO08X_UART
@@ -29,7 +29,7 @@ try:
     bno.enable_feature(BNO_REPORT_LINEAR_ACCELERATION)
     bno.enable_feature(BNO_REPORT_GYROSCOPE)
     bno.enable_feature(BNO_REPORT_MAGNETOMETER)
-    bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
+    bno.enable_feature(BNO_REPORT_GAME_ROTATION_VECTOR)
 except Exception as e:
     raise RuntimeError("Could not initialize IMU")
 
@@ -76,13 +76,13 @@ def read_data() -> dict:
     data["magnetometer"] = make_xyz_dict(mag_x, mag_y, mag_z)
 
     # quaternion
-    quat_i, quat_j, quat_k, quat_real = bno.quaternion  # pylint:disable=no-member
+    quat_i, quat_j, quat_k, quat_real = bno.game_quaternion  # pylint:disable=no-member
     quaternion = {}
     quaternion["i"] = quat_i
     quaternion["j"] = quat_j
     quaternion["k"] = quat_k
     quaternion["real"] = quat_real
-    data["quaternion"] = quaternion
+    data["game quaternion"] = quaternion
 
     return data
 
