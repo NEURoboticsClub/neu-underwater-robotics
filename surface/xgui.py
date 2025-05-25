@@ -258,19 +258,21 @@ class XguiApplication():
 
             if "imu_data" in json_msg:
                 self.imu_data = json_msg["imu_data"]
-                if hasattr(self.scw, 'update_imu'):
-                    self.scw.update_imu(dict(json.loads(json_msg["imu_data"])))
-                    print(dict(json.loads(json_msg["imu_data"])))
-                else:
-                    print("Warning: GUI not fully initialized, skipping update.")
+                if self.scw != None:
+                    if hasattr(self.scw, 'update_imu'):
+                        self.scw.update_imu(dict(json.loads(json_msg["imu_data"])))
+                        print(dict(json.loads(json_msg["imu_data"])))
+                    else:
+                        print("Warning: GUI not fully initialized, skipping update.")
             
             if "depth" in json_msg:
                 self.depth = float(json_msg["depth"])
-                if hasattr(self.scw, 'update_depth'):
-                    self.scw.update_depth(self.depth)
-                    print(json.loads(json_msg["depth"]))
-                else:
-                    print("Warning: GUI not fully initialized, skipping update.")
+                if self.scw != None:
+                    if hasattr(self.scw, 'update_depth'):
+                        self.scw.update_depth(self.depth)
+                        print(json.loads(json_msg["depth"]))
+                    else:
+                        print("Warning: GUI not fully initialized, skipping update.")
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
                 await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
