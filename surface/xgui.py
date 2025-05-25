@@ -280,7 +280,7 @@ class XguiApplication():
     
     async def run_asyncio(self):
         """start reader, writer, and parser"""
-        reader = await asyncio.open_connection(HOST, PORT)
+        reader, writer = await asyncio.open_connection(HOST, PORT)
 
         receive_task = asyncio.create_task(self.receive_messages(reader))
         parse_task = asyncio.create_task(self._parse())
