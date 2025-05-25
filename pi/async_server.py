@@ -14,7 +14,7 @@ from .rov_state import ROVState
 SERVER_IP = "192.168.0.115"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
-RESPONSE_LOOP_FREQ = 1 # Hz
+RESPONSE_LOOP_FREQ = 10 # Hz
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
