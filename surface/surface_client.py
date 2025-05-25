@@ -14,25 +14,6 @@ WRITE_LOOP_FREQ = 100  # Hz
 drive_controller = XBoxDriveController(joy_id=0)
 claw_controller = XBoxDriveController(joy_id=1)
 
-def get_cmdline_args():
-    """Gets the values of the command line arguments.
-
-    Returns: argparse's Namespace that holds the values of the command
-    line arguments
-
-    """
-    parser = argparse.ArgumentParser(
-        prog='launch',
-        description=('Reads the video and non-video data from the given '
-                     'ports, and renders them with PyQt5.'))
-
-    parser.add_argument('-p', '--lowest-port-num', type=int, required=True)
-    parser.add_argument('-n', '--num-cameras', type=int, required=True)
-    parser.add_argument('-w', '--widget', default=None)
-    parser.add_argument('-s', '--show-surpressed', action='store_true')
-
-    return parser.parse_args()
-
 class SurfaceClient:
     """Surface client class."""
 

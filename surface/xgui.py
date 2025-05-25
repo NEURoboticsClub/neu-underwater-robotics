@@ -210,6 +210,7 @@ class XguiApplication():
         self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
         self.sc_widget_cls = get_surface_central_if_can(args.widget)
         self.messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
+        self.scw = None
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
         self.last_msg = ""
@@ -261,7 +262,7 @@ class XguiApplication():
                 if self.scw != None:
                     if hasattr(self.scw, 'update_imu'):
                         self.scw.update_imu(dict(json.loads(json_msg["imu_data"])))
-                        print(dict(json.loads(json_msg["imu_data"])))
+                        print(self.imu_data)
                     else:
                         print("Warning: GUI not fully initialized, skipping update.")
             
@@ -270,7 +271,7 @@ class XguiApplication():
                 if self.scw != None:
                     if hasattr(self.scw, 'update_depth'):
                         self.scw.update_depth(self.depth)
-                        print(json.loads(json_msg["depth"]))
+                        print(self.depth)
                     else:
                         print("Warning: GUI not fully initialized, skipping update.")
             
@@ -314,6 +315,6 @@ class XguiApplication():
 if __name__ == '__main__':
     args = get_cmdline_args()
     gui = XguiApplication(args)
-    asyncio_thread = threading.Thread(target=asyncio.run(gui.run_asyncio()), args=())
+    asyncio_thread = threading.Thread(target=lambda: asyncio.run(gui.run_asyncio()))
     asyncio_thread.start()
     gui.run()
