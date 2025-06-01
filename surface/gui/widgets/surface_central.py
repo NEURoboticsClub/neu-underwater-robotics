@@ -1,32 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout, QGraphicsOpacityEffect
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout, QGraphicsOpacityEffect, QSizePolicy
 from PyQt5.QtCore import Qt, QTime, QTimer, QElapsedTimer
 from .grid_video_players import GridVideoPlayersWidget
-import math
+from common import utils
 
 # An ISurfaceCentralWidget is a QWidget that takes in a list of QUrls
 # in its __init__.
-
-def euler_from_quaternion(x, y, z, w):
-        """
-        Convert a quaternion into euler angles (roll, pitch, yaw)
-        roll is rotation around x in radians (counterclockwise)
-        pitch is rotation around y in radians (counterclockwise)
-        yaw is rotation around z in radians (counterclockwise)
-        """
-        t0 = +2.0 * (w * x + y * z)
-        t1 = +1.0 - 2.0 * (x * x + y * y)
-        roll_x = math.atan2(t0, t1)
-     
-        t2 = +2.0 * (w * y - z * x)
-        t2 = +1.0 if t2 > +1.0 else t2
-        t2 = -1.0 if t2 < -1.0 else t2
-        pitch_y = math.asin(t2)
-     
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        yaw_z = math.atan2(t3, t4)
-     
-        return roll_x, pitch_y, yaw_z # in radians
 
 class SurfaceCentralWidget(QWidget):
     """The central widget for the surface window.
@@ -55,6 +33,8 @@ class SurfaceCentralWidget(QWidget):
 
         # telemetry box
         self.telemetry = QLabel(self._format_telemetry_text(), self)
+        size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.telemetry.setSizePolicy(size_policy)
         layout.addWidget(self.telemetry, 0, 0, Qt.AlignTop | Qt.AlignRight)
         opacity_effect = QGraphicsOpacityEffect(self.telemetry)
         opacity_effect.setOpacity(0.8)  # Set the opacity (0.8 = 80% visible)
@@ -98,7 +78,7 @@ class SurfaceCentralWidget(QWidget):
         self.telemetry_velocity = imu_data["acceleration"]
         self.telemetry.setText(self._format_telemetry_text())
         game_quaternion = imu_data["game quaternion"]
-        roll, pitch, yaw = euler_from_quaternion(game_quaternion["i"], game_quaternion["j"], game_quaternion["k"], game_quaternion["real"])
+        roll, pitch, yaw = utils.euler_from_quaternion(game_quaternion["i"], game_quaternion["j"], game_quaternion["k"], game_quaternion["real"])
         self.grid_player.attitude_indicator.setRollPitch(roll, pitch)
 
     # mock incrementing 
