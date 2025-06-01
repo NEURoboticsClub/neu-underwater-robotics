@@ -22,6 +22,50 @@ def linear_map(
     """
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
+"""Creates a dictionary with the given x, y, and z arguments.
+
+Args:
+    x: the value to set dict["x"] to
+    y: the value to set dict["y"] to
+    z: the value to set dict["z"] to
+
+Returns:
+    dict: a dictionary with the given values as "x", "y", and "z"
+"""
+def make_xyz_dict(x, y, z) -> dict:
+    diction = {}
+    diction["x"] = x
+    diction["y"] = y
+    diction["z"] = z
+
+    return diction
+
+"""Returns a dictionary of the correct format for the IMU with zeroed data.
+
+Returns:
+    dict: a dictionary of dictionaries, each one containing a set of zeroed IMU data
+        (accelerometer, gyroscope, magnetometer, or quaternion)
+"""
+def init_imu_data() -> dict:
+    data = {}
+    # acceleration
+    data["acceleration"] = make_xyz_dict(0,0,0)
+
+    # gyro
+    data["gyroscope"] = make_xyz_dict(0,0,0)
+
+    # magnetometer
+    data["magnetometer"] = make_xyz_dict(0,0,0)
+
+    # quaternion
+    quaternion = {}
+    quaternion["i"] = 0
+    quaternion["j"] = 0
+    quaternion["k"] = 0
+    quaternion["real"] = 0
+    data["game quaternion"] = quaternion
+
+    return data
 
 @dataclass
 class VelocityVector:

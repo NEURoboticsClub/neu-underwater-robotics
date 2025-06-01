@@ -18,6 +18,8 @@ from adafruit_bno08x import (
 from adafruit_bno08x.i2c import BNO08X_I2C
 # from adafruit_bno08x.uart import BNO08X_UART
 
+from common import utils
+
 try:
     i2c = I2C(8)
     bno = BNO08X_I2C(i2c)
@@ -37,24 +39,6 @@ HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 CONTROL_LOOP_FREQ = 5  # Hz
 
-"""Creates a dictionary with the given x, y, and z arguments.
-
-Args:
-    x: the value to set dict["x"] to
-    y: the value to set dict["y"] to
-    z: the value to set dict["z"] to
-
-Returns:
-    dict: a dictionary with the given values as "x", "y", and "z"
-"""
-def make_xyz_dict(x, y, z) -> dict:
-    diction = {}
-    diction["x"] = x
-    diction["y"] = y
-    diction["z"] = z
-
-    return diction
-
 """Reads data from the IMU sensor and returns as a dictionary.
 
 Returns:
@@ -65,15 +49,15 @@ def read_data() -> dict:
     data = {}
     # acceleration
     accel_x, accel_y, accel_z = bno.linear_acceleration  # pylint:disable=no-member
-    data["acceleration"] = make_xyz_dict(accel_x, accel_y, accel_z)
+    data["acceleration"] = utils.make_xyz_dict(accel_x, accel_y, accel_z)
 
     # gyro
     gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
-    data["gyroscope"] = make_xyz_dict(gyro_x, gyro_y, gyro_z)
+    data["gyroscope"] = utils.make_xyz_dict(gyro_x, gyro_y, gyro_z)
 
     # magnetometer
     mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
-    data["magnetometer"] = make_xyz_dict(mag_x, mag_y, mag_z)
+    data["magnetometer"] = utils.make_xyz_dict(mag_x, mag_y, mag_z)
 
     # quaternion
     quat_i, quat_j, quat_k, quat_real = bno.game_quaternion  # pylint:disable=no-member
