@@ -33,7 +33,7 @@ class SurfaceCentralWidget(QWidget):
 
         # telemetry box
         self.telemetry = QLabel(self._format_telemetry_text(), self)
-        self.telemetry.setFixedSize(200, 50)
+        self.telemetry.setFixedSize(525, 150)
         layout.addWidget(self.telemetry, 0, 0, Qt.AlignTop | Qt.AlignRight)
         
         self.telemetry.setStyleSheet("""

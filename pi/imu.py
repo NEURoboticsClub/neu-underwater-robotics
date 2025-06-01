@@ -93,6 +93,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"Fatal error: {err=}. Resetting.")
             bno.hard_reset()
             time.sleep(5)
+        except BrokenPipeError:
+            print("Connection closed.")
+            break
         except Exception as err:
             print(f"Transient error: {err=}.")
 
