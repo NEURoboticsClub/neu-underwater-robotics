@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout, QGraphicsOpacityEffect, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout
 from PyQt5.QtCore import Qt, QTime, QTimer, QElapsedTimer
 from .grid_video_players import GridVideoPlayersWidget
 from common import utils
@@ -33,12 +33,8 @@ class SurfaceCentralWidget(QWidget):
 
         # telemetry box
         self.telemetry = QLabel(self._format_telemetry_text(), self)
-        size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.telemetry.setSizePolicy(size_policy)
+        self.telemetry.setFixedSize(200, 50)
         layout.addWidget(self.telemetry, 0, 0, Qt.AlignTop | Qt.AlignRight)
-        opacity_effect = QGraphicsOpacityEffect(self.telemetry)
-        opacity_effect.setOpacity(0.8)  # Set the opacity (0.8 = 80% visible)
-        self.telemetry.setGraphicsEffect(opacity_effect)
         
         self.telemetry.setStyleSheet("""
             background-color: rgb(42, 107, 126);  /* Semi-transparent teal background */
