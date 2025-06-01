@@ -166,6 +166,8 @@ class Server:
             async with self.lock:
                 if len(self.incoming) > 0:
                     msg = self.incoming.pop()
+                    if len(self.incoming) > 5:
+                        self.incoming = []
                 else:
                     msg = None
             
@@ -197,7 +199,7 @@ class Server:
             
             if "depth" in json_msg:
                 self.rov_state.set_current_depth(
-                    dict(json.loads(json_msg["depth"]))
+                    list(json.loads(json_msg["depth"]))
                 )
 
 

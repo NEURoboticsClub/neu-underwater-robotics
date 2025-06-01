@@ -41,8 +41,8 @@ class ROVState:
         self._last_current_velocity_update = 0  # time of last current velocity update in ms
         self._last_current_claw_update = 0  # time of last current claw update in ms
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
-        self._current_depth = 0 # current depth of ROV
-        self._target_depth = 0 # target depth for ROV
+        self._current_depth = 0.0 # current depth of ROV
+        self._target_depth = 0.0 # target depth for ROV
         self._current_imu_data = utils.init_imu_data()
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
 
@@ -107,7 +107,7 @@ class ROVState:
         Args: 
             recent_depths (List[float]): Lsit of the most recent depths
         """
-        self._current_depth = np.avg(recent_depths)
+        self._current_depth = np.average(recent_depths)
 
     def set_current_imu_data(self, imu_data):
         """
