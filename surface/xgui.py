@@ -22,7 +22,7 @@ from surface.gui.surface_window import SurfaceWindow
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
-READ_LOOP_FREQ = 10
+READ_LOOP_FREQ = 5
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s')
@@ -267,7 +267,7 @@ class XguiApplication():
                         print("Warning: GUI not fully initialized, skipping update.")
             
             if "depth" in json_msg:
-                self.depth = float(json_msg["depth"])
+                self.depth = float(json.loads(json_msg["depth"]))
                 if self.scw != None:
                     if hasattr(self.scw, 'update_depth'):
                         self.scw.update_depth(self.depth)
