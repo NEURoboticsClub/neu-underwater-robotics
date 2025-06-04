@@ -32,6 +32,7 @@ class ROVState:
         self._current_claw = {"extend": 0, "rotate": 90, "close": 90}
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
+        # TOASK: how are we using this and is it tuned? May explain some things
         for axis in self._current_velocity.keys():
             self._pid_controllers[axis] = PIDController(
                 kp=1.0, ki=0.1, kd=0.01, max_output=90, max_rate_of_change=180
@@ -67,14 +68,14 @@ class ROVState:
             dict[str, float]: thruster mix
         """
         mix = {
-            "front_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "front_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "back_left_horizontal": -target_velocity.x - target_velocity.y - target_velocity.yaw,
-            "back_right_horizontal": target_velocity.x - target_velocity.y + target_velocity.yaw,
-            "front_left_vertical": target_velocity.z + target_velocity.pitch - target_velocity.roll,
-            "front_right_vertical": target_velocity.z + target_velocity.pitch + target_velocity.roll,
-            "back_left_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,
-            "back_right_vertical": target_velocity.z - target_velocity.pitch + target_velocity.roll,
+            "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
+            "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
+            "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
+            "back_right_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
+            "front_left_vertical": target_velocity.z + target_velocity.pitch + target_velocity.roll,
+            "front_right_vertical": target_velocity.z + target_velocity.pitch - target_velocity.roll,
+            "back_left_vertical": target_velocity.z - target_velocity.pitch + target_velocity.roll,
+            "back_right_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,
         }
 
         # cap value to [-1, 1]
