@@ -43,6 +43,7 @@ class ROVState:
         self._last_target_velocity_update = 0  # time of last target velocity update in ms
         self._current_depth = 0 # current depth of ROV
         self._target_depth = 0 # target depth for ROV
+        self._current_imu_data = {} # last received imu data
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
 
     def get_tasks(self) -> list[asyncio.Task]:
@@ -53,6 +54,7 @@ class ROVState:
         for actuator in self.thrusters.values():
             tasks.append(actuator.run())
         return tasks
+    
 
     def _translate_velocity_to_thruster_mix(
         self, target_velocity: VelocityVector
@@ -65,12 +67,14 @@ class ROVState:
             dict[str, float]: thruster mix
         """
         mix = {
-            "front_left_horizontal": target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "front_right_horizontal": -target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "back_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
-            "back_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
-            "left_vertical": target_velocity.z + target_velocity.roll,
-            "right_vertical": target_velocity.z - target_velocity.roll,
+            "front_left_horizontal": -target_velocity.x + target_velocity.y + target_velocity.yaw,
+            "front_right_horizontal": target_velocity.x + target_velocity.y - target_velocity.yaw,
+            "back_left_horizontal": -target_velocity.x - target_velocity.y - target_velocity.yaw,
+            "back_right_horizontal": target_velocity.x - target_velocity.y + target_velocity.yaw,
+            "front_left_vertical": target_velocity.z + target_velocity.pitch - target_velocity.roll,
+            "front_right_vertical": target_velocity.z + target_velocity.pitch + target_velocity.roll,
+            "back_left_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,
+            "back_right_vertical": target_velocity.z - target_velocity.pitch + target_velocity.roll,
         }
 
         # cap value to [-1, 1]
@@ -90,7 +94,7 @@ class ROVState:
     
     def set_claw_movement(self, claw: dict):
         """
-        Set current velocity.
+        Set current claw movement values.
         Args:
             claw (dict): current claw movement values
         """
@@ -105,6 +109,13 @@ class ROVState:
         """
         self._current_depth = np.avg(recent_depths)
 
+    def set_current_imu_data(self, imu_data):
+        """
+        Set current imu data.
+        Args:
+            imu_data (dict): current imu data
+        """
+        self._current_imu_data = imu_data
 
     def set_target_velocity(self, velocity: VelocityVector):
         """Set target velocity.
@@ -119,6 +130,7 @@ class ROVState:
     async def control_loop(self):
         """Control loop."""
         loop_period = 1000 / self._control_loop_frequency  # ms
+
         while True:
             dt = (time_ms() - self._last_time) / 1000
             # update last time

@@ -6,6 +6,8 @@ import board
 import busio
 import json
 import socket
+from adafruit_extended_bus import ExtendedI2C as I2C
+# import serial
 
 from adafruit_bno08x import (
     BNO_REPORT_ACCELEROMETER,
@@ -14,10 +16,15 @@ from adafruit_bno08x import (
     BNO_REPORT_ROTATION_VECTOR,
 )
 from adafruit_bno08x.i2c import BNO08X_I2C
+# from adafruit_bno08x.uart import BNO08X_UART
 
 try:
-    i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
+    i2c = I2C(8)
     bno = BNO08X_I2C(i2c)
+
+    # uart = busio.UART(board.TX, board.RX, baudrate=3000000, receiver_buffer_size=2048)
+    # uart = serial.Serial("/dev/serial0", 115200)
+    # bno = BNO08X_UART(uart)
 
     bno.enable_feature(BNO_REPORT_ACCELEROMETER)
     bno.enable_feature(BNO_REPORT_GYROSCOPE)
@@ -28,7 +35,7 @@ except Exception as e:
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
-CONTROL_LOOP_FREQ = 5  # Hz
+CONTROL_LOOP_FREQ = 4  # Hz
 
 """Creates a dictionary with the given x, y, and z arguments.
 
@@ -89,13 +96,21 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     last_time = time.time()
     
     while True:
-        data = read_data()
-        msg = {
-            "imu_data": json.dumps(data),
-        }
-        s.send(str.encode(json.dumps(msg)))
+        try:
+            data = read_data()
+            msg = {
+                "imu_data": json.dumps(data),
+            }
+            
+            s.send(str.encode(json.dumps(msg)))
 
-        print(f"sent: {msg}")
+            print(f"sent: {msg}")
+        except RuntimeError as err:
+            print(f"Fatal error: {err=}. Resetting.")
+            bno.hard_reset()
+            time.sleep(5)
+        except Exception as err:
+            print(f"Transient error: {err=}.")
 
         # sleep for remainder of loop
         if time.time() - last_time < 1 / CONTROL_LOOP_FREQ:

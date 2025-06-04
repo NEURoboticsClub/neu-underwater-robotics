@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python -m venv venvs/neu-mate
+python3.10 -m venv venvs/neu-mate
 
 source ./activate.sh
 
