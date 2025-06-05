@@ -14,7 +14,7 @@ from .rov_state import ROVState
 SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyACM0"
-RESPONSE_LOOP_FREQ = 1 # Hz
+RESPONSE_LOOP_FREQ = 10 # Hz
 
 if os.environ.get("SIM"):
     from .sim_hardware import SimThruster
@@ -29,7 +29,7 @@ class Server:
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
         self.tasks = []
-        self.last_msg = ""
+        self.incoming = []
         self.last_update = utils.time_ms()
         if not os.environ.get("SIM"):
             self._init_firmata()
@@ -127,7 +127,7 @@ class Server:
             print(f"received first message: {msg}")
             while msg:
                 async with self.lock:
-                    self.last_msg = msg
+                    self.incoming.append(msg)
                     self.last_update = utils.time_ms()
                 msg = (await reader.read(1024)).decode("utf-8")
             print("client disconnected, closing parser")
@@ -167,9 +167,14 @@ class Server:
         while True:
             await asyncio.sleep(0.01)
             async with self.lock:
-                msg = self.last_msg
-
-            if msg is None:  # no message received yet
+                if len(self.incoming) > 0:
+                    msg = self.incoming.pop()
+                    if len(self.incoming) > 5:
+                        self.incoming = []
+                else:
+                    msg = None
+            
+            if msg is None:
                 await asyncio.sleep(0.01)
                 continue
 
@@ -197,7 +202,7 @@ class Server:
             
             if "depth" in json_msg:
                 self.rov_state.set_current_depth(
-                    dict(json.loads(json_msg["depth"]))
+                    list(json.loads(json_msg["depth"]))
                 )
 
 
