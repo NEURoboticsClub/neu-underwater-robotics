@@ -29,7 +29,7 @@ class ROVState:
         self.thrusters = thrusters
         self.sensors = sensors
         self._current_velocity = VelocityVector()
-        self._current_claw = {"extend": 0, "rotate": 90, "close": 90}
+        self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90, }
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things

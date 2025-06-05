@@ -166,12 +166,12 @@ class XBoxDriveController(Controller):
         self.velocity_vec.x = self.axis_dict["left_x"].get_joy_val() * -1
         self.velocity_vec.y = self.axis_dict["left_y"].get_joy_val() 
         self.velocity_vec.z = (self.axis_dict["right_y"].get_joy_val() if self.buttons_dict["X"] 
-                               else self.sensor_dict) * self.agnes_factor
+                               else self.target_depth - self.sensor_dict["depth"]) * self.agnes_factor
         self.velocity_vec.yaw = self.axis_dict["right_x"].get_joy_val() * -1
         self.velocity_vec.pitch = (((self.axis_dict["left_trigger"].get_joy_val() + 1) / 2) - 
                     ((self.axis_dict["right_trigger"].get_joy_val() + 1) / 2))
-        self.velocity_vec.roll = int(self.buttons_dict["RB"].get_joy_val()) - \
-                                 int(self.buttons_dict["LB"].get_joy_val()) 
+        self.velocity_vec.roll = (int(self.buttons_dict["RB"].get_joy_val()) - \
+                                 int(self.buttons_dict["LB"].get_joy_val())) * 0.5
         
         return self.velocity_vec
     
@@ -179,7 +179,7 @@ class XBoxDriveController(Controller):
         """get the desired claw vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        # TODO: control scheme goes here
+        # TODO: control scheme goes here     
         self.claw_vec["extend"] = self.axis_dict["left_y"].get_joy_val()
         self.claw_vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * 90 + 90
         self.claw_vec["close_main"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \

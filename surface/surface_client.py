@@ -53,9 +53,10 @@ class SurfaceClient:
         while True:
             vec = drive_controller.get_velocity_vector()
             claw_vec = claw_controller.get_claw_vector()
-            msg = {
+            msg = { 
                 "target_velocity": json.dumps(vec.to_dict()),
                 "claw_movement": json.dumps(claw_vec),
+                # "status_flags"
             }
             writer.write(str.encode(json.dumps(msg)))
             await writer.drain()
