@@ -1,6 +1,6 @@
 from dataclasses import asdict, dataclass
 from time import time_ns
-
+import math
 
 def time_ms():
     """Returns the current time in milliseconds."""
@@ -22,6 +22,76 @@ def linear_map(
     """
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
+"""Creates a dictionary with the given x, y, and z arguments.
+
+Args:
+    x: the value to set dict["x"] to
+    y: the value to set dict["y"] to
+    z: the value to set dict["z"] to
+
+Returns:
+    dict: a dictionary with the given values as "x", "y", and "z"
+"""
+def make_xyz_dict(x, y, z) -> dict:
+    xyz_dict = {}
+    xyz_dict["x"] = x
+    xyz_dict["y"] = y
+    xyz_dict["z"] = z
+
+    return xyz_dict
+
+"""Returns a dictionary of the correct format for the IMU with zeroed data.
+
+Returns:
+    dict: a dictionary of dictionaries, each one containing a set of zeroed IMU data
+        (accelerometer, gyroscope, magnetometer, or quaternion)
+"""
+def init_imu_data() -> dict:
+    data = {}
+    # acceleration
+    data["acceleration"] = make_xyz_dict(0,0,0)
+
+    # gyro
+    data["gyroscope"] = make_xyz_dict(0,0,0)
+
+    # magnetometer
+    data["magnetometer"] = make_xyz_dict(0,0,0)
+
+    # quaternion
+    quaternion = {}
+    quaternion["i"] = 0
+    quaternion["j"] = 0
+    quaternion["k"] = 0
+    quaternion["real"] = 0
+    data["game_quaternion"] = quaternion
+
+    return data
+
+def euler_from_quaternion(x, y, z, w):
+        """
+        Convert a quaternion into euler angles (roll, pitch, yaw)
+        roll is rotation around x in degrees (counterclockwise)
+        pitch is rotation around y in degrees (counterclockwise)
+        yaw is rotation around z in degrees (counterclockwise)
+        """
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll_x = math.atan2(t0, t1)
+     
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch_y = math.asin(t2)
+     
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw_z = math.atan2(t3, t4)
+
+        roll_x = (roll_x * 180.0) / math.pi
+        pitch_y = (pitch_y * 180.0) / math.pi
+        yaw_z = (yaw_z * 180.0) / math.pi
+     
+        return roll_x, pitch_y, yaw_z # in degrees
 
 @dataclass
 class VelocityVector:

@@ -32,7 +32,6 @@ def generate_random_mock_data():
     }
     return data
 
-
 def generate_sliding_mock_data():
     """Generate sliding mock IMU data for testing."""
     global r, p, y, dx  
@@ -98,7 +97,6 @@ def run_mock_imu():
             print("Connection closed.")
         except KeyboardInterrupt:
             print("Mock IMU server stopped.")
-
 
 def main():
     """Main function to run the mock IMU server."""

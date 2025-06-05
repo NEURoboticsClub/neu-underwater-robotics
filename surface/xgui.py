@@ -10,10 +10,19 @@ import importlib
 import logging
 import os
 import sys
+import threading
+import asyncio
+import json
+from common import utils
+import time
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
-from .gui.widgets.surface_central import SurfaceCentralWidget
-from .gui.surface_window import SurfaceWindow
+from surface.gui.widgets.surface_central import SurfaceCentralWidget
+from surface.gui.surface_window import SurfaceWindow
+
+HOST = "192.168.0.102"  # The server's hostname or IP address
+PORT = 2049  # The port used by the server
+READ_LOOP_FREQ = 5
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s')
@@ -193,33 +202,119 @@ def get_messages_to_surpress(should_show_surpressed):
         with open(PATH_TO_SURPRESSED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
             return [line for line in (x.strip() for x in f)]
 
-def main():
-    """The entry point of this module."""
-    args = get_cmdline_args()
+class XguiApplication():
+    """Xgui Application Class. 
+    Intended for running Xgui as an attribute or an object from other entrypoints.    
+    """
+    def __init__(self, args):
+        self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
+        self.sc_widget_cls = get_surface_central_if_can(args.widget)
+        self.messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
+        self.scw = None
+        self.loop = asyncio.get_event_loop()
+        self.lock = asyncio.Lock()
+        self.last_msg = ""
+        self.last_update = utils.time_ms()
+        if os.environ.get("SIM"):
+            print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
+            if input() != "YES":
+                raise RuntimeError("Simulation mode not confirmed")
+            HOST = "127.0.0.1"
 
-    qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
-    sc_widget_cls = get_surface_central_if_can(args.widget)
-    messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
+        self.depth = 0
+        self.imu_data = ""
+    
+    def __del__(self):
+        self.loop.close()
 
-    if not sc_widget_cls:
-        sys.exit(1)
+    async def receive_messages(self, reader):
+        """receives sensor information from bottomside."""
+        msg = (await reader.read(1024)).decode("utf-8")
+        print(f"received first message: {msg}")
+        while msg:
+            async with self.lock:
+                self.last_msg = msg
+                self.last_update = utils.time_ms()
+            msg = (await reader.read(1024)).decode("utf-8")
+        print("client disconnected, closing parser")
 
-    app = QApplication(sys.argv)
-    qInstallMessageHandler(get_surpressed_message_handler(messages_to_surpress))
-    try:
-        scw = sc_widget_cls(qurls)
-    except TypeError as e:
-        logger.error(('There is a TypeError with the instantiation of the widget class. '
-                      'Make sure that the __init__ of the widget class takes in the expected '
-                      'arguments. As for what the expected arguments are, refer to the '
-                      'README.md of the surface module.'))
-        logger.error(e)
-        logger.error('Shutting down...')
-        sys.exit(1)
+    async def _parse(self):
+        """parses received messages."""
+        last_parse_time = time.time()
+        while True:
+            await asyncio.sleep(0.01)
+            async with self.lock:
+                msg = self.last_msg
 
-    main_window = SurfaceWindow(scw)
-    main_window.show()
-    app.exec_()
+            if msg is None:  # no message received yet
+                await asyncio.sleep(0.01)
+                continue
+
+            try:
+                json_msg = json.loads(msg)
+            except json.JSONDecodeError as e:
+                print(f"error decoding json: {e} | received: {msg}")
+                await asyncio.sleep(0.01)
+                continue
+
+            if "imu_data" in json_msg:
+                self.imu_data = json_msg["imu_data"]
+                if self.scw != None:
+                    if hasattr(self.scw, 'update_imu'):
+                        self.scw.update_imu(dict(json.loads(json_msg["imu_data"])))
+                        print(self.imu_data)
+                    else:
+                        print("Warning: GUI not fully initialized, skipping update.")
+            
+            if "depth" in json_msg:
+                self.depth = float(json.loads(json_msg["depth"]))
+                if self.scw != None:
+                    if hasattr(self.scw, 'update_depth'):
+                        self.scw.update_depth(self.depth)
+                        print(self.depth)
+                    else:
+                        print("Warning: GUI not fully initialized, skipping update.")
+            
+            if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
+                await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
+            else:
+                print("Warning: read loop took too long")
+            last_parse_time = time.time()
+    
+    async def run_asyncio(self):
+        """start reader, writer, and parser"""
+        reader, writer = await asyncio.open_connection(HOST, PORT)
+
+        receive_task = asyncio.create_task(self.receive_messages(reader))
+        parse_task = asyncio.create_task(self._parse())
+
+        await asyncio.gather(receive_task, parse_task)
+
+    def run(self):
+        if not self.sc_widget_cls:
+            sys.exit(1)
+        
+        self.app = QApplication(sys.argv)
+        qInstallMessageHandler(get_surpressed_message_handler(self.messages_to_surpress))
+        try:
+            self.scw = self.sc_widget_cls(self.qurls)
+        except TypeError as e:
+            logger.error(('There is a TypeError with the instantiation of the widget class. '
+                        'Make sure that the __init__ of the widget class takes in the expected '
+                        'arguments. As for what the expected arguments are, refer to the '
+                        'README.md of the surface module.'))
+            logger.error(e)
+            logger.error('Shutting down...')
+            sys.exit(1)
+
+        main_window = SurfaceWindow(self.scw)
+        main_window.show()
+        self.app.exec_()
+
 
 if __name__ == '__main__':
-    main()
+    args = get_cmdline_args()
+    gui = XguiApplication(args)
+    asyncio_thread = threading.Thread(target=lambda: asyncio.run(gui.run_asyncio()))
+    asyncio_thread.start()
+    gui.run()

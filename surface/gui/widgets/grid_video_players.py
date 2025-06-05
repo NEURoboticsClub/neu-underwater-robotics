@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from .video_player import VideoPlayerWidget
 from .AttitudeIndicatorWidget_Test import AttitudeIndicatorWidget_Test
 from .AttitudeIndicatorWidget import AttitudeIndicatorWidget
+from .ai import AttitudeIndicator
 
 class GridVideoPlayersWidget(QWidget):
     """A grid of [1,4] video player widgets.
@@ -44,7 +45,7 @@ class GridVideoPlayersWidget(QWidget):
         # Attitude indicator
         HOST = "127.0.0.1"  # Use localhost for testing
         PORT = 2049  # Same port as the GUI listener
-        self.attitude_indicator = AttitudeIndicatorWidget(HOST, PORT)
+        self.attitude_indicator = AttitudeIndicator()
         self.attitude_indicator.setFixedSize(200, 200)
         grid.addWidget(self.attitude_indicator, 0, 0, 2, 2, alignment=Qt.AlignCenter)
 
@@ -57,4 +58,3 @@ class GridVideoPlayersWidget(QWidget):
             grid.setRowStretch(1, 1)
 
         self.setLayout(grid)
-
