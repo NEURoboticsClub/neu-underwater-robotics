@@ -37,7 +37,7 @@ except Exception as e:
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
-CONTROL_LOOP_FREQ = 5  # Hz
+CONTROL_LOOP_FREQ = 10  # Hz
 
 """Reads data from the IMU sensor and returns as a dictionary.
 
@@ -66,7 +66,7 @@ def read_data() -> dict:
     quaternion["j"] = quat_j
     quaternion["k"] = quat_k
     quaternion["real"] = quat_real
-    data["game quaternion"] = quaternion
+    data["game_quaternion"] = quaternion
 
     return data
 

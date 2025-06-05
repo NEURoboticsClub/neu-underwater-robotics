@@ -33,12 +33,12 @@ Returns:
     dict: a dictionary with the given values as "x", "y", and "z"
 """
 def make_xyz_dict(x, y, z) -> dict:
-    diction = {}
-    diction["x"] = x
-    diction["y"] = y
-    diction["z"] = z
+    xyz_dict = {}
+    xyz_dict["x"] = x
+    xyz_dict["y"] = y
+    xyz_dict["z"] = z
 
-    return diction
+    return xyz_dict
 
 """Returns a dictionary of the correct format for the IMU with zeroed data.
 
@@ -63,7 +63,7 @@ def init_imu_data() -> dict:
     quaternion["j"] = 0
     quaternion["k"] = 0
     quaternion["real"] = 0
-    data["game quaternion"] = quaternion
+    data["game_quaternion"] = quaternion
 
     return data
 
