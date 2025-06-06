@@ -29,7 +29,9 @@ class ROVState:
         self.thrusters = thrusters
         self.sensors = sensors
         self._current_velocity = VelocityVector()
-        self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90, }
+        self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90,
+                              "close_side": 90, "sample": 0, "camera_servo": 30}
+        self._status_flags = {"agnes_factor": 0.3, "agnes_mode": False, "auto_depth": False, }
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things
@@ -46,6 +48,8 @@ class ROVState:
         self._target_depth = 0.0 # target depth for ROV
         self._current_imu_data = utils.init_imu_data()
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
+        self._bang_bang_radius = 0.02 # distance in meters from target depth before turning on
+        self._p_factor = 1 # factor to scale the auto-depth by
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -58,7 +62,7 @@ class ROVState:
     
 
     def _translate_velocity_to_thruster_mix(
-        self, target_velocity: VelocityVector
+        self, target_velocity: VelocityVector,
     ) -> dict[str, float]:
         """
         Translate target velocity to thruster mix.
@@ -77,6 +81,11 @@ class ROVState:
             "back_left_vertical": target_velocity.z - target_velocity.pitch + target_velocity.roll,
             "back_right_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,
         }
+        if self._status_flags["agnes_mode"]:
+            mix["front_left_vertical"] *= self._status_flags["agnes_factor"]
+            mix["front_right_vertical"] *= self._status_flags["agnes_factor"]
+            mix["back_left_vertical"] *= self._status_flags["agnes_factor"]
+            mix["back_right_vertical"] *= self._status_flags["agnes_factor"]
 
         # cap value to [-1, 1]
         for name, value in mix.items():
@@ -126,6 +135,16 @@ class ROVState:
         """
         self._target_velocity = velocity
         self._last_target_velocity_update = time_ms()
+
+    def set_status_flags(self, status_flags: dict):
+        """
+        Set current status flags.
+        Args:
+            status_flags (dict): current status flags
+        """
+        if status_flags["auto_depth"] and not self.status_flags["auto_depth"]:
+            self._target_depth = self._current_depth
+        self.status_flags = status_flags
     
 
     async def control_loop(self):
@@ -137,11 +156,34 @@ class ROVState:
             # update last time
             self._last_time = time_ms()
 
-            if -0.1 < self._target_velocity.z < 0.1:
-                self._target_depth -= self._target_velocity.z * self._z_sensitivity
-                # test different sensitivities and potentially functions
-                if self._target_depth > 1 and self._current_depth > 1:
-                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
+            # Plan test these and either make them toggleable or keep the best one
+            # Auto Depth V1 (Bang Bang P)
+            if self.status_flags["auto_depth"]:
+                if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
+                    self._target_velocity.z = ((self._target_depth - self._current_depth) * 
+                                               self._p_factor)
+                else: 
+                    self._target_velocity.z = 0
+
+            # Auto Depth V2 (Pure Bang Bang)
+            # if self.status_flags["auto_depth"]:
+            #     if self._target_depth - self._current_depth > self._bang_bang_radius:
+            #         self._target_velocity.z = 1 
+            #     elif self._current_depth - self._target_depth > self._bang_bang_radius:
+            #         self._target_velocity.z = -1
+            #     else: 
+            #         self._target_velocity.z = 0
+
+            # Auto Depth V3 (Altitude Mode w/ Bang Bang P)
+            # if self.status_flags["auto_depth"]:
+            #     z_radius = 0.1 # parameter for how far stick has to be to stop holding altitude
+            #     if abs(self._target_velocity.z) > z_radius:
+            #         self._target_depth += self._target_velocity.z * self._z_sensitivity
+            #     if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
+            #         self._target_velocity.z = ((self._target_depth - self._current_depth) *
+            #                                    self._p_factor)
+            #     else:
+            #          self._target_velocity.z = 0
 
             if time_ms() - self._last_target_velocity_update > 2 * loop_period:
                 # target velocity is stale, stop ROV

@@ -44,10 +44,10 @@ class Server:
                 },
                 thrusters={
                     #remove to isolate claw
-                    "front_left_horizontal": Thruster(self._get_pin(2, "s")),
-                    "front_right_horizontal": Thruster(self._get_pin(4, "s")),
-                    "back_left_horizontal": Thruster(self._get_pin(6, "s")), 
-                    "back_right_horizontal": Thruster(self._get_pin(8, "s")),
+                    "front_left_horizontal": Thruster(self._get_pin(2, "s"), active_range=(1250, 1750)),
+                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), active_range=(1250, 1750)),
+                    "back_left_horizontal": Thruster(self._get_pin(6, "s"), active_range=(1250, 1750)), 
+                    "back_right_horizontal": Thruster(self._get_pin(8, "s"), active_range=(1250, 1750)),
                     "front_left_vertical": Thruster(self._get_pin(3, "s")),
                     "front_right_vertical": Thruster(self._get_pin(5, "s"), reverse=True), 
                     "back_left_vertical": Thruster(self._get_pin(7, "s"), reverse=True),
@@ -189,6 +189,9 @@ class Server:
                 self.rov_state.set_target_velocity(
                     utils.VelocityVector(json.loads(json_msg["target_velocity"]))
                 )
+
+            if "status_flags" in json_msg:
+                self.rov_state.set_status_flags(json.loads(json_msg["status_flags"]))
 
             if "imu_data" in json_msg:
                 self.rov_state.set_current_imu_data(

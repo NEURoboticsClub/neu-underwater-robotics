@@ -51,12 +51,13 @@ class SurfaceClient:
         """sends controller inputs to bottomside."""
         last_send_time = time.time()
         while True:
-            vec = drive_controller.get_velocity_vector()
+            velocity_vec = drive_controller.get_velocity_vector()
             claw_vec = claw_controller.get_claw_vector()
+            status_flags = drive_controller.get_status_flags()
             msg = { 
-                "target_velocity": json.dumps(vec.to_dict()),
+                "target_velocity": json.dumps(velocity_vec.to_dict()),
                 "claw_movement": json.dumps(claw_vec),
-                # "status_flags"
+                "status_flags": json.dumps(status_flags)
             }
             writer.write(str.encode(json.dumps(msg)))
             await writer.drain()

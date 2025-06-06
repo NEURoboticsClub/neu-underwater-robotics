@@ -152,21 +152,20 @@ class XBoxDriveController(Controller):
             "right_trigger": self._axes[5],
         }
         self.velocity_vec = VelocityVector()
-        self.claw_vec = {"camera_servo": 20}
-        self.agnes_factor = 0.3
-        self.sensor_dict = {}
-        self.target_depth = None
+        self.status_flags = {
+            "agnes_factor":0.3,
+            "agnes_mode":False,
+            "auto_depth":False,
+        }
+        self.claw_vec = {"camera_servo": 30}
 
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        self.target_depth = self.sensor_dict["depth"] if self.buttons_dict["X"] else None
-        self.agnes_factor += self.hat_dict["hat"].get_joy_val()[0] * 0.05
         self.velocity_vec.x = self.axis_dict["left_x"].get_joy_val() * -1
         self.velocity_vec.y = self.axis_dict["left_y"].get_joy_val() 
-        self.velocity_vec.z = (self.axis_dict["right_y"].get_joy_val() if self.buttons_dict["X"] 
-                               else self.target_depth - self.sensor_dict["depth"]) * self.agnes_factor
+        self.velocity_vec.z = self.axis_dict["right_y"].get_joy_val() 
         self.velocity_vec.yaw = self.axis_dict["right_x"].get_joy_val() * -1
         self.velocity_vec.pitch = (((self.axis_dict["left_trigger"].get_joy_val() + 1) / 2) - 
                     ((self.axis_dict["right_trigger"].get_joy_val() + 1) / 2))
@@ -175,6 +174,14 @@ class XBoxDriveController(Controller):
         
         return self.velocity_vec
     
+    def get_status_flags(self) -> dict:
+        self.status_flags["agnes_factor"] += self.hat_dict["hat"].get_joy_val()[0] * 0.05
+        self.status_flags["agnes_mode"] = self.buttons_dict["Y"]
+        self.status_flags["auto_depth"] = self.buttons_dict["X"]
+
+        return self.status_flags
+
+
     def get_claw_vector(self) -> dict:
         """get the desired claw vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
