@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QVideoProbe, QVideoFrame
+from PyQt5.QtGui import QImage
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 
 class VideoPlayerWidget(QWidget):
@@ -46,6 +47,13 @@ class VideoPlayerWidget(QWidget):
 
         # Finish setting up media player
         self.media_player.setVideoOutput(video_widget)
+
+        self.do_save_image = False
+        self.img_save_path = "capture_path_error.jpg"
+        self.probe = QVideoProbe()
+        self.probe.setSource(self.media_player)
+        self.probe.videoFrameProbed.connect(self.process_frame)
+
         self.media_player.setMedia(QMediaContent(qurl))
         self.media_player.play()
 
@@ -69,4 +77,27 @@ class VideoPlayerWidget(QWidget):
         # too generic.
         if new_error != 0:
             raise Exception(f"Media player error state: {new_error}")
+    
+    def save_image(self, camera_no, num_saved_images):
+        self.do_save_image = True
+        self.img_save_path = "camera_" + camera_no + "_capture_" + num_saved_images + ".jpg"
+
+    def process_frame(self, frame: QVideoFrame):
+        if frame.isValid() and self.do_save_image:
+            self.do_save_image = False
+
+            frame.map(QVideoFrame.ReadOnly)
+
+            image = QImage(
+                frame.bits(),
+                frame.width(),
+                frame.height(),
+                frame.bytesPerLine(),
+                QVideoFrame.imageFormatFromPixelFormat(frame.pixelFormat())
+            )
+
+            frame.unmap()
+
+            image.save(self.img_save_path)
+            print("Image saved to " + self.img_save_path)
 

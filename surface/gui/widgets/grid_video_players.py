@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QGridLayout, QWidget
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeyEvent
 from .video_player import VideoPlayerWidget
 from .AttitudeIndicatorWidget_Test import AttitudeIndicatorWidget_Test
 from .AttitudeIndicatorWidget import AttitudeIndicatorWidget
@@ -20,6 +21,7 @@ class GridVideoPlayersWidget(QWidget):
         video_player_qurls : List[QUrl]
 
         """
+        self.num_saved_images = 0
         num_cells = len(video_player_qurls)
 
         if num_cells == 0 or num_cells > 4:
@@ -33,9 +35,9 @@ class GridVideoPlayersWidget(QWidget):
         grid.setSpacing(0)
         grid.setContentsMargins(0, 0, 0, 0)
 
-        video_players = [VideoPlayerWidget(qurl) for qurl in video_player_qurls]
+        self._video_players = [VideoPlayerWidget(qurl) for qurl in video_player_qurls]
 
-        for i, video_player in enumerate(video_players):
+        for i, video_player in enumerate(self._video_players):
             grid.addWidget(video_player, i // 2, i % 2)
 
         # Equally-sized cells
@@ -58,3 +60,36 @@ class GridVideoPlayersWidget(QWidget):
             grid.setRowStretch(1, 1)
 
         self.setLayout(grid)
+
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key_1:
+            for i, video_player in enumerate(self._video_players):
+                if i == 0:
+                    video_player.show()
+                else:
+                    video_player.hide()
+        elif event.key() == Qt.Key_2:
+            for i, video_player in enumerate(self._video_players):
+                if i == 1:
+                    video_player.show()
+                else:
+                    video_player.hide()
+        elif event.key() == Qt.Key_3:
+            for i, video_player in enumerate(self._video_players):
+                if i == 2:
+                    video_player.show()
+                else:
+                    video_player.hide()
+        elif event.key() == Qt.Key_4:
+            for i, video_player in enumerate(self._video_players):
+                if i == 3:
+                    video_player.show()
+                else:
+                    video_player.hide()
+        elif event.key() == Qt.Key_Escape:
+            for i, video_player in enumerate(self._video_players):
+                video_player.show()
+        elif event.key() == Qt.Key_S:
+            for i, video_player in enumerate(self._video_players):
+                video_player.save_image(i, self.num_saved_images)
+            self.num_saved_images += 1
