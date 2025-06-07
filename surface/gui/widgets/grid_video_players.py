@@ -66,35 +66,49 @@ class GridVideoPlayersWidget(QWidget):
         if event.key() == Qt.Key_1:
             print("Key 1 pressed")
             for i, video_player in enumerate(self._video_players):
-                if i == 0:
+                if i == 0 and self.layout().indexOf(video_player) == -1:
+                    self.layout().addWidget(video_player)
                     video_player.show()
                 else:
-                    video_player.hide()
+                    if self.layout().indexOf(video_player) != -1:
+                        self.layout().removeWidget(video_player)
+                        video_player.hide()
         elif event.key() == Qt.Key_2:
             print("Key 2 pressed")
             for i, video_player in enumerate(self._video_players):
-                if i == 1:
+                if i == 1 and self.layout().indexOf(video_player) == -1:
+                    self.layout().addWidget(video_player)
                     video_player.show()
                 else:
-                    video_player.hide()
+                    if self.layout().indexOf(video_player) != -1:
+                        self.layout().removeWidget(video_player)
+                        video_player.hide()
         elif event.key() == Qt.Key_3:
             print("Key 3 pressed")
             for i, video_player in enumerate(self._video_players):
-                if i == 2:
+                if i == 2 and self.layout().indexOf(video_player) == -1:
+                    self.layout().addWidget(video_player)
                     video_player.show()
                 else:
-                    video_player.hide()
+                    if self.layout().indexOf(video_player) != -1:
+                        self.layout().removeWidget(video_player)
+                        video_player.hide()
         elif event.key() == Qt.Key_4:
             print("Key 4 pressed")
             for i, video_player in enumerate(self._video_players):
-                if i == 3:
+                if i == 3 and self.layout().indexOf(video_player) == -1:
+                    self.layout().addWidget(video_player)
                     video_player.show()
                 else:
-                    video_player.hide()
+                    if self.layout().indexOf(video_player) != -1:
+                        self.layout().removeWidget(video_player)
+                        video_player.hide()
         elif event.key() == Qt.Key_Escape:
             print("Key esc pressed")
             for i, video_player in enumerate(self._video_players):
-                video_player.show()
+                if self.layout().indexOf(video_player) == -1:
+                    self.layout().addWidget(video_player)
+                    video_player.show()
         elif event.key() == Qt.Key_S:
             print("Key s pressed")
             for i, video_player in enumerate(self._video_players):
