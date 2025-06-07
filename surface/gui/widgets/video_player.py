@@ -54,6 +54,8 @@ class VideoPlayerWidget(QWidget):
         probe_attachment_successful = self.probe.setSource(self.media_player)
         if not probe_attachment_successful:
             print("Error: Probe did not attach")
+        else:
+            print("Probe attached successfully")
         self.probe.videoFrameProbed.connect(self.process_frame)
 
         self.media_player.setMedia(QMediaContent(qurl))
