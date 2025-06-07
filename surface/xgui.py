@@ -34,7 +34,7 @@ MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! xvimagesink name=\"qtvideosink\""
+PORT_NUM_TO_GST_QURL_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! xvimagesink name=\"qtvideosink\""
 
 def get_cmdline_args():
     """Gets the values of the command line arguments.
@@ -72,7 +72,7 @@ def get_qurls_or_exit(lowest_port_num, num_cameras):
     highest_port_num = lowest_port_num + num_cameras - 1
 
     if _check_valid_port_num(lowest_port_num) and _check_valid_port_num(highest_port_num):
-        return [QUrl(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_num))
+        return [QUrl(PORT_NUM_TO_GST_QURL_PIPELINE_COMMAND(port_num))
                 for port_num in range(lowest_port_num, highest_port_num + 1)]
     else:
         logger.error(('Invalid port number. A port number must be between 1 and 65536. '

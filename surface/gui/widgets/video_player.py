@@ -1,8 +1,13 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtCore import QUrl
 import cv2
 from os.path import expanduser
+
+# TODO(config): Users ought to be able to specify this without prying
+# into the code.
+PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND = lambda qurl : str(qurl)[len("gst-pipeline: "):].replace('xvimagesink name="qtvideosink"', 'appsink')
 
 class VideoPlayerWidget(QWidget):
     """A PyQt5 Widget that plays a video with the given QUrl.
@@ -18,7 +23,7 @@ class VideoPlayerWidget(QWidget):
     https://doc.qt.io/qt-5/qmediaplayer.html#setMedia
 
     """
-    def __init__(self, qurl, parent=None, on_media_status_changed=None, on_error=None):
+    def __init__(self, qurl: QUrl, parent=None, on_media_status_changed=None, on_error=None):
         """Constructs this widget, and set this media player to play
         state.
 
@@ -49,7 +54,7 @@ class VideoPlayerWidget(QWidget):
         # Finish setting up media player
         self.media_player.setVideoOutput(video_widget)
 
-        self.capture = cv2.VideoCapture(qurl, cv2.CAP_GSTREAMER)
+        self.capture = cv2.VideoCapture(PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND(qurl.url()), cv2.CAP_GSTREAMER)
         if not self.capture.isOpened():
             print("Error: Failed to start video capture")
 
