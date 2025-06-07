@@ -80,7 +80,7 @@ class VideoPlayerWidget(QWidget):
     
     def save_image(self, camera_no, num_saved_images):
         self.do_save_image = True
-        self.img_save_path = "camera_" + str(camera_no) + "_capture_" + str(num_saved_images) + ".jpg"
+        self.img_save_path = "~/neu-underwater-robotics/surface/camera_" + str(camera_no) + "_capture_" + str(num_saved_images) + ".jpg"
 
     def process_frame(self, frame: QVideoFrame):
         if frame.isValid() and self.do_save_image:
