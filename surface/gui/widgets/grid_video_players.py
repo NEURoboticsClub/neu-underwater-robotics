@@ -62,34 +62,42 @@ class GridVideoPlayersWidget(QWidget):
         self.setLayout(grid)
 
     def keyPressEvent(self, event: QKeyEvent):
+        print("Key pressed")
         if event.key() == Qt.Key_1:
+            print("Key 1 pressed")
             for i, video_player in enumerate(self._video_players):
                 if i == 0:
                     video_player.show()
                 else:
                     video_player.hide()
         elif event.key() == Qt.Key_2:
+            print("Key 2 pressed")
             for i, video_player in enumerate(self._video_players):
                 if i == 1:
                     video_player.show()
                 else:
                     video_player.hide()
         elif event.key() == Qt.Key_3:
+            print("Key 3 pressed")
             for i, video_player in enumerate(self._video_players):
                 if i == 2:
                     video_player.show()
                 else:
                     video_player.hide()
         elif event.key() == Qt.Key_4:
+            print("Key 4 pressed")
             for i, video_player in enumerate(self._video_players):
                 if i == 3:
                     video_player.show()
                 else:
                     video_player.hide()
         elif event.key() == Qt.Key_Escape:
+            print("Key esc pressed")
             for i, video_player in enumerate(self._video_players):
                 video_player.show()
         elif event.key() == Qt.Key_S:
+            print("Key s pressed")
             for i, video_player in enumerate(self._video_players):
                 video_player.save_image(i, self.num_saved_images)
             self.num_saved_images += 1
+        event.accept()
