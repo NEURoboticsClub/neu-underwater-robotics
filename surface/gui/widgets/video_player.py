@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QVideoProbe, QVideoFrame
-from PyQt5.QtGui import QImage
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+import cv2
+from os.path import expanduser
 
 class VideoPlayerWidget(QWidget):
     """A PyQt5 Widget that plays a video with the given QUrl.
@@ -48,15 +49,9 @@ class VideoPlayerWidget(QWidget):
         # Finish setting up media player
         self.media_player.setVideoOutput(video_widget)
 
-        self.do_save_image = False
-        self.img_save_path = "capture_path_error.jpg"
-        self.probe = QVideoProbe()
-        probe_attachment_successful = self.probe.setSource(self.media_player)
-        if not probe_attachment_successful:
-            print("Error: Probe did not attach")
-        else:
-            print("Probe attached successfully")
-        self.probe.videoFrameProbed.connect(self.process_frame)
+        self.capture = cv2.VideoCapture(qurl, cv2.CAP_GSTREAMER)
+        if not self.capture.isOpened():
+            print("Error: Failed to start video capture")
 
         self.media_player.setMedia(QMediaContent(qurl))
         self.media_player.play()
@@ -83,29 +78,15 @@ class VideoPlayerWidget(QWidget):
             raise Exception(f"Media player error state: {new_error}")
     
     def save_image(self, camera_no, num_saved_images):
-        self.img_save_path = "~/neu-underwater-robotics/surface/camera_" + str(camera_no) + "_capture_" + str(num_saved_images) + ".jpg"
-        self.do_save_image = True
+        img_save_path = expanduser("~/neu-underwater-robotics/surface/camera_" + str(camera_no) + "_capture_" + str(num_saved_images) + ".jpg")
 
-    def process_frame(self, frame: QVideoFrame):
-        print("Is frame valid? " + str(frame.isValid()))
-        if frame.isValid() and self.do_save_image:
-            self.do_save_image = False
+        capture_read_successful, frame = self.capture.read()
+        if not capture_read_successful:
+            print("Error: Failed to capture frame from video feed")
 
-            frame.map(QVideoFrame.ReadOnly)
-
-            image = QImage(
-                frame.bits(),
-                frame.width(),
-                frame.height(),
-                frame.bytesPerLine(),
-                QVideoFrame.imageFormatFromPixelFormat(frame.pixelFormat())
-            )
-
-            frame.unmap()
-
-            save_successful = image.save(self.img_save_path)
-            if save_successful:
-                print("Image saved to " + self.img_save_path)
-            else:
-                print("Error: Image failed to save")
+        img_save_successful = cv2.imwrite(img_save_path, frame)
+        if img_save_successful:
+            print("Image saved to " + img_save_path)
+        else:
+            print("Error: Image failed to save")
 
