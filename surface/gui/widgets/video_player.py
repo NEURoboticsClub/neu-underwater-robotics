@@ -51,7 +51,9 @@ class VideoPlayerWidget(QWidget):
         self.do_save_image = False
         self.img_save_path = "capture_path_error.jpg"
         self.probe = QVideoProbe()
-        self.probe.setSource(self.media_player)
+        probe_attachment_successful = self.probe.setSource(self.media_player)
+        if not probe_attachment_successful:
+            print("Error: Probe did not attach")
         self.probe.videoFrameProbed.connect(self.process_frame)
 
         self.media_player.setMedia(QMediaContent(qurl))
