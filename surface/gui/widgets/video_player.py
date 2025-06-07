@@ -79,10 +79,11 @@ class VideoPlayerWidget(QWidget):
             raise Exception(f"Media player error state: {new_error}")
     
     def save_image(self, camera_no, num_saved_images):
-        self.do_save_image = True
         self.img_save_path = "~/neu-underwater-robotics/surface/camera_" + str(camera_no) + "_capture_" + str(num_saved_images) + ".jpg"
+        self.do_save_image = True
 
     def process_frame(self, frame: QVideoFrame):
+        print("Is frame valid? " + str(frame.isValid()))
         if frame.isValid() and self.do_save_image:
             self.do_save_image = False
 
@@ -98,6 +99,9 @@ class VideoPlayerWidget(QWidget):
 
             frame.unmap()
 
-            image.save(self.img_save_path)
-            print("Image saved to " + self.img_save_path)
+            save_successful = image.save(self.img_save_path)
+            if save_successful:
+                print("Image saved to " + self.img_save_path)
+            else:
+                print("Error: Image failed to save")
 
