@@ -20,7 +20,6 @@ class SurfaceCentralWidget(QWidget):
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)  #
         self.grid_player = GridVideoPlayersWidget(video_player_qurls, self)
-        self.grid_player.setFocus()
         layout.addWidget(self.grid_player, 0, 0)
 
         # telemetry attributes

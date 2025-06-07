@@ -309,6 +309,7 @@ class XguiApplication():
 
         main_window = SurfaceWindow(self.scw)
         main_window.show()
+        self.scw.grid_player.setFocus()
         self.app.exec_()
 
 
