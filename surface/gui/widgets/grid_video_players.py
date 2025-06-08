@@ -20,7 +20,6 @@ class GridVideoPlayersWidget(QWidget):
         video_player_qurls : List[QUrl]
 
         """
-        self._num_saved_images = 0
         self._current_fullscreen = -1
         num_cells = len(port_nums)
 
@@ -35,7 +34,7 @@ class GridVideoPlayersWidget(QWidget):
         self.grid.setSpacing(0)
         self.grid.setContentsMargins(0, 0, 0, 0)
 
-        self._video_players = [VideoPlayerWidget(port) for port in port_nums]
+        self._video_players = [VideoPlayerWidget(port, i) for i, port in enumerate(port_nums)]
 
         for i, video_player in enumerate(self._video_players):
             self.grid.addWidget(video_player, i // 2, i % 2)
@@ -105,6 +104,6 @@ class GridVideoPlayersWidget(QWidget):
         elif event.key() == Qt.Key_S:
             print("Key s pressed")
             for i, video_player in enumerate(self._video_players):
-                video_player.save_image(i, self._num_saved_images)
+                video_player.save_image(i)
             self._num_saved_images += 1
         event.accept()
