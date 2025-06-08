@@ -41,6 +41,7 @@ class VideoPlayerWidget(QWidget):
         self.camera_feed.start()
         print("Camera feed running? " + str(self.camera_feed.isRunning()))
         self.camera_feed.frame_signal.connect(self._setImage)
+        print("Camera feed signal connected to video player")
 
     @Slot(QImage)
     def _setImage(self,img):

@@ -9,12 +9,14 @@ import time
 PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink"
 
 class CameraFeed(QThread):
+
+    frame_signal = Signal(QImage)
+
     def __init__(self, port_no : int, camera_no : int):
         super(CameraFeed, self).__init__()
 
         print("Initializing camera feed on port " + str(port_no))
 
-        self.frame_signal = Signal(QImage)
         self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
         self.camera_no = camera_no
         self._num_saved_images = 0

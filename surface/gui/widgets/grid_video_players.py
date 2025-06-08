@@ -105,5 +105,4 @@ class GridVideoPlayersWidget(QWidget):
             print("Key s pressed")
             for i, video_player in enumerate(self._video_players):
                 video_player.save_image(i)
-            self._num_saved_images += 1
         event.accept()
