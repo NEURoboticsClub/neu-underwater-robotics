@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QImage
-from PyQt5.QtCore import QThread, pyqtSignal as Signal
+from PyQt5.QtCore import QThread, pyqtBoundSignal as Signal
 import cv2, imutils
 from os.path import expanduser
 
@@ -10,7 +10,7 @@ PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} !
 class CameraFeed(QThread):
     def __init__(self, port_no : int):
         super(CameraFeed, self).__init__()
-        
+
         self.frame_signal = Signal(QImage)
         self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
 
