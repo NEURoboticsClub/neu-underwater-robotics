@@ -168,6 +168,7 @@ class ROVState:
             for name, value in self._current_claw.items():
                 set_val_tasks.append(self.actuators[name].set_val(value))
             
+            # Redundant debugging code
             # for thruster_name, thruster in self.thrusters.items():
             #     print(f"{thruster_name}: {thruster_mix[thruster_name]}")
             # for actuator_name, actuator in self.actuators.items():
