@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
 from .video_player import VideoPlayerWidget
 from .ai import AttitudeIndicator
+from typing import List
 
 class GridVideoPlayersWidget(QWidget):
     """A grid of [1,4] video player widgets.
@@ -11,7 +12,7 @@ class GridVideoPlayersWidget(QWidget):
     qurls.
 
     """
-    def __init__(self, video_player_qurls, parent=None):
+    def __init__(self, port_nums : List[int], parent=None):
         """Constructs this widget with the given QUrls.
 
         Errors if the number of QUrls are not within the range [1,4]
@@ -21,7 +22,7 @@ class GridVideoPlayersWidget(QWidget):
         """
         self.num_saved_images = 0
         self.current_fullscreen = -1
-        num_cells = len(video_player_qurls)
+        num_cells = len(port_nums)
 
         if num_cells == 0 or num_cells > 4:
             raise ValueError(("GridVideoPlayersWidget needs to be given [1,4] QUrls, "
@@ -34,7 +35,7 @@ class GridVideoPlayersWidget(QWidget):
         grid.setSpacing(0)
         grid.setContentsMargins(0, 0, 0, 0)
 
-        self._video_players = [VideoPlayerWidget(qurl) for qurl in video_player_qurls]
+        self._video_players = [VideoPlayerWidget(port) for port in port_nums]
 
         for i, video_player in enumerate(self._video_players):
             grid.addWidget(video_player, i // 2, i % 2)

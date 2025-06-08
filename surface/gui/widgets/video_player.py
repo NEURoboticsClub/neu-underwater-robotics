@@ -30,7 +30,7 @@ class VideoPlayerWidget(QWidget):
         """
         super(VideoPlayerWidget, self).__init__()
 
-        self.camera_feed = CameraFeed(port_no)
+        self.camera_feed = CameraFeed(port_no=port_no)
         self.label = QLabel()
         self._set_layout_to_given(self.label)
 
