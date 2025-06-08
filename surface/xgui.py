@@ -32,10 +32,6 @@ PATH_TO_SUPRESSED_MESSAGES_FILE = os.path.join(os.path.dirname(__file__),
                                                 RPATH_TO_SUPRESSED_MESSAGES_FILE)
 MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 
-# TODO(config): Users ought to be able to specify this without prying
-# into the code.
-PORT_NUM_TO_GST_QURL_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! xvimagesink name=\"qtvideosink\""
-
 def get_cmdline_args():
     """Gets the values of the command line arguments.
 
@@ -55,25 +51,24 @@ def get_cmdline_args():
 
     return parser.parse_args()
 
-def get_qurls_or_exit(lowest_port_num, num_cameras):
-    """Gets the QUrls list if the port numbers are legal, exits
-    with error code 1 otherwise.
+def get_port_nums_or_exit(lowest_port_num, num_cameras):
+    """Gets the port number list if the port numbers are legal;
+    else exits with error code 1.
 
-    The length of the output list equals to the given number of
-    cameras, and each QUrl has the port number equal to the given
+    The length of the output list equals the given number of
+    cameras, and each port number is equal to the given
     lowest_port_num plus its index.
 
     lowest_port_num : nat
     num_cameras : nat
 
-    Returns: List[QUrl]
+    Returns: List[int]
 
     """
     highest_port_num = lowest_port_num + num_cameras - 1
 
     if _check_valid_port_num(lowest_port_num) and _check_valid_port_num(highest_port_num):
-        return [QUrl(PORT_NUM_TO_GST_QURL_PIPELINE_COMMAND(port_num))
-                for port_num in range(lowest_port_num, highest_port_num + 1)]
+        return range(lowest_port_num, highest_port_num + 1)
     else:
         logger.error(('Invalid port number. A port number must be between 1 and 65536. '
                       'The given port numbers are in range [%s,%s]. Shutting down...'), 
@@ -207,7 +202,7 @@ class XguiApplication():
     Intended for running Xgui as an attribute or an object from other entrypoints.    
     """
     def __init__(self, args):
-        self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
+        self.port_nums = get_port_nums_or_exit(args.lowest_port_num, args.num_cameras)
         self.sc_widget_cls = get_surface_central_if_can(args.widget)
         self.messages_to_supress = get_messages_to_supress(args.show_supressed)
         self.scw = None
@@ -297,7 +292,7 @@ class XguiApplication():
         self.app = QApplication(sys.argv)
         qInstallMessageHandler(get_supressed_message_handler(self.messages_to_supress))
         try:
-            self.scw = self.sc_widget_cls(self.qurls)
+            self.scw = self.sc_widget_cls(self.port_nums)
         except TypeError as e:
             logger.error(('There is a TypeError with the instantiation of the widget class. '
                         'Make sure that the __init__ of the widget class takes in the expected '

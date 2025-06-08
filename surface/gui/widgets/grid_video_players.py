@@ -2,8 +2,6 @@ from PyQt5.QtWidgets import QGridLayout, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
 from .video_player import VideoPlayerWidget
-from .AttitudeIndicatorWidget_Test import AttitudeIndicatorWidget_Test
-from .AttitudeIndicatorWidget import AttitudeIndicatorWidget
 from .ai import AttitudeIndicator
 
 class GridVideoPlayersWidget(QWidget):
@@ -22,6 +20,7 @@ class GridVideoPlayersWidget(QWidget):
 
         """
         self.num_saved_images = 0
+        self.current_fullscreen = -1
         num_cells = len(video_player_qurls)
 
         if num_cells == 0 or num_cells > 4:
@@ -45,8 +44,6 @@ class GridVideoPlayersWidget(QWidget):
         grid.setRowStretch(0, 1)
 
         # Attitude indicator
-        HOST = "127.0.0.1"  # Use localhost for testing
-        PORT = 2049  # Same port as the GUI listener
         self.attitude_indicator = AttitudeIndicator()
         self.attitude_indicator.setFixedSize(200, 200)
         grid.addWidget(self.attitude_indicator, 0, 0, 2, 2, alignment=Qt.AlignCenter)
@@ -65,50 +62,47 @@ class GridVideoPlayersWidget(QWidget):
         print("Key pressed")
         if event.key() == Qt.Key_1:
             print("Key 1 pressed")
-            for i, video_player in enumerate(self._video_players):
-                if i == 0 and self.layout().indexOf(video_player) == -1:
-                    self.layout().addWidget(video_player)
-                    video_player.show()
-                else:
-                    if self.layout().indexOf(video_player) != -1:
-                        self.layout().removeWidget(video_player)
-                        video_player.hide()
+            if self.current_fullscreen != -1:
+                self.layout().addWidget(self._video_players[self.current_fullscreen],
+                                        self.current_fullscreen // 2,
+                                        self.current_fullscreen % 2)
+                self._video_players[self.current_fullscreen].showNormal()
+            self.layout().removeWidget(self._video_players[0])
+            self._video_players[0].showFullScreen()
         elif event.key() == Qt.Key_2:
             print("Key 2 pressed")
-            for i, video_player in enumerate(self._video_players):
-                if i == 1 and self.layout().indexOf(video_player) == -1:
-                    self.layout().addWidget(video_player)
-                    video_player.show()
-                else:
-                    if self.layout().indexOf(video_player) != -1:
-                        self.layout().removeWidget(video_player)
-                        video_player.hide()
+            if self.current_fullscreen != -1:
+                self.layout().addWidget(self._video_players[self.current_fullscreen],
+                                        self.current_fullscreen // 2,
+                                        self.current_fullscreen % 2)
+                self._video_players[self.current_fullscreen].showNormal()
+            self.layout().removeWidget(self._video_players[1])
+            self._video_players[1].showFullScreen()
         elif event.key() == Qt.Key_3:
             print("Key 3 pressed")
-            for i, video_player in enumerate(self._video_players):
-                if i == 2 and self.layout().indexOf(video_player) == -1:
-                    self.layout().addWidget(video_player)
-                    video_player.show()
-                else:
-                    if self.layout().indexOf(video_player) != -1:
-                        self.layout().removeWidget(video_player)
-                        video_player.hide()
+            if self.current_fullscreen != -1:
+                self.layout().addWidget(self._video_players[self.current_fullscreen],
+                                        self.current_fullscreen // 2,
+                                        self.current_fullscreen % 2)
+                self._video_players[self.current_fullscreen].showNormal()
+            self.layout().removeWidget(self._video_players[2])
+            self._video_players[2].showFullScreen()
         elif event.key() == Qt.Key_4:
             print("Key 4 pressed")
-            for i, video_player in enumerate(self._video_players):
-                if i == 3 and self.layout().indexOf(video_player) == -1:
-                    self.layout().addWidget(video_player)
-                    video_player.show()
-                else:
-                    if self.layout().indexOf(video_player) != -1:
-                        self.layout().removeWidget(video_player)
-                        video_player.hide()
+            if self.current_fullscreen != -1:
+                self.layout().addWidget(self._video_players[self.current_fullscreen],
+                                        self.current_fullscreen // 2,
+                                        self.current_fullscreen % 2)
+                self._video_players[self.current_fullscreen].showNormal()
+            self.layout().removeWidget(self._video_players[3])
+            self._video_players[3].showFullScreen()
         elif event.key() == Qt.Key_Escape:
             print("Key esc pressed")
-            for i, video_player in enumerate(self._video_players):
-                if self.layout().indexOf(video_player) == -1:
-                    self.layout().addWidget(video_player)
-                    video_player.show()
+            if self.current_fullscreen != -1:
+                self.layout().addWidget(self._video_players[self.current_fullscreen],
+                                        self.current_fullscreen // 2,
+                                        self.current_fullscreen % 2)
+                self._video_players[self.current_fullscreen].showNormal()
         elif event.key() == Qt.Key_S:
             print("Key s pressed")
             for i, video_player in enumerate(self._video_players):

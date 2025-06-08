@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout
-from PyQt5.QtCore import Qt, QTime, QTimer, QElapsedTimer
+from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout
+from PyQt5.QtCore import Qt, QTimer, QElapsedTimer
 from .grid_video_players import GridVideoPlayersWidget
 from common import utils
+from typing import List
 
 # An ISurfaceCentralWidget is a QWidget that takes in a list of QUrls
 # in its __init__.
@@ -9,17 +10,17 @@ from common import utils
 class SurfaceCentralWidget(QWidget):
     """The central widget for the surface window.
     """
-    def __init__(self, video_player_qurls):
-        """Constructs this widget with the given QUrls.
+    def __init__(self, port_nums : List[int]):
+        """Constructs this widget with the given port numbers.
 
-        video_player_qurls : List[QUrl]
+        port_nums : List[int]
 
         """
         super().__init__()
 
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)  #
-        self.grid_player = GridVideoPlayersWidget(video_player_qurls, self)
+        self.grid_player = GridVideoPlayersWidget(port_nums, self)
         layout.addWidget(self.grid_player, 0, 0)
 
         # telemetry attributes

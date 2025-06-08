@@ -34,7 +34,7 @@ __all__ = ['AttitudeIndicator']
 
 import sys
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
 class AttitudeIndicator(QtWidgets.QWidget):
     """Widget for showing attitude"""

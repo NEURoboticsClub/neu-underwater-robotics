@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtCore import QUrl
-import cv2
-from os.path import expanduser
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import pyqtSlot as Slot
+from .camera_feed import CameraFeed
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
@@ -23,45 +21,29 @@ class VideoPlayerWidget(QWidget):
     https://doc.qt.io/qt-5/qmediaplayer.html#setMedia
 
     """
-    def __init__(self, qurl: QUrl, parent=None, on_media_status_changed=None, on_error=None):
+    def __init__(self, port_no : int):
         """Constructs this widget, and set this media player to play
         state.
 
-        qurl : QUrl -- To be passed into a QMediaContent, and is set
-        to the internal media player.
-
-        parent : Optional[QWidget]
-
-        on_media_status_changed : Optional[[MediaStatus -> Void]]
-
-        on_error : Optional[[QMediaPlayer.Error -> Void]]
+        port_no : int -- port number of the camera
 
         """
-        super(VideoPlayerWidget, self).__init__(parent)
+        super(VideoPlayerWidget, self).__init__()
 
-        # Create media player, and attach listeners
-        self.media_player = QMediaPlayer(self, QMediaPlayer.VideoSurface)
-        if on_media_status_changed:
-            self.media_player.mediaStatusChanged.connect(on_media_status_changed)
-        if on_error:
-            self.media_player.error.connect(on_error)
-        self.media_player.error.connect(self.on_error)
+        self.camera_feed = CameraFeed(port_no)
+        self.label = QLabel()
+        self._set_layout_to_given(self.label)
 
-        # Video widget
-        video_widget = QVideoWidget(self)
-        self._set_layout_to_given(video_widget)
+        self.camera_feed = CameraFeed()
+        self.camera_feed.frame_signal.connect(self.setImage)
+    
+    def open_camera(self):        
+        self.camera_feed.start()
+        print(self.camera_feed.isRunning())
 
-        # Finish setting up media player
-        self.media_player.setVideoOutput(video_widget)
-
-        capture_path = PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND(qurl.url())
-        print(capture_path)
-        self.capture = cv2.VideoCapture(capture_path, cv2.CAP_GSTREAMER)
-        if not self.capture.isOpened():
-            print("Error: Failed to start video capture")
-
-        self.media_player.setMedia(QMediaContent(qurl))
-        self.media_player.play()
+    @Slot(QImage)
+    def setImage(self,img):
+        self.label.setPixmap(QPixmap.fromImage(img))
 
     def _set_layout_to_given(self, w):
         """Sets the layout of this widget to the given widget.
@@ -73,27 +55,5 @@ class VideoPlayerWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0) 
         self.setLayout(layout)
 
-    def on_error(self, new_error):
-        """Watches for changes to the error state, and raises an
-        exception if there is one.
-
-        new_error : QMediaPlayer.Error
-        """
-        # TODO(error): Ought to make a custom exception, Exception is
-        # too generic.
-        if new_error != 0:
-            raise Exception(f"Media player error state: {new_error}")
-    
     def save_image(self, camera_no, num_saved_images):
-        img_save_path = expanduser("~/neu-underwater-robotics/surface/camera_" + str(camera_no) + "_capture_" + str(num_saved_images) + ".jpg")
-
-        capture_read_successful, frame = self.capture.read()
-        if not capture_read_successful:
-            print("Error: Failed to capture frame from video feed")
-
-        img_save_successful = cv2.imwrite(img_save_path, frame)
-        if img_save_successful:
-            print("Image saved to " + img_save_path)
-        else:
-            print("Error: Image failed to save")
-
+        self.camera_feed.save_image(camera_no, num_saved_images)
