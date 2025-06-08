@@ -40,11 +40,11 @@ class VideoPlayerWidget(QWidget):
     def open_camera(self):        
         self.camera_feed.start()
         print("Camera feed running? " + str(self.camera_feed.isRunning()))
-        # self.camera_feed.frame_signal.connect(self._setImage)
-        # print("Camera feed signal connected to video player")
+        self.camera_feed.frame_signal.connect(self._setImage)
+        print("Camera feed signal connected to video player")
 
     @Slot(QImage)
-    def _setImage(self,img):
+    def _setImage(self, img : QImage):
         self.label.setPixmap(QPixmap.fromImage(img))
 
     def _set_layout_to_given(self, w):

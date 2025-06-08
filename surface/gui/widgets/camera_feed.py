@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QImage
-from PyQt5.QtCore import QThread, pyqtBoundSignal as Signal
+from PyQt5.QtCore import QThread, pyqtSignal as Signal
 import cv2, imutils
 from os.path import expanduser
 import time
@@ -36,15 +36,15 @@ class CameraFeed(QThread):
                 if self._do_save_img:
                     print("Error: failed to save image from video feed")
             else:
-                img = self.cvimage_to_label(self._current_frame)
+                img = self._cvimage_to_qimage(self._current_frame)
                 self.frame_signal.emit(img)
                 if self._do_save_img:
                     self._save_image()
             time.sleep(0.01)
         print("Error: camera closed. Exiting.")
     
-    def cvimage_to_label(self, img):
-        img = imutils.resize(img, width = 640)
+    def _cvimage_to_qimage(self, frame) -> QImage:
+        img = imutils.resize(frame, width = 640)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = QImage(img,
                      img.shape[1],
