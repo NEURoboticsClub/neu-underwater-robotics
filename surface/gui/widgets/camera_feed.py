@@ -11,6 +11,8 @@ class CameraFeed(QThread):
     def __init__(self, port_no : int):
         super(CameraFeed, self).__init__()
 
+        print("Initializing camera feed on port " + str(port_no))
+
         self.frame_signal = Signal(QImage)
         self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
 
@@ -19,11 +21,11 @@ class CameraFeed(QThread):
         if not self.capture.isOpened():
             print("Error: Failed to start video capture")
         while self.capture.isOpened():
-            capture_read_successful, frame = self.capture.read()
+            capture_read_successful, self.current_frame = self.capture.read()
             if not capture_read_successful:
                 print("Error: Failed to capture frame from video feed")
             else:
-                img = self.cvimage_to_label(frame)
+                img = self.cvimage_to_label(self.current_frame)
                 self.frame_signal.emit(img)
     
     def cvimage_to_label(self, img):
@@ -41,11 +43,7 @@ class CameraFeed(QThread):
                                    + "_capture_"
                                    + str(num_saved_images) + ".jpg")
 
-        capture_read_successful, frame = self.capture.read()
-        if not capture_read_successful:
-            print("Error: Failed to capture frame from video feed")
-
-        img_save_successful = cv2.imwrite(img_save_path, frame)
+        img_save_successful = cv2.imwrite(img_save_path, self.current_frame)
         if img_save_successful:
             print("Image saved to " + img_save_path)
         else:

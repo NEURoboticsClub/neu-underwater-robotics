@@ -20,8 +20,8 @@ class GridVideoPlayersWidget(QWidget):
         video_player_qurls : List[QUrl]
 
         """
-        self.num_saved_images = 0
-        self.current_fullscreen = -1
+        self._num_saved_images = 0
+        self._current_fullscreen = -1
         num_cells = len(port_nums)
 
         if num_cells == 0 or num_cells > 4:
@@ -31,82 +31,80 @@ class GridVideoPlayersWidget(QWidget):
         super(GridVideoPlayersWidget, self).__init__(parent)
 
         # Set up the grid layout
-        grid = QGridLayout()
-        grid.setSpacing(0)
-        grid.setContentsMargins(0, 0, 0, 0)
+        self.grid = QGridLayout()
+        self.grid.setSpacing(0)
+        self.grid.setContentsMargins(0, 0, 0, 0)
 
         self._video_players = [VideoPlayerWidget(port) for port in port_nums]
 
         for i, video_player in enumerate(self._video_players):
-            grid.addWidget(video_player, i // 2, i % 2)
+            self.grid.addWidget(video_player, i // 2, i % 2)
 
         # Equally-sized cells
-        grid.setColumnStretch(0, 1)
-        grid.setRowStretch(0, 1)
+        self.grid.setColumnStretch(0, 1)
+        self.grid.setRowStretch(0, 1)
 
         # Attitude indicator
         self.attitude_indicator = AttitudeIndicator()
         self.attitude_indicator.setFixedSize(200, 200)
-        grid.addWidget(self.attitude_indicator, 0, 0, 2, 2, alignment=Qt.AlignCenter)
-
-
+        self.grid.addWidget(self.attitude_indicator, 0, 0, 2, 2, alignment=Qt.AlignCenter)
 
         if num_cells >= 2:
-            grid.setColumnStretch(1, 1)
+            self.grid.setColumnStretch(1, 1)
 
         if num_cells >= 3:
-            grid.setRowStretch(1, 1)
+            self.grid.setRowStretch(1, 1)
 
-        self.setLayout(grid)
+        self.setLayout(self.grid)
 
     def keyPressEvent(self, event: QKeyEvent):
         print("Key pressed")
         if event.key() == Qt.Key_1:
             print("Key 1 pressed")
-            if self.current_fullscreen != -1:
-                self.layout().addWidget(self._video_players[self.current_fullscreen],
-                                        self.current_fullscreen // 2,
-                                        self.current_fullscreen % 2)
-                self._video_players[self.current_fullscreen].showNormal()
-            self.layout().removeWidget(self._video_players[0])
+            if self._current_fullscreen != -1:
+                self.grid.addWidget(self._video_players[self._current_fullscreen],
+                                        self._current_fullscreen // 2,
+                                        self._current_fullscreen % 2)
+                self._video_players[self._current_fullscreen].showNormal()
+            self.grid.removeWidget(self._video_players[0])
             self._video_players[0].showFullScreen()
         elif event.key() == Qt.Key_2:
             print("Key 2 pressed")
-            if self.current_fullscreen != -1:
-                self.layout().addWidget(self._video_players[self.current_fullscreen],
-                                        self.current_fullscreen // 2,
-                                        self.current_fullscreen % 2)
-                self._video_players[self.current_fullscreen].showNormal()
-            self.layout().removeWidget(self._video_players[1])
+            if self._current_fullscreen != -1:
+                self.grid.addWidget(self._video_players[self._current_fullscreen],
+                                        self._current_fullscreen // 2,
+                                        self._current_fullscreen % 2)
+                self._video_players[self._current_fullscreen].showNormal()
+            self.grid.removeWidget(self._video_players[1])
             self._video_players[1].showFullScreen()
         elif event.key() == Qt.Key_3:
             print("Key 3 pressed")
-            if self.current_fullscreen != -1:
-                self.layout().addWidget(self._video_players[self.current_fullscreen],
-                                        self.current_fullscreen // 2,
-                                        self.current_fullscreen % 2)
-                self._video_players[self.current_fullscreen].showNormal()
-            self.layout().removeWidget(self._video_players[2])
+            if self._current_fullscreen != -1:
+                self.grid.addWidget(self._video_players[self._current_fullscreen],
+                                        self._current_fullscreen // 2,
+                                        self._current_fullscreen % 2)
+                self._video_players[self._current_fullscreen].showNormal()
+            self.grid.removeWidget(self._video_players[2])
             self._video_players[2].showFullScreen()
         elif event.key() == Qt.Key_4:
             print("Key 4 pressed")
-            if self.current_fullscreen != -1:
-                self.layout().addWidget(self._video_players[self.current_fullscreen],
-                                        self.current_fullscreen // 2,
-                                        self.current_fullscreen % 2)
-                self._video_players[self.current_fullscreen].showNormal()
-            self.layout().removeWidget(self._video_players[3])
+            if self._current_fullscreen != -1:
+                self.grid.addWidget(self._video_players[self._current_fullscreen],
+                                        self._current_fullscreen // 2,
+                                        self._current_fullscreen % 2)
+                self._video_players[self._current_fullscreen].showNormal()
+            self.grid.removeWidget(self._video_players[3])
             self._video_players[3].showFullScreen()
         elif event.key() == Qt.Key_Escape:
             print("Key esc pressed")
-            if self.current_fullscreen != -1:
-                self.layout().addWidget(self._video_players[self.current_fullscreen],
-                                        self.current_fullscreen // 2,
-                                        self.current_fullscreen % 2)
-                self._video_players[self.current_fullscreen].showNormal()
+            if self._current_fullscreen != -1:
+                self.grid.addWidget(self._video_players[self._current_fullscreen],
+                                        self._current_fullscreen // 2,
+                                        self._current_fullscreen % 2)
+                self._video_players[self._current_fullscreen].showNormal()
         elif event.key() == Qt.Key_S:
             print("Key s pressed")
             for i, video_player in enumerate(self._video_players):
-                video_player.save_image(i, self.num_saved_images)
-            self.num_saved_images += 1
+                video_player.save_image(i, self._num_saved_images)
+            self._num_saved_images += 1
         event.accept()

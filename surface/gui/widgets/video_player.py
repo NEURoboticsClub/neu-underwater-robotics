@@ -30,18 +30,20 @@ class VideoPlayerWidget(QWidget):
         """
         super(VideoPlayerWidget, self).__init__()
 
+        print("Initializing video player on port " + str(port_no))
+
         self.camera_feed = CameraFeed(port_no)
         self.label = QLabel()
         self._set_layout_to_given(self.label)
-
-        self.camera_feed.frame_signal.connect(self.setImage)
+        self.open_camera()
     
     def open_camera(self):        
         self.camera_feed.start()
-        print(self.camera_feed.isRunning())
+        print("Camera feed running? " + str(self.camera_feed.isRunning()))
+        self.camera_feed.frame_signal.connect(self._setImage)
 
     @Slot(QImage)
-    def setImage(self,img):
+    def _setImage(self,img):
         self.label.setPixmap(QPixmap.fromImage(img))
 
     def _set_layout_to_given(self, w):
