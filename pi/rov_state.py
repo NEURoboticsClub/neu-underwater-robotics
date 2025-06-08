@@ -168,10 +168,10 @@ class ROVState:
             for name, value in self._current_claw.items():
                 set_val_tasks.append(self.actuators[name].set_val(value))
             
-            for thruster_name, thruster in self.thrusters.items():
-                print(f"{thruster_name}: {thruster_mix[thruster_name]}")
-            for actuator_name, actuator in self.actuators.items():
-                print(f"{actuator_name}: {self._current_claw[actuator_name]}")
+            # for thruster_name, thruster in self.thrusters.items():
+            #     print(f"{thruster_name}: {thruster_mix[thruster_name]}")
+            # for actuator_name, actuator in self.actuators.items():
+            #     print(f"{actuator_name}: {self._current_claw[actuator_name]}")
             await asyncio.gather(*set_val_tasks)
 
             # sleep until next control loop iteration

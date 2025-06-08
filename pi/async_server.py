@@ -104,7 +104,7 @@ class Server:
     async def run(self):
         """run the server"""
         _server = await asyncio.start_server(self._handle_client, SERVER_IP, PORT)
-        print(f"{len(self.tasks)}")
+        #print(f"{len(self.tasks)}") #could remove?
         for task in self.tasks:
             print("ensuring future")
             asyncio.create_task(task)
