@@ -9,6 +9,7 @@ PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} !
 
 class CameraFeed(QThread):
     def __init__(self, port_no : int):
+        super(CameraFeed, self).__init__()
         self.frame_signal = Signal(QImage)
         self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
 
