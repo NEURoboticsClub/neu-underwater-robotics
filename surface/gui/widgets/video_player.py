@@ -21,7 +21,7 @@ class VideoPlayerWidget(QWidget):
     https://doc.qt.io/qt-5/qmediaplayer.html#setMedia
 
     """
-    def __init__(self, port : int):
+    def __init__(self, port_no : int):
         """Constructs this widget, and set this media player to play
         state.
 
@@ -30,11 +30,10 @@ class VideoPlayerWidget(QWidget):
         """
         super(VideoPlayerWidget, self).__init__()
 
-        self.camera_feed = CameraFeed(port_no=port)
+        self.camera_feed = CameraFeed(port_no)
         self.label = QLabel()
         self._set_layout_to_given(self.label)
 
-        self.camera_feed = CameraFeed()
         self.camera_feed.frame_signal.connect(self.setImage)
     
     def open_camera(self):        
