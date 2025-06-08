@@ -7,7 +7,7 @@ from os.path import expanduser
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND = lambda qurl : str(qurl)[len("gst-pipeline: "):].replace('xvimagesink name="qtvideosink"', 'appsink')
+PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND = lambda qurl : str(qurl)[len("gst-pipeline:"):].replace('xvimagesink name="qtvideosink"', 'appsink')
 
 class VideoPlayerWidget(QWidget):
     """A PyQt5 Widget that plays a video with the given QUrl.
@@ -54,7 +54,9 @@ class VideoPlayerWidget(QWidget):
         # Finish setting up media player
         self.media_player.setVideoOutput(video_widget)
 
-        self.capture = cv2.VideoCapture(PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND(qurl.url()), cv2.CAP_GSTREAMER)
+        capture_path = PORT_NUM_TO_CV2_GST_PIPELINE_COMMAND(qurl.url())
+        print(capture_path)
+        self.capture = cv2.VideoCapture(capture_path, cv2.CAP_GSTREAMER)
         if not self.capture.isOpened():
             print("Error: Failed to start video capture")
 
