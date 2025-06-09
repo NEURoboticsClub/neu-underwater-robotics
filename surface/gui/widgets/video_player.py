@@ -46,13 +46,8 @@ class VideoPlayerWidget(QWidget):
 
     @Slot(QImage)
     def _setImage(self, img : QImage):
-        self.label.setPixmap(QPixmap.fromImage(img))
-
-    def resizeEvent(self, event):
-        if self.label.pixmap():
-            scaled_pixmap = self.label.pixmap().scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.label.setPixmap(scaled_pixmap)
-        super().resizeEvent(event)
+        scaled_pixmap = QPixmap.fromImage(img).scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.label.setPixmap(scaled_pixmap)
     
     def _set_layout_to_given(self, w):
         """Sets the layout of this widget to the given widget.
