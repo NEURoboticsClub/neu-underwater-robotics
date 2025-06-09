@@ -49,8 +49,9 @@ class VideoPlayerWidget(QWidget):
         self.label.setPixmap(QPixmap.fromImage(img))
 
     def resizeEvent(self, event):
-        scaled_pixmap = self.label.pixmap().scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.label.setPixmap(scaled_pixmap)
+        if self.label.pixmap():
+            scaled_pixmap = self.label.pixmap().scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.label.setPixmap(scaled_pixmap)
         super().resizeEvent(event)
     
     def _set_layout_to_given(self, w):
