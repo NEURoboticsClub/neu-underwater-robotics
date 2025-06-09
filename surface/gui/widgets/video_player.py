@@ -46,6 +46,7 @@ class VideoPlayerWidget(QWidget):
     @Slot(QImage)
     def _setImage(self, img : QImage):
         self.label.setPixmap(QPixmap.fromImage(img))
+        self.resize(img.width(), img.height())
 
     def _set_layout_to_given(self, w):
         """Sets the layout of this widget to the given widget.
@@ -54,7 +55,7 @@ class VideoPlayerWidget(QWidget):
         """
         layout = QVBoxLayout()
         layout.addWidget(w)
-        layout.setContentsMargins(0, 0, 0, 0) 
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
     def save_image(self):
