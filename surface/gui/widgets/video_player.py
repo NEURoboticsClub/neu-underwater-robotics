@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import pyqtSlot as Slot
+from PyQt5.QtCore import pyqtSlot as Slot, Qt
 from .camera_feed import CameraFeed
 
 # TODO(config): Users ought to be able to specify this without prying
@@ -34,6 +34,7 @@ class VideoPlayerWidget(QWidget):
 
         self.camera_feed = CameraFeed(port_no, camera_no)
         self.label = QLabel()
+        self.label.setAlignment(Qt.AlignCenter)
         self._set_layout_to_given(self.label)
         self.open_camera()
     
@@ -46,8 +47,12 @@ class VideoPlayerWidget(QWidget):
     @Slot(QImage)
     def _setImage(self, img : QImage):
         self.label.setPixmap(QPixmap.fromImage(img))
-        self.resize(img.width(), img.height())
 
+    def resizeEvent(self, event):
+        scaled_pixmap = self.label.pixmap().scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.label.setPixmap(scaled_pixmap)
+        super().resizeEvent(event)
+    
     def _set_layout_to_given(self, w):
         """Sets the layout of this widget to the given widget.
 
