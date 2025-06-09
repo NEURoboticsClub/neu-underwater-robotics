@@ -1,12 +1,11 @@
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QThread, pyqtSignal as Signal
-import cv2, imutils
+import cv2
 from os.path import expanduser
-import time
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink"
+PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false drop=true"
 
 class CameraFeed(QThread):
 
@@ -43,7 +42,7 @@ class CameraFeed(QThread):
         print("Error: Camera closed. Exiting.")
     
     def _cvimage_to_qimage(self, frame) -> QImage:
-        img = imutils.resize(frame, width = 640)
+        img = cv2.resize(frame, (640, int(640 * frame.shape[0] / frame.shape[1])), interpolation=cv2.INTER_LINEAR)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = QImage(img,
                      img.shape[1],
