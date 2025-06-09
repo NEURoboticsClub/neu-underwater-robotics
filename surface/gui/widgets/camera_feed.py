@@ -40,7 +40,7 @@ class CameraFeed(QThread):
                 self.frame_signal.emit(img)
                 if self._do_save_img:
                     self._save_image()
-            time.sleep(0.01)
+            time.sleep(0.05)
         print("Error: Camera closed. Exiting.")
     
     def _cvimage_to_qimage(self, frame) -> QImage:
