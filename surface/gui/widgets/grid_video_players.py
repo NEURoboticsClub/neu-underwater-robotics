@@ -103,6 +103,6 @@ class GridVideoPlayersWidget(QWidget):
                 self._video_players[self._current_fullscreen].showNormal()
         elif event.key() == Qt.Key_S:
             print("Key s pressed")
-            for i, video_player in enumerate(self._video_players):
-                video_player.save_image(i)
+            for video_player in self._video_players:
+                video_player.save_image()
         event.accept()

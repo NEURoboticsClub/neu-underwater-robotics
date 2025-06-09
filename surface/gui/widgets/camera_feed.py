@@ -34,14 +34,14 @@ class CameraFeed(QThread):
             if not capture_read_successful:
                 print("Error: Failed to capture frame from video feed")
                 if self._do_save_img:
-                    print("Error: failed to save image from video feed")
+                    print("Error: Failed to save image from video feed")
             else:
                 img = self._cvimage_to_qimage(self._current_frame)
                 self.frame_signal.emit(img)
                 if self._do_save_img:
                     self._save_image()
             time.sleep(0.01)
-        print("Error: camera closed. Exiting.")
+        print("Error: Camera closed. Exiting.")
     
     def _cvimage_to_qimage(self, frame) -> QImage:
         img = imutils.resize(frame, width = 640)
