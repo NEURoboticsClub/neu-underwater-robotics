@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QThread, pyqtSignal as Signal
-import cv2
+import cv2, imutils
 from os.path import expanduser
 
 # TODO(config): Users ought to be able to specify this without prying
@@ -42,7 +42,7 @@ class CameraFeed(QThread):
         print("Error: Camera closed. Exiting.")
     
     def _cvimage_to_qimage(self, frame) -> QImage:
-        img = cv2.resize(frame, (640, int(640 * frame.shape[0] / frame.shape[1])), interpolation=cv2.INTER_LINEAR)
+        img = imutils.resize(frame, width = 640)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = QImage(img,
                      img.shape[1],
