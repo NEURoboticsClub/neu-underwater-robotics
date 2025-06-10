@@ -6,7 +6,7 @@ import time
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false drop=true"
+PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer latency=0 ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink max-buffers=1 sync=false drop=true"
 
 class CameraFeed(QThread):
 
