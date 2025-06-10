@@ -40,7 +40,7 @@ class CameraFeed(QThread):
             else:
                 if time.time() - self._last_emit_time > self._min_emit_interval:
                     img = self._cvimage_to_qimage(self._current_frame)
-                    self.frame_signal.emit(img, time.time())
+                    self.frame_signal.emit(img.copy(), time.time())
                     self._last_emit_time = time.time()
                 if self._do_save_img:
                     self._save_image()
