@@ -10,13 +10,15 @@ from adafruit_extended_bus import ExtendedI2C as I2C
 # import serial
 
 from adafruit_bno08x import (
-    BNO_REPORT_ACCELEROMETER,
+    BNO_REPORT_LINEAR_ACCELERATION,
     BNO_REPORT_GYROSCOPE,
     BNO_REPORT_MAGNETOMETER,
-    BNO_REPORT_ROTATION_VECTOR,
+    BNO_REPORT_GAME_ROTATION_VECTOR,
 )
 from adafruit_bno08x.i2c import BNO08X_I2C
 # from adafruit_bno08x.uart import BNO08X_UART
+
+from common import utils
 
 try:
     i2c = I2C(8)
@@ -26,34 +28,16 @@ try:
     # uart = serial.Serial("/dev/serial0", 115200)
     # bno = BNO08X_UART(uart)
 
-    bno.enable_feature(BNO_REPORT_ACCELEROMETER)
+    bno.enable_feature(BNO_REPORT_LINEAR_ACCELERATION)
     bno.enable_feature(BNO_REPORT_GYROSCOPE)
     bno.enable_feature(BNO_REPORT_MAGNETOMETER)
-    bno.enable_feature(BNO_REPORT_ROTATION_VECTOR)
+    bno.enable_feature(BNO_REPORT_GAME_ROTATION_VECTOR)
 except Exception as e:
     raise RuntimeError("Could not initialize IMU")
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
-CONTROL_LOOP_FREQ = 4  # Hz
-
-"""Creates a dictionary with the given x, y, and z arguments.
-
-Args:
-    x: the value to set dict["x"] to
-    y: the value to set dict["y"] to
-    z: the value to set dict["z"] to
-
-Returns:
-    dict: a dictionary with the given values as "x", "y", and "z"
-"""
-def make_xyz_dict(x, y, z) -> dict:
-    diction = {}
-    diction["x"] = x
-    diction["y"] = y
-    diction["z"] = z
-
-    return diction
+CONTROL_LOOP_FREQ = 10  # Hz
 
 """Reads data from the IMU sensor and returns as a dictionary.
 
@@ -64,25 +48,25 @@ Returns:
 def read_data() -> dict:
     data = {}
     # acceleration
-    accel_x, accel_y, accel_z = bno.acceleration  # pylint:disable=no-member
-    data["acceleration"] = make_xyz_dict(accel_x, accel_y, accel_z)
+    accel_x, accel_y, accel_z = bno.linear_acceleration  # pylint:disable=no-member
+    data["acceleration"] = utils.make_xyz_dict(accel_x, accel_y, accel_z)
 
     # gyro
     gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
-    data["gyroscope"] = make_xyz_dict(gyro_x, gyro_y, gyro_z)
+    data["gyroscope"] = utils.make_xyz_dict(gyro_x, gyro_y, gyro_z)
 
     # magnetometer
     mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
-    data["magnetometer"] = make_xyz_dict(mag_x, mag_y, mag_z)
+    data["magnetometer"] = utils.make_xyz_dict(mag_x, mag_y, mag_z)
 
     # quaternion
-    quat_i, quat_j, quat_k, quat_real = bno.quaternion  # pylint:disable=no-member
+    quat_i, quat_j, quat_k, quat_real = bno.game_quaternion  # pylint:disable=no-member
     quaternion = {}
     quaternion["i"] = quat_i
     quaternion["j"] = quat_j
     quaternion["k"] = quat_k
     quaternion["real"] = quat_real
-    data["quaternion"] = quaternion
+    data["game_quaternion"] = quaternion
 
     return data
 
@@ -109,6 +93,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"Fatal error: {err=}. Resetting.")
             bno.hard_reset()
             time.sleep(5)
+        except BrokenPipeError:
+            print("Connection closed.")
+            break
         except Exception as err:
             print(f"Transient error: {err=}.")
 
