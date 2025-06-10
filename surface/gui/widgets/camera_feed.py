@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QThread, pyqtSignal as Signal
-import cv2, imutils
+import cv2
 from os.path import expanduser
 import time
 
@@ -20,7 +20,7 @@ class CameraFeed(QThread):
         self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
         self.camera_no = camera_no
         self._current_frame = None
-        self._min_emit_interval = 0.05
+        self._min_emit_interval = 1.0 / 20.0
         self._last_emit_time = 0.0
         self._num_saved_images = 0
         self._do_save_img = False
@@ -47,13 +47,10 @@ class CameraFeed(QThread):
         print("Error: Camera closed. Exiting.")
     
     def _cvimage_to_qimage(self, frame) -> QImage:
-        img = imutils.resize(frame, width = 640)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = QImage(img,
-                     img.shape[1],
-                     img.shape[0],
-                     QImage.Format_RGB888)
-        return img
+        height, width, _ = frame.shape
+        bytes_per_line = 3 * width
+        qimg = QImage(frame.data, width, height, bytes_per_line, QImage.Format_BGR888)
+        return qimg
     
     def save_image(self):
         self._do_save_img = True
