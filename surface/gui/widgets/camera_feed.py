@@ -6,11 +6,11 @@ import time
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer latency=0 ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink max-buffers=1 sync=false drop=true"
+PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink max-buffers=1 sync=false drop=true"
 
 class CameraFeed(QThread):
 
-    frame_signal = Signal(QImage, float)
+    frame_signal = Signal(QImage)
 
     def __init__(self, port_no : int, camera_no : int):
         super(CameraFeed, self).__init__()
@@ -40,7 +40,7 @@ class CameraFeed(QThread):
             else:
                 if time.time() - self._last_emit_time > self._min_emit_interval:
                     img = self._cvimage_to_qimage(self._current_frame)
-                    self.frame_signal.emit(img.copy(), time.time())
+                    self.frame_signal.emit(img)
                     self._last_emit_time = time.time()
                 if self._do_save_img:
                     self._save_image()

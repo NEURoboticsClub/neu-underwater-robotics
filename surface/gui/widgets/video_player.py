@@ -2,9 +2,6 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import pyqtSlot as Slot, Qt
 from .camera_feed import CameraFeed
-import time
-
-REFRESH_RATE_HZ = 20
 
 class VideoPlayerWidget(QWidget):
     """A PyQt5 Widget that plays a video with the given QUrl.
@@ -43,11 +40,10 @@ class VideoPlayerWidget(QWidget):
         self.camera_feed.frame_signal.connect(self._setImage)
         print("Camera feed signal connected to video player")
 
-    @Slot(QImage, float)
-    def _setImage(self, img : QImage, time_emitted : float):
-        if time.time() - time_emitted > (1 / REFRESH_RATE_HZ):
-            scaled_pixmap = QPixmap.fromImage(img).scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.label.setPixmap(scaled_pixmap)
+    @Slot(QImage)
+    def _setImage(self, img : QImage):
+        scaled_pixmap = QPixmap.fromImage(img).scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.label.setPixmap(scaled_pixmap)
     
     def _set_layout_to_given(self, w):
         """Sets the layout of this widget to the given widget.
