@@ -11,9 +11,9 @@ from common import utils
 from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.115"  # raspberry pi ip
+SERVER_IP = "192.168.0.111"  # raspberry pi ip
 PORT = 2049
-ARDUINO_PORT = "/dev/ttyACM0"
+ARDUINO_PORT = "/dev/ttyUSB0"
 RESPONSE_LOOP_FREQ = 10 # Hz
 
 if os.environ.get("SIM"):
@@ -36,7 +36,7 @@ class Server:
             self.rov_state = ROVState(
                 actuators={
                     "rotate": Servo(self._get_pin(10, "s")),
-                    "close_main": Servo(self._get_pin(2, "s")),
+                    "close_main": Servo(self._get_pin(11, "s")),
                     "close_side": Servo(self._get_pin(12, "s")),
                     "camera": Servo(self._get_pin(13, "s")),
                     "extend": LinActuator(self._get_pin(14, "o"), self._get_pin(15, "o")),
