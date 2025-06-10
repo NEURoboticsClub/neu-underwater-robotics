@@ -176,8 +176,8 @@ class XBoxDriveController(Controller):
     
     def get_status_flags(self) -> dict:
         self.status_flags["agnes_factor"] += self.hat_dict["hat"].get_joy_val()[0] * 0.05
-        self.status_flags["agnes_mode"] = self.buttons_dict["Y"]
-        self.status_flags["auto_depth"] = self.buttons_dict["X"]
+        self.status_flags["agnes_mode"] = self.buttons_dict["Y"].get_joy_val()
+        self.status_flags["auto_depth"] = self.buttons_dict["X"].get_joy_val()
 
         return self.status_flags
 
