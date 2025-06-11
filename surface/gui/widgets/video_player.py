@@ -77,4 +77,5 @@ class VideoPlayerWidget(QWidget):
             raise Exception(f"Media player error state: {new_error}")
 
     def save_image(self):
+        print("saving image (video_player)")
         self.camera_feed.save_image()

@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QThread
 import cv2
 from os.path import expanduser
+from datetime import datetime
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
@@ -37,14 +38,18 @@ class CameraFeed(QThread):
         print("Error: Camera closed. Exiting.")
     
     def save_image(self):
-        self._do_save_img = True
+        print("saving image (camera_feed)")
         self._num_saved_images += 1
+        self._do_save_img = True
     
     def _save_image(self):
+        print("saving image (camera_feed private)")
         img_save_path = expanduser("~/neu-underwater-robotics/surface/camera_"
                                    + str(self.camera_no)
                                    + "_capture_"
-                                   + str(self._num_saved_images) + ".jpg")
+                                   + str(self._num_saved_images)
+                                   + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                   + ".jpg")
 
         img_save_successful = cv2.imwrite(img_save_path, self._current_frame)
         if img_save_successful:
