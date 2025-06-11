@@ -1,16 +1,12 @@
-from PyQt5.QtGui import QImage
-from PyQt5.QtCore import QThread, pyqtSignal as Signal
+from PyQt5.QtCore import QThread
 import cv2
 from os.path import expanduser
-import time
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink max-buffers=1 sync=false drop=true"
+PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"t{port_no}. ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink max-buffers=1 sync=false drop=true"
 
 class CameraFeed(QThread):
-
-    frame_signal = Signal(QImage)
 
     def __init__(self, port_no : int, camera_no : int):
         super(CameraFeed, self).__init__()
@@ -20,8 +16,6 @@ class CameraFeed(QThread):
         self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
         self.camera_no = camera_no
         self._current_frame = None
-        self._min_emit_interval = 1.0 / 20.0
-        self._last_emit_time = 0.0
         self._num_saved_images = 0
         self._do_save_img = False
 
@@ -38,19 +32,9 @@ class CameraFeed(QThread):
                 if self._do_save_img:
                     print("Error: Failed to save image from video feed")
             else:
-                if time.time() - self._last_emit_time > self._min_emit_interval:
-                    img = self._cvimage_to_qimage(self._current_frame)
-                    self.frame_signal.emit(img)
-                    self._last_emit_time = time.time()
                 if self._do_save_img:
                     self._save_image()
         print("Error: Camera closed. Exiting.")
-    
-    def _cvimage_to_qimage(self, frame) -> QImage:
-        height, width, _ = frame.shape
-        bytes_per_line = 3 * width
-        qimg = QImage(frame.data, width, height, bytes_per_line, QImage.Format_BGR888)
-        return qimg
     
     def save_image(self):
         self._do_save_img = True
