@@ -34,9 +34,6 @@ class VideoPlayerWidget(QWidget):
 
         print("Initializing video player on port " + str(port_no))
 
-        self.camera_feed = CameraFeed(port_no, camera_no)
-        self.open_camera()
-
         self.media_player = QMediaPlayer(self, QMediaPlayer.VideoSurface)
         if on_media_status_changed:
             self.media_player.mediaStatusChanged.connect(on_media_status_changed)
@@ -49,6 +46,8 @@ class VideoPlayerWidget(QWidget):
 
         self.media_player.setVideoOutput(video_widget)
         self.media_player.setMedia(QMediaContent(QUrl(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_no))))
+        self.camera_feed = CameraFeed(port_no, camera_no)
+        self.open_camera()
         self.media_player.play()
     
     def open_camera(self):        
