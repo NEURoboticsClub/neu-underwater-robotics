@@ -20,7 +20,7 @@ from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
 from surface.gui.widgets.surface_central import SurfaceCentralWidget
 from surface.gui.surface_window import SurfaceWindow
 
-HOST = "192.168.0.113"  # The server's hostname or IP address
+HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 READ_LOOP_FREQ = 5
 
