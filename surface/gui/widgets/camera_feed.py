@@ -20,7 +20,6 @@ class CameraFeed(QThread):
         self._num_saved_images = 0
         self._do_save_img = False
 
-    def run(self):
         print("opening video capture")
         self.capture = cv2.VideoCapture(self.video_capture_pipeline, cv2.CAP_GSTREAMER)
         print("opened video capture")
@@ -28,6 +27,8 @@ class CameraFeed(QThread):
             print("Error: Failed to start video capture")
         else:
             print("Video capture started successfully on camera " + str(self.camera_no))
+
+    def run(self):
         while self.capture.isOpened():
             capture_read_successful, self._current_frame = self.capture.read()
             if not capture_read_successful:
