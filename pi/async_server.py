@@ -157,7 +157,6 @@ class Server:
             msg = json.dumps(response)
             writer.write(str.encode(msg))
             await writer.drain()
-            print(f"Sent response: {msg}")
         except Exception as e:
             print(f"Error sending response: {e}")
 

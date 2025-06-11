@@ -158,12 +158,12 @@ class ROVState:
 
             # Plan test these and either make them toggleable or keep the best one
             # Auto Depth V1 (Bang Bang P)
-            if self.status_flags["auto_depth"]:
-                if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
-                    self._target_velocity.z = ((self._target_depth - self._current_depth) * 
-                                               self._p_factor)
-                else: 
-                    self._target_velocity.z = 0
+            # if self.status_flags["auto_depth"]:
+            #     if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
+            #         self._target_velocity.z = ((self._target_depth - self._current_depth) * 
+            #                                    self._p_factor)
+            #     else: 
+            #         self._target_velocity.z = 0
 
             # Auto Depth V2 (Pure Bang Bang)
             # if self.status_flags["auto_depth"]:
