@@ -156,6 +156,12 @@ class ROVState:
             # update last time
             self._last_time = time_ms()
 
+            if -0.1 < self._target_velocity.z < 0.1:
+                self._target_depth -= self._target_velocity.z * self._z_sensitivity
+                # test different sensitivities and potentially functions
+                if self._target_depth > 1 and self._current_depth > 1:
+                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
+
             # Plan test these and either make them toggleable or keep the best one
             # Auto Depth V1 (Bang Bang P)
             # if self.status_flags["auto_depth"]:
