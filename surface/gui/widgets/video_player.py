@@ -3,6 +3,7 @@ from .camera_feed import CameraFeed
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtCore import QUrl
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
@@ -47,7 +48,7 @@ class VideoPlayerWidget(QWidget):
         self._set_layout_to_given(video_widget)
 
         self.media_player.setVideoOutput(video_widget)
-        self.media_player.setMedia(QMediaContent(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_no)))
+        self.media_player.setMedia(QMediaContent(QUrl(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_no))))
         self.media_player.play()
     
     def open_camera(self):        
