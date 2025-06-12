@@ -34,7 +34,6 @@ class ROVState:
         self._current_velocity = VelocityVector()
         self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90,
                               "close_side": 90, "sample": 0, "camera_servo": 30}
-        self._status_flags = {"agnes_factor": 0.3, "agnes_mode": False, "auto_depth": False, }
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things
@@ -84,11 +83,11 @@ class ROVState:
             "back_left_vertical": target_velocity.z - target_velocity.pitch + target_velocity.roll,
             "back_right_vertical": target_velocity.z - target_velocity.pitch - target_velocity.roll,
         }
-        if self._status_flags["agnes_mode"]:
-            mix["front_left_vertical"] *= self._status_flags["agnes_factor"]
-            mix["front_right_vertical"] *= self._status_flags["agnes_factor"]
-            mix["back_left_vertical"] *= self._status_flags["agnes_factor"]
-            mix["back_right_vertical"] *= self._status_flags["agnes_factor"]
+        if self.status_flags["agnes_mode"]:
+            mix["front_left_vertical"] *= self.status_flags["agnes_factor"]
+            mix["front_right_vertical"] *= self.status_flags["agnes_factor"]
+            mix["back_left_vertical"] *= self.status_flags["agnes_factor"]
+            mix["back_right_vertical"] *= self.status_flags["agnes_factor"]
 
         # cap value to [-1, 1]
         for name, value in mix.items():
