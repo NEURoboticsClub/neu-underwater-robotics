@@ -86,7 +86,8 @@ class Controller(ABC):
         self._joystick = pygame.joystick.Joystick(joy_id)
         self._joystick.init()
         self._axes: list[Axis] = [Axis() for _ in range(self._joystick.get_numaxes())]
-        self._buttons: list[Button] = [Button() for _ in range(self._joystick.get_numbuttons())]
+        self._buttons: list[Button] = [Button() if i not in toggles else Toggle() 
+                                       for i in range(self._joystick.get_numbuttons())]
         self._hats: list[Hat] = [Hat() for _ in range(self._joystick.get_numhats())]
 
     def update(self, event: pygame.event.EventType) -> None:
@@ -158,6 +159,7 @@ class XBoxDriveController(Controller):
             "auto_depth":False,
         }
         self.claw_vec = {"camera_servo": 30}
+        self.agnes_factor_scale = 0.002
 
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
@@ -175,7 +177,7 @@ class XBoxDriveController(Controller):
         return self.velocity_vec
     
     def get_status_flags(self) -> dict:
-        self.status_flags["agnes_factor"] += self.hat_dict["hat"].get_joy_val()[0] * 0.05
+        self.status_flags["agnes_factor"] += self.hat_dict["hat"].get_joy_val()[0] * self.agnes_factor_scale
         self.status_flags["agnes_mode"] = self.buttons_dict["Y"].get_joy_val()
         self.status_flags["auto_depth"] = self.buttons_dict["X"].get_joy_val()
 
