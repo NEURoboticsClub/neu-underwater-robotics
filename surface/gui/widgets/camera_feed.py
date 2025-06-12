@@ -30,6 +30,7 @@ class CameraFeed(QThread):
 
     def run(self):
         while self.capture.isOpened():
+            print("running camera feed")
             capture_read_successful, self._current_frame = self.capture.read()
             if not capture_read_successful:
                 print("Error: Failed to capture frame from video feed")
