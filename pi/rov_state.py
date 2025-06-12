@@ -18,12 +18,13 @@ class ROVState:
     actuators: dict[str, Actuator]  # name: actuator  arm motors
     thrusters: dict[str, Actuator]  # name: actuator  thrusters
     sensors: dict[str, Sensor]  # name: sensor
-
+    status_flags: dict[str, any] # name: status_flags
     def __init__(
         self,
         actuators: dict[str, Actuator],
         thrusters: dict[str, Actuator],
         sensors: dict[str, Sensor],
+	status_flags: dict[str, any],
     ):
         self.actuators = actuators
         self.thrusters = thrusters
@@ -31,7 +32,7 @@ class ROVState:
         self._current_velocity = VelocityVector()
         self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90,
                               "close_side": 90, "sample": 0, "camera_servo": 30}
-        self._status_flags = {"agnes_factor": 0.3, "agnes_mode": False, "auto_depth": False, }
+        self._status_flags = status_flags
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things
