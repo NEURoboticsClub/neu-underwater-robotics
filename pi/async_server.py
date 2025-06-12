@@ -11,7 +11,7 @@ from common import utils
 from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.112"  # raspberry pi ip
+SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyUSB0"
 RESPONSE_LOOP_FREQ = 10 # Hz
