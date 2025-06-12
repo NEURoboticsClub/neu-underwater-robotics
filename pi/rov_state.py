@@ -3,8 +3,9 @@ import logging
 import numpy as np
 
 from common import utils
+from common.utils import SlewRateLimiter
 
-from .hardware import Actuator, Sensor
+from .hardware import Actuator, Sensor, Thruster
 
 PIDController = utils.PIDController
 VelocityVector = utils.VelocityVector
@@ -50,6 +51,11 @@ class ROVState:
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
         self._bang_bang_radius = 0.02 # distance in meters from target depth before turning on
         self._p_factor = 1 # factor to scale the auto-depth by
+        self._slew_limiters = {}
+        for name, thruster in self.thrusters.items():
+            self._slew_limiters[name] = SlewRateLimiter(
+                max_rate_of_change=(thruster.active_range[1] - thruster.active_range[0]) # max rate of change per second
+            )
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -206,9 +212,15 @@ class ROVState:
                 # logging.warning("Current velocity is stale, using target velocity directly.")
                 output_velocity = self._target_velocity
             
+            # apply slew rate limiters to output velocity
+            slewed_velocity = VelocityVector()
+            for axis in output_velocity.keys():
+                slewed_velocity[axis] = self._slew_limiters[axis].update(
+                    output_velocity[axis], dt
+                )
 
             # translate output velocity to thruster mix
-            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
+            thruster_mix = self._translate_velocity_to_thruster_mix(slewed_velocity)
             print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
