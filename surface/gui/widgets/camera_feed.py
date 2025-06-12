@@ -5,7 +5,7 @@ from datetime import datetime
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"t{port_no}. ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink max-buffers=1 sync=false drop=true"
+PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"t{port_no}. ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink async=0 max-buffers=1 sync=false drop=true"
 
 class CameraFeed(QThread):
 
