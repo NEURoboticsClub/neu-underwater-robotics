@@ -176,8 +176,8 @@ class XBoxDriveController(Controller):
     
     def get_status_flags(self) -> dict:
         self.status_flags["agnes_factor"] += self.hat_dict["hat"].get_joy_val()[0] * 0.05
-        self.status_flags["agnes_mode"] = self.buttons_dict["Y"]
-        self.status_flags["auto_depth"] = self.buttons_dict["X"]
+        self.status_flags["agnes_mode"] = self.buttons_dict["Y"].get_joy_val()
+        self.status_flags["auto_depth"] = self.buttons_dict["X"].get_joy_val()
 
         return self.status_flags
 
@@ -188,11 +188,11 @@ class XBoxDriveController(Controller):
         self._poll()  # get current joystick values
         # TODO: control scheme goes here     
         self.claw_vec["extend"] = self.axis_dict["left_y"].get_joy_val()
-        self.claw_vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * 90 + 90
+        self.claw_vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * -90 + 90
         self.claw_vec["close_main"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
                         (self.axis_dict["left_trigger"].get_joy_val() + 1) * 5 + 92
-        self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * -4 + \
-                        int(self.buttons_dict["RB"].get_joy_val()) * 6 + 92
+        self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
+                        int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
         self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
                          int(self.buttons_dict["A"].get_joy_val()))
         self.claw_vec["camera_servo"] += self.hat_dict["hat"].get_joy_val()[0]

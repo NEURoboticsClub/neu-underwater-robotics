@@ -18,12 +18,14 @@ class ROVState:
     actuators: dict[str, Actuator]  # name: actuator  arm motors
     thrusters: dict[str, Actuator]  # name: actuator  thrusters
     sensors: dict[str, Sensor]  # name: sensor
+    status_flags: dict[str, any] # name: status_flags
 
     def __init__(
         self,
         actuators: dict[str, Actuator],
         thrusters: dict[str, Actuator],
         sensors: dict[str, Sensor],
+        status_flags: dict[str, any],
     ):
         self.actuators = actuators
         self.thrusters = thrusters
