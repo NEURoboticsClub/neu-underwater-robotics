@@ -19,12 +19,13 @@ class ROVState:
     thrusters: dict[str, Actuator]  # name: actuator  thrusters
     sensors: dict[str, Sensor]  # name: sensor
     status_flags: dict[str, any] # name: status_flags
+
     def __init__(
         self,
         actuators: dict[str, Actuator],
         thrusters: dict[str, Actuator],
         sensors: dict[str, Sensor],
-	status_flags: dict[str, any],
+        status_flags: dict[str, any],
     ):
         self.actuators = actuators
         self.thrusters = thrusters
@@ -32,7 +33,7 @@ class ROVState:
         self._current_velocity = VelocityVector()
         self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90,
                               "close_side": 90, "sample": 0, "camera_servo": 30}
-        self._status_flags = status_flags
+        self._status_flags = {"agnes_factor": 0.3, "agnes_mode": False, "auto_depth": False, }
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things
@@ -157,20 +158,14 @@ class ROVState:
             # update last time
             self._last_time = time_ms()
 
-            if -0.1 < self._target_velocity.z < 0.1:
-                self._target_depth -= self._target_velocity.z * self._z_sensitivity
-                # test different sensitivities and potentially functions
-                if self._target_depth > 1 and self._current_depth > 1:
-                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
-
             # Plan test these and either make them toggleable or keep the best one
             # Auto Depth V1 (Bang Bang P)
-            # if self.status_flags["auto_depth"]:
-            #     if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
-            #         self._target_velocity.z = ((self._target_depth - self._current_depth) * 
-            #                                    self._p_factor)
-            #     else: 
-            #         self._target_velocity.z = 0
+            if self.status_flags["auto_depth"]:
+                if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
+                    self._target_velocity.z = ((self._target_depth - self._current_depth) * 
+                                               self._p_factor)
+                else: 
+                    self._target_velocity.z = 0
 
             # Auto Depth V2 (Pure Bang Bang)
             # if self.status_flags["auto_depth"]:
