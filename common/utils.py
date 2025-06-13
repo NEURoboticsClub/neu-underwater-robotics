@@ -181,8 +181,8 @@ class PIDController:
         return output
 
 class SlewRateLimiter:
-    def __init__(self, max_rate_per_sec, initial_value=0.0):
-        self.max_rate = max_rate_per_sec   # Maximum rate of change
+    def __init__(self, max_rate, initial_value=0.0):
+        self.max_rate = max_rate   # Maximum rate of change
         self.last_value = initial_value
 
     def update(self, target_value, dt):

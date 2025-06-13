@@ -52,9 +52,14 @@ class ROVState:
         self._bang_bang_radius = 0.02 # distance in meters from target depth before turning on
         self._p_factor = 1 # factor to scale the auto-depth by
         self._slew_limiters = {}
-        for name, thruster in self.thrusters.items():
-            self._slew_limiters[name] = SlewRateLimiter(
-                max_rate_of_change=(thruster.active_range[1] - thruster.active_range[0]) # max rate of change per second
+        # for name, thruster in self.thrusters.items():
+        #     self._slew_limiters[name] = SlewRateLimiter(
+        #         max_rate==(thruster.active_range[1] - thruster.active_range[0]) # max rate of change per second
+        #     )
+
+        for axis in self._current_velocity.keys():
+            self._slew_limiters[axis] = SlewRateLimiter(
+                max_rate=500  # max rate of change per second for velocity axes
             )
 
     def get_tasks(self) -> list[asyncio.Task]:
@@ -213,6 +218,7 @@ class ROVState:
                 output_velocity = self._target_velocity
             
             # apply slew rate limiters to output velocity
+            # TODO: reconcile axis with thrusters- are they somehow compatible? can we use them interchangeably?
             slewed_velocity = VelocityVector()
             for axis in output_velocity.keys():
                 slewed_velocity[axis] = self._slew_limiters[axis].update(
