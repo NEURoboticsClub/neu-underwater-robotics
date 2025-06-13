@@ -3,12 +3,12 @@ import logging
 import numpy as np
 
 from common import utils
-from common.utils import SlewRateLimiter
 
 from .hardware import Actuator, Sensor, Thruster
 
 PIDController = utils.PIDController
 VelocityVector = utils.VelocityVector
+SlewRateLimiter = utils.SlewRateLimiter
 time_ms = utils.time_ms
 linear_map = utils.linear_map
 
@@ -52,15 +52,15 @@ class ROVState:
         self._bang_bang_radius = 0.02 # distance in meters from target depth before turning on
         self._p_factor = 1 # factor to scale the auto-depth by
         self._slew_limiters = {}
-        # for name, thruster in self.thrusters.items():
-        #     self._slew_limiters[name] = SlewRateLimiter(
-        #         max_rate==(thruster.active_range[1] - thruster.active_range[0]) # max rate of change per second
-        #     )
-
-        for axis in self._current_velocity.keys():
-            self._slew_limiters[axis] = SlewRateLimiter(
-                max_rate=500  # max rate of change per second for velocity axes
+        for name, thruster in self.thrusters.items():
+            self._slew_limiters[name] = SlewRateLimiter(
+                max_rate=(thruster.active_range[1] - thruster.active_range[0]) # max rate of change per second
             )
+
+        # for axis in self._current_velocity.keys():
+        #     self._slew_limiters[axis] = SlewRateLimiter(
+        #         max_rate=500  # max rate of change of pwm per second
+        #     )
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -216,17 +216,15 @@ class ROVState:
                 # controller bypass. uses target velocity directly.
                 # logging.warning("Current velocity is stale, using target velocity directly.")
                 output_velocity = self._target_velocity
-            
-            # apply slew rate limiters to output velocity
-            # TODO: reconcile axis with thrusters- are they somehow compatible? can we use them interchangeably?
-            slewed_velocity = VelocityVector()
-            for axis in output_velocity.keys():
-                slewed_velocity[axis] = self._slew_limiters[axis].update(
-                    output_velocity[axis], dt
-                )
 
             # translate output velocity to thruster mix
-            thruster_mix = self._translate_velocity_to_thruster_mix(slewed_velocity)
+            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
+            # apply slew rate limiters to thruster mix
+            for name, value in thruster_mix.items():
+                if name in self._slew_limiters:
+                    thruster_mix[name] = self._slew_limiters[name].update(value, dt)
+                else:
+                    logging.warning(f"Slew rate limiter for {name} not found, using raw value.")
             print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
