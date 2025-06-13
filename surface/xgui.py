@@ -264,7 +264,8 @@ class XguiApplication():
                         self.scw.update_imu(dict(json.loads(json_msg["imu_data"])))
                         print(self.imu_data)
                     else:
-                        print("Warning: GUI not fully initialized, skipping update.")
+                        logger.warning("GUI not fully initialized, skipping update.")
+                        #print("Warning: GUI not fully initialized, skipping update.")
             
             if "depth" in json_msg:
                 self.depth = float(json.loads(json_msg["depth"]))
@@ -273,12 +274,14 @@ class XguiApplication():
                         self.scw.update_depth(self.depth)
                         print(self.depth)
                     else:
-                        print("Warning: GUI not fully initialized, skipping update.")
+                        logger.warning("GUI not fully initialized, skipping update.")
+                        #print("Warning: GUI not fully initialized, skipping update.")
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
                 await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
             else:
-                print("Warning: read loop took too long")
+                logger.warning("read loop took too long")
+                #print("Warning: read loop took too long")
             last_parse_time = time.time()
     
     async def run_asyncio(self):

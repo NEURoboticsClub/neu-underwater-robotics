@@ -6,10 +6,14 @@ import asyncio
 from common import utils
 import surface.xgui as xgui
 from surface.joystick import XBoxDriveController
+import logging
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 WRITE_LOOP_FREQ = 100  # Hz
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(levelname)s:%(message)s')
 
 drive_controller = XBoxDriveController(joy_id=0)
 claw_controller = XBoxDriveController(joy_id=1)
@@ -64,7 +68,8 @@ class SurfaceClient:
             if time.time() - last_send_time < 1 / WRITE_LOOP_FREQ:
                 await asyncio.sleep(1 / WRITE_LOOP_FREQ - (time.time() - last_send_time))
             else:
-                print("Warning: write loop took too long")
+                logger.warning("Write loop took too long")
+                #print("Warning: write loop took too long")
             last_send_time = time.time()
 
 if __name__ == "__main__":
