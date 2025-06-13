@@ -11,7 +11,7 @@ from common import utils
 from .hardware import Servo, Thruster, LinActuator
 from .rov_state import ROVState
 
-SERVER_IP = "192.168.0.111"  # raspberry pi ip
+SERVER_IP = "192.168.0.102"  # raspberry pi ip
 PORT = 2049
 ARDUINO_PORT = "/dev/ttyUSB0"
 RESPONSE_LOOP_FREQ = 10 # Hz
@@ -48,10 +48,10 @@ class Server:
                     "front_right_horizontal": Thruster(self._get_pin(4, "s"), active_range=(1250, 1750)),
                     "back_left_horizontal": Thruster(self._get_pin(6, "s"), active_range=(1250, 1750)),
                     "back_right_horizontal": Thruster(self._get_pin(8, "s"), active_range=(1250, 1750)),
-                    "front_left_vertical": Thruster(self._get_pin(3, "s")),
+                    "front_left_vertical": Thruster(self._get_pin(3, "s"), reverse=True),
                     "front_right_vertical": Thruster(self._get_pin(5, "s"), reverse=True),
                     "back_left_vertical": Thruster(self._get_pin(7, "s"), reverse=True),
-                    "back_right_vertical": Thruster(self._get_pin(9, "s")),
+                    "back_right_vertical": Thruster(self._get_pin(9, "s"), reverse=True),
                 },
                 sensors={
 
