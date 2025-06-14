@@ -194,7 +194,7 @@ class Server:
                 )
 
             if "status_flags" in json_msg:
-                self.rov_state.set_status_flags(json.loads(json_msg["status_flags"]))
+                self.rov_state.set_status_flags(dict(json.loads(json_msg["status_flags"])))
 
             if "imu_data" in json_msg:
                 self.rov_state.set_current_imu_data(
