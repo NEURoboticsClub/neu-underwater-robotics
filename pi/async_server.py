@@ -39,13 +39,13 @@ class Server:
                     "close_main": Servo(self._get_pin(11, "s")),
                     "close_side": Servo(self._get_pin(12, "s")),
                     "camera_servo": Servo(self._get_pin(13, "s")),
-                    "extend": LinActuator(self._get_pin(14, "o"), self._get_pin(15, "o")),
+                    "extend": LinActuator(self._get_pin(15, "o"), self._get_pin(14, "o")),
                     "sample": LinActuator(self._get_pin(18, "o"), self._get_pin(19, "o")),
                 },
                 thrusters={
                     #remove to isolate claw
-                    "front_left_horizontal": Thruster(self._get_pin(2, "s"), active_range=(1250, 1750)),
-                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), active_range=(1250, 1750)),
+                    "front_left_horizontal": Thruster(self._get_pin(2, "s"), active_range=(1250, 1750), reverse=True),
+                    "front_right_horizontal": Thruster(self._get_pin(4, "s"), active_range=(1250, 1750), reverse=True),
                     "back_left_horizontal": Thruster(self._get_pin(6, "s"), active_range=(1250, 1750)),
                     "back_right_horizontal": Thruster(self._get_pin(8, "s"), active_range=(1250, 1750)),
                     "front_left_vertical": Thruster(self._get_pin(3, "s"), reverse=True),
@@ -56,13 +56,18 @@ class Server:
                 sensors={
 
                 },
+                status_flags={
+                    "agnes_mode": False,
+                    "agnes_factor": 0.3,
+                    "auto_depth": False,
+                }
             )
             self.board.servo_config(3, 1100, 1900, 1500)
             self.board.servo_config(5, 1100, 1900, 1500)
             self.board.servo_config(7, 1100, 1900, 1500)
             self.board.servo_config(9, 1100, 1900, 1500)
             # TOASK: can we remove
-            time.sleep(10)
+            
         else:
             print(f"{'='*10} SIMULATION MODE. Type YES to continue {'='*10}")
             if input() != "YES":
