@@ -160,7 +160,7 @@ class ROVState:
 
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
-            print(thruster_mix)
+            # print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
             for name, value in thruster_mix.items():
@@ -168,11 +168,10 @@ class ROVState:
             for name, value in self._current_claw.items():
                 set_val_tasks.append(self.actuators[name].set_val(value))
             
-            # Redundant debugging code
-            # for thruster_name, thruster in self.thrusters.items():
-            #     print(f"{thruster_name}: {thruster_mix[thruster_name]}")
-            # for actuator_name, actuator in self.actuators.items():
-            #     print(f"{actuator_name}: {self._current_claw[actuator_name]}")
+            for thruster_name, _ in self.thrusters.items():
+                print(f"{thruster_name}: {thruster_mix[thruster_name]}")
+            for actuator_name, _ in self.actuators.items():
+                print(f"{actuator_name}: {self._current_claw[actuator_name]}")
             await asyncio.gather(*set_val_tasks)
 
             # sleep until next control loop iteration
