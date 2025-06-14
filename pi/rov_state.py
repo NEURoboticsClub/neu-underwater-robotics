@@ -103,11 +103,11 @@ class ROVState:
             mix["back_right_vertical"] *= self.status_flags["agnes_factor"]
         
         # apply slew rate limiters to thruster mix
-            for name, value in mix.items():
-                if name in self._slew_limiters:
-                    mix[name] = self._slew_limiters[name].update(value, dt)
-                else:
-                    logging.warning(f"Slew rate limiter for {name} not found, using raw value.")
+        for name, value in mix.items():
+            if name in self._slew_limiters:
+                mix[name] = self._slew_limiters[name].update(value, dt)
+            else:
+                logging.warning(f"Slew rate limiter for {name} not found, using raw value.")
 
         # cap value to [-1, 1]
         for name, value in mix.items():
