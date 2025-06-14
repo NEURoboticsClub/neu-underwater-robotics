@@ -181,10 +181,9 @@ class PIDController:
         return output
 
 class SlewRateLimiter:
-    def __init__(self, max_rate, initial_value, min_value):
+    def __init__(self, max_rate, initial_value):
         self.max_rate = max_rate   # Maximum rate of change
         self.last_value = initial_value
-        self.min_value = min_value
 
     def update(self, target_value, dt):
         """Update the slew rate limiter.
@@ -199,8 +198,5 @@ class SlewRateLimiter:
         if abs(change) > max_change:
             change = max_change * (1 if change > 0 else -1)
         self.last_value += change
-
-        if self.min_value is not None:
-            self.last_value = max(self.last_value, self.min_value)
         
         return self.last_value

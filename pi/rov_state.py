@@ -54,11 +54,10 @@ class ROVState:
         self._bang_bang_radius = 0.02 # distance in meters from target depth before turning on
         self._p_factor = 1 # factor to scale the auto-depth by
         self._slew_limiters = {}
-        for name, thruster in self.thrusters.items():
+        for name, _ in self.thrusters.items():
             self._slew_limiters[name] = SlewRateLimiter(
-                max_rate = ((thruster.active_range[1] - thruster.active_range[0]) / 10), 
-                initial_value = thruster.angle,
-                min_value = thruster.active_range[0]
+                max_rate = (2.0 / 10.0), 
+                initial_value = 0
             )
 
         # for axis in self._current_velocity.keys():
@@ -77,12 +76,13 @@ class ROVState:
     
 
     def _translate_velocity_to_thruster_mix(
-        self, target_velocity: VelocityVector,
+        self, target_velocity: VelocityVector, dt: float
     ) -> dict[str, float]:
         """
         Translate target velocity to thruster mix.
         Args:
             target_velocity (VelocityVector): target velocity
+            dt (float): delta time (s)
         Returns:
             dict[str, float]: thruster mix
         """
@@ -101,6 +101,13 @@ class ROVState:
             mix["front_right_vertical"] *= self.status_flags["agnes_factor"]
             mix["back_left_vertical"] *= self.status_flags["agnes_factor"]
             mix["back_right_vertical"] *= self.status_flags["agnes_factor"]
+        
+        # apply slew rate limiters to thruster mix
+            for name, value in mix.items():
+                if name in self._slew_limiters:
+                    mix[name] = self._slew_limiters[name].update(value, dt)
+                else:
+                    logging.warning(f"Slew rate limiter for {name} not found, using raw value.")
 
         # cap value to [-1, 1]
         for name, value in mix.items():
@@ -222,13 +229,7 @@ class ROVState:
                 output_velocity = self._target_velocity
 
             # translate output velocity to thruster mix
-            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
-            # apply slew rate limiters to thruster mix
-            for name, value in thruster_mix.items():
-                if name in self._slew_limiters:
-                    thruster_mix[name] = self._slew_limiters[name].update(value, dt)
-                else:
-                    logging.warning(f"Slew rate limiter for {name} not found, using raw value.")
+            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity, dt)
             print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
@@ -237,9 +238,9 @@ class ROVState:
             for name, value in self._current_claw.items():
                 set_val_tasks.append(self.actuators[name].set_val(value))
             
-            for thruster_name, thruster in self.thrusters.items():
+            for thruster_name, _ in self.thrusters.items():
                 print(f"{thruster_name}: {thruster_mix[thruster_name]}")
-            for actuator_name, actuator in self.actuators.items():
+            for actuator_name, _ in self.actuators.items():
                 print(f"{actuator_name}: {self._current_claw[actuator_name]}")
             await asyncio.gather(*set_val_tasks)
 
