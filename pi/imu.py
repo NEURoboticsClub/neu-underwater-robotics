@@ -58,6 +58,7 @@ def read_data() -> dict:
     data["acceleration"] = utils.make_xyz_dict(accel_x, accel_y, accel_z)
 
     # velocity
+    global vel_x, vel_y, vel_z
     vel_x = vel_x + accel_x / CONTROL_LOOP_FREQ
     vel_y = vel_y + accel_y / CONTROL_LOOP_FREQ
     vel_z = vel_z + accel_z / CONTROL_LOOP_FREQ

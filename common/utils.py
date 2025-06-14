@@ -51,8 +51,11 @@ def init_imu_data() -> dict:
     # acceleration
     data["acceleration"] = make_xyz_dict(0,0,0)
 
+    # velocity
+    data["velocity"] = make_xyz_dict(0,0,0)
+
     # gyro
-    data["gyroscope"] = make_xyz_dict(0,0,0)
+    # data["gyroscope"] = make_xyz_dict(0,0,0)
 
     # magnetometer
     data["magnetometer"] = make_xyz_dict(0,0,0)
