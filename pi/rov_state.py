@@ -4,10 +4,11 @@ import numpy as np
 
 from common import utils
 
-from .hardware import Actuator, Sensor
+from .hardware import Actuator, Sensor, Thruster
 
 PIDController = utils.PIDController
 VelocityVector = utils.VelocityVector
+SlewRateLimiter = utils.SlewRateLimiter
 time_ms = utils.time_ms
 linear_map = utils.linear_map
 
@@ -41,7 +42,7 @@ class ROVState:
             self._pid_controllers[axis] = PIDController(
                 kp=1.0, ki=0.1, kd=0.01, max_output=90, max_rate_of_change=180
             )
-        self._control_loop_frequency = 10  # Hz
+        self._control_loop_frequency = 10.0  # Hz
         self._last_time = time_ms()  # time the last control loop iteration was executed in ms
         self._last_current_velocity_update = 0  # time of last current velocity update in ms
         self._last_current_claw_update = 0  # time of last current claw update in ms
@@ -52,6 +53,17 @@ class ROVState:
         self._z_sensitivity = 0.0001 # how much the z changes with controller input
         self._bang_bang_radius = 0.02 # distance in meters from target depth before turning on
         self._p_factor = 1 # factor to scale the auto-depth by
+        self._slew_limiters = {}
+        for name, _ in self.thrusters.items():
+            self._slew_limiters[name] = SlewRateLimiter(
+                max_rate = (2.0 / 1.0), 
+                initial_value = 0.0
+            )
+
+        # for axis in self._current_velocity.keys():
+        #     self._slew_limiters[axis] = SlewRateLimiter(
+        #         max_rate=500  # max rate of change of pwm per second
+        #     )
 
     def get_tasks(self) -> list[asyncio.Task]:
         """Return tasks for all actuators"""
@@ -64,12 +76,13 @@ class ROVState:
     
 
     def _translate_velocity_to_thruster_mix(
-        self, target_velocity: VelocityVector,
+        self, target_velocity: VelocityVector, dt: float
     ) -> dict[str, float]:
         """
         Translate target velocity to thruster mix.
         Args:
             target_velocity (VelocityVector): target velocity
+            dt (float): delta time (s)
         Returns:
             dict[str, float]: thruster mix
         """
@@ -88,6 +101,13 @@ class ROVState:
             mix["front_right_vertical"] *= self.status_flags["agnes_factor"]
             mix["back_left_vertical"] *= self.status_flags["agnes_factor"]
             mix["back_right_vertical"] *= self.status_flags["agnes_factor"]
+        
+        # apply slew rate limiters to thruster mix
+        for name, value in mix.items():
+            if name in self._slew_limiters:
+                mix[name] = self._slew_limiters[name].update(value, dt)
+            else:
+                logging.warning(f"Slew rate limiter for {name} not found, using raw value.")
 
         # cap value to [-1, 1]
         for name, value in mix.items():
@@ -151,21 +171,27 @@ class ROVState:
 
     async def control_loop(self):
         """Control loop."""
-        loop_period = 1000 / self._control_loop_frequency  # ms
+        loop_period = 1000.0 / self._control_loop_frequency  # ms
 
         while True:
-            dt = (time_ms() - self._last_time) / 1000
+            dt = float(time_ms() - self._last_time) / 1000.0
             # update last time
             self._last_time = time_ms()
 
+            if -0.1 < self._target_velocity.z < 0.1:
+                self._target_depth -= self._target_velocity.z * self._z_sensitivity
+                # test different sensitivities and potentially functions
+                if self._target_depth > 1 and self._current_depth > 1:
+                    self._target_velocity.z = (self._target_depth - self._current_depth) ** 3
+
             # Plan test these and either make them toggleable or keep the best one
             # Auto Depth V1 (Bang Bang P)
-            if self.status_flags["auto_depth"]:
-                if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
-                    self._target_velocity.z = ((self._target_depth - self._current_depth) * 
-                                               self._p_factor)
-                else: 
-                    self._target_velocity.z = 0
+            # if self.status_flags["auto_depth"]:
+            #     if abs(self._target_depth - self._current_depth) > self._bang_bang_radius:
+            #         self._target_velocity.z = ((self._target_depth - self._current_depth) * 
+            #                                    self._p_factor)
+            #     else: 
+            #         self._target_velocity.z = 0
 
             # Auto Depth V2 (Pure Bang Bang)
             # if self.status_flags["auto_depth"]:
@@ -201,10 +227,9 @@ class ROVState:
                 # controller bypass. uses target velocity directly.
                 # logging.warning("Current velocity is stale, using target velocity directly.")
                 output_velocity = self._target_velocity
-            
 
             # translate output velocity to thruster mix
-            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity)
+            thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity, dt)
             print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
@@ -213,9 +238,9 @@ class ROVState:
             for name, value in self._current_claw.items():
                 set_val_tasks.append(self.actuators[name].set_val(value))
             
-            for thruster_name, thruster in self.thrusters.items():
+            for thruster_name, _ in self.thrusters.items():
                 print(f"{thruster_name}: {thruster_mix[thruster_name]}")
-            for actuator_name, actuator in self.actuators.items():
+            for actuator_name, _ in self.actuators.items():
                 print(f"{actuator_name}: {self._current_claw[actuator_name]}")
             await asyncio.gather(*set_val_tasks)
 

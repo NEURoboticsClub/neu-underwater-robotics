@@ -49,8 +49,8 @@ class Server:
                     "back_left_horizontal": Thruster(self._get_pin(6, "s"), active_range=(1250, 1750)),
                     "back_right_horizontal": Thruster(self._get_pin(8, "s"), active_range=(1250, 1750)),
                     "front_left_vertical": Thruster(self._get_pin(3, "s"), reverse=True),
-                    "front_right_vertical": Thruster(self._get_pin(25, "s"), reverse=True),
-                    "back_left_vertical": Thruster(self._get_pin(27, "s"), reverse=True),
+                    "front_right_vertical": Thruster(self._get_pin(5, "s"), reverse=True),
+                    "back_left_vertical": Thruster(self._get_pin(7, "s"), reverse=True),
                     "back_right_vertical": Thruster(self._get_pin(9, "s"), reverse=True),
                 },
                 sensors={
@@ -194,7 +194,7 @@ class Server:
                 )
 
             if "status_flags" in json_msg:
-                self.rov_state.set_status_flags(json.loads(json_msg["status_flags"]))
+                self.rov_state.set_status_flags(dict(json.loads(json_msg["status_flags"])))
 
             if "imu_data" in json_msg:
                 self.rov_state.set_current_imu_data(

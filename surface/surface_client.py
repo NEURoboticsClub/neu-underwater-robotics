@@ -57,7 +57,7 @@ class SurfaceClient:
             msg = { 
                 "target_velocity": json.dumps(velocity_vec.to_dict()),
                 "claw_movement": json.dumps(claw_vec),
-                "status_flags": json.dumps(status_flags)
+                "status_flags": json.dumps(status_flags),
             }
             writer.write(str.encode(json.dumps(msg)))
             await writer.drain()
