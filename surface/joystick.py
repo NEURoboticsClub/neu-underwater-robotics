@@ -165,12 +165,12 @@ class XBoxDriveController(Controller):
         """get the desired velocity vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        self.velocity_vec.x = self.axis_dict["left_x"].get_joy_val() * -1
-        self.velocity_vec.y = self.axis_dict["left_y"].get_joy_val() 
-        self.velocity_vec.z = self.axis_dict["right_y"].get_joy_val() 
-        self.velocity_vec.yaw = self.axis_dict["right_x"].get_joy_val() * -1
-        self.velocity_vec.pitch = (((self.axis_dict["left_trigger"].get_joy_val() + 1) / 2) - 
-                    ((self.axis_dict["right_trigger"].get_joy_val() + 1) / 2))
+        self.velocity_vec.x = utils.deadzone_retrict(self.axis_dict["left_x"].get_joy_val()) * -1
+        self.velocity_vec.y = utils.deadzone_retrict(self.axis_dict["left_y"].get_joy_val())
+        self.velocity_vec.z = utils.deadzone_retrict(self.axis_dict["right_y"].get_joy_val())
+        self.velocity_vec.yaw = utils.deadzone_retrict(self.axis_dict["right_x"].get_joy_val()) * -1
+        self.velocity_vec.pitch = (((utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) / 2) - 
+                    ((utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) / 2))
         self.velocity_vec.roll = (int(self.buttons_dict["RB"].get_joy_val()) - \
                                  int(self.buttons_dict["LB"].get_joy_val())) * 0.5
         
@@ -189,10 +189,10 @@ class XBoxDriveController(Controller):
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
         # TODO: control scheme goes here     
-        self.claw_vec["extend"] = self.axis_dict["left_y"].get_joy_val()
-        self.claw_vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * -90 + 90
-        self.claw_vec["close_main"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
-                        (self.axis_dict["left_trigger"].get_joy_val() + 1) * 5 + 92
+        self.claw_vec["extend"] = utils.deadzone_retrict(self.axis_dict["left_y"].get_joy_val())
+        self.claw_vec["rotate"] = utils.deadzone_retrict(self.axis_dict["right_x"].get_joy_val()) * -90 + 90
+        self.claw_vec["close_main"] = (utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) * -5 + \
+                        (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 5 + 92
         self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
                         int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
         self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
