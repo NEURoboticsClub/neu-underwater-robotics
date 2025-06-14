@@ -204,7 +204,8 @@ class SlewRateLimiter:
         
         return self.last_value
 
+# TODO: make deadzone value configurable somewhere
 def deadzone_retrict(val: float) -> float:
-    if abs(val) < 0.05:
+    if abs(val) < 0.07:
         val = 0.0
     return val
