@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, List, TypeVar
 
 import pygame
 
@@ -80,13 +80,14 @@ class Hat(JoyItem[tuple[float, float]]):
 class Controller(ABC):
     """Controller class to represent any joystick."""
 
-    def __init__(self, joy_id: int):
+    def __init__(self, joy_id: int, toggles: List[int] = []):
         pygame.init()  # safe to call multiple times
         pygame.joystick.init()  # safe to call multiple times
         self._joystick = pygame.joystick.Joystick(joy_id)
         self._joystick.init()
         self._axes: list[Axis] = [Axis() for _ in range(self._joystick.get_numaxes())]
-        self._buttons: list[Button] = [Button() for _ in range(self._joystick.get_numbuttons())]
+        self._buttons: list[Button] = [Button() if i not in toggles else Toggle() 
+                                       for i in range(self._joystick.get_numbuttons())]
         self._hats: list[Hat] = [Hat() for _ in range(self._joystick.get_numhats())]
 
     def update(self, event: pygame.event.EventType) -> None:
@@ -126,7 +127,8 @@ class XBoxDriveController(Controller):
     """Represents a joystick with buttons and axes."""
 
     def __init__(self, joy_id: int):
-        super().__init__(joy_id)
+        toggles = [2, 3] # indices treated as toggles
+        super().__init__(joy_id, toggles)
         self.buttons_dict = {
             "A": self._buttons[0],
             "B": self._buttons[1],
@@ -139,6 +141,9 @@ class XBoxDriveController(Controller):
             "left_stick": self._buttons[8],
             "right_stick": self._buttons[9],
         }
+        self.hat_dict = {
+            "hat": self._hats[0]
+        }
         self.axis_dict = {
             "left_x": self._axes[0],
             "left_y": self._axes[1],
@@ -147,32 +152,55 @@ class XBoxDriveController(Controller):
             "left_trigger": self._axes[2],
             "right_trigger": self._axes[5],
         }
+        self.velocity_vec = VelocityVector()
+        self.status_flags = {
+            "agnes_factor":0.3,
+            "agnes_mode":False,
+            "auto_depth":False,
+        }
+        self.claw_vec = {"camera_servo": 30}
+        self.agnes_factor_scale = 0.002
 
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        vec = VelocityVector()
-        # TODO: control scheme goes here
-        vec.x = self.axis_dict["left_x"].get_joy_val() * -1
-        vec.y = self.axis_dict["left_y"].get_joy_val() 
-        vec.z = self.axis_dict["right_y"].get_joy_val()
-        vec.yaw = self.axis_dict["right_x"].get_joy_val() * -1
-        vec.pitch = (((self.axis_dict["left_trigger"].get_joy_val() + 1) / 2) - 
+        self.velocity_vec.x = self.axis_dict["left_x"].get_joy_val() * -1
+        self.velocity_vec.y = self.axis_dict["left_y"].get_joy_val() 
+        self.velocity_vec.z = self.axis_dict["right_y"].get_joy_val() 
+        self.velocity_vec.yaw = self.axis_dict["right_x"].get_joy_val() * -1
+        self.velocity_vec.pitch = (((self.axis_dict["left_trigger"].get_joy_val() + 1) / 2) - 
                     ((self.axis_dict["right_trigger"].get_joy_val() + 1) / 2))
-        # print(self.axis_dict["right_y"].get_joy_val())
-
-        return vec
+        self.velocity_vec.roll = (int(self.buttons_dict["RB"].get_joy_val()) - \
+                                 int(self.buttons_dict["LB"].get_joy_val())) * 0.5
+        
+        return self.velocity_vec
     
+    def get_status_flags(self) -> dict:
+        self.status_flags["agnes_factor"] += self.hat_dict["hat"].get_joy_val()[0] * self.agnes_factor_scale
+        self.status_flags["agnes_mode"] = self.buttons_dict["Y"].get_joy_val()
+        self.status_flags["auto_depth"] = self.buttons_dict["X"].get_joy_val()
+
+        return self.status_flags
+
+
     def get_claw_vector(self) -> dict:
         """get the desired claw vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        vec = {}
-        # TODO: control scheme goes here
-        vec["extend"] = self.axis_dict["left_y"].get_joy_val()
-        vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * 90 + 90
-        vec["close"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
+        # TODO: control scheme goes here     
+        self.claw_vec["extend"] = self.axis_dict["left_y"].get_joy_val()
+        self.claw_vec["rotate"] = self.axis_dict["right_x"].get_joy_val() * -90 + 90
+        self.claw_vec["close_main"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
                         (self.axis_dict["left_trigger"].get_joy_val() + 1) * 5 + 92
-
-        return vec
+        self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
+                        int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
+        self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
+                         int(self.buttons_dict["A"].get_joy_val()))
+        self.claw_vec["camera_servo"] += self.hat_dict["hat"].get_joy_val()[0]
+        
+        return self.claw_vec
+    
+    def update_sensor_reading(self, sensor_dict):
+        # TODO: implement sensor dict in surface client
+        self.sensor_dict = sensor_dict
