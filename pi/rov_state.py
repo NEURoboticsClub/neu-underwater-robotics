@@ -42,7 +42,7 @@ class ROVState:
             self._pid_controllers[axis] = PIDController(
                 kp=1.0, ki=0.1, kd=0.01, max_output=90, max_rate_of_change=180
             )
-        self._control_loop_frequency = 10  # Hz
+        self._control_loop_frequency = 10.0  # Hz
         self._last_time = time_ms()  # time the last control loop iteration was executed in ms
         self._last_current_velocity_update = 0  # time of last current velocity update in ms
         self._last_current_claw_update = 0  # time of last current claw update in ms
@@ -57,7 +57,7 @@ class ROVState:
         for name, _ in self.thrusters.items():
             self._slew_limiters[name] = SlewRateLimiter(
                 max_rate = (2.0 / 10.0), 
-                initial_value = 0
+                initial_value = 0.0
             )
 
         # for axis in self._current_velocity.keys():
@@ -171,10 +171,10 @@ class ROVState:
 
     async def control_loop(self):
         """Control loop."""
-        loop_period = 1000 / self._control_loop_frequency  # ms
+        loop_period = 1000.0 / self._control_loop_frequency  # ms
 
         while True:
-            dt = (time_ms() - self._last_time) / 1000
+            dt = float(time_ms() - self._last_time) / 1000.0
             # update last time
             self._last_time = time_ms()
 
