@@ -58,21 +58,15 @@ class Stepper(Actuator):
         async with self.lock:
             self.direction_pin.write(self.direction_pin)
             self.direction = not self.direction
-        # self.direction_pin.write(1)
-        # await asyncio.sleep(0.01)
-        # self.direction_pin.write(0)
 
     async def run(self):
         while True:
             async with self.lock:
                 speed = self.speed
-            # print(f"speed: {speed}")
             if speed == 0:
                 await asyncio.sleep(0.1)
                 continue
             delay = (1 / 200) * (1 / speed)
-            # if speed < 0 and self.direction or speed > 0 and not self.direction:
-            #     asyncio.ensure_future(self.reverse())
             asyncio.ensure_future(self.reverse())
             self.pin.write(1)
             await asyncio.sleep(delay)
@@ -90,13 +84,12 @@ class Servo(Actuator):
 
     def linear_map(self, x: float):
         """no mapping needed"""
-        # return int(linear_map(x, 0, 180, 0, 180))
         return int(x)
 
     async def set_val(self, val: int):
         """set angle of servo motor in degrees"""
         val = self.linear_map(val)
-        if val < 0 or val > 180:
+        if val < 0 or val > 1800:
             raise ValueError("Angle must be between 0 and 180")
         async with self.lock:
             self.angle = val
@@ -107,7 +100,7 @@ class Servo(Actuator):
             async with self.lock:
                 print(f"{self.pin}: writing {self.angle}")
                 self.pin.write(self.angle)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.7)
 
 
 class Thruster(Servo):
@@ -115,8 +108,10 @@ class Thruster(Servo):
 
     active_range: tuple
 
-    def __init__(self, pin: Pin, active_range: tuple = (35, 145), reverse=False):
+    # TOASK: are we limiting our range here for all thrusters
+    def __init__(self, pin: Pin, active_range: tuple = (1200, 1800), reverse=False):
         super().__init__(pin)
+        self.angle = 1500
         self.active_range = active_range
         self.reverse = reverse
 
@@ -125,6 +120,7 @@ class Thruster(Servo):
         if not self.reverse:
             return int(linear_map(x, -1, 1, self.active_range[0], self.active_range[1]))
         return int(linear_map(x, -1, 1, self.active_range[1], self.active_range[0]))
+
 
 class LinActuator(Actuator):
     """Linear actuator class."""
@@ -138,7 +134,6 @@ class LinActuator(Actuator):
 
     def linear_map(self, x: float):
         """no mapping needed"""
-        # return int(linear_map(x, 0, 180, 0, 180))
         return int(x)
 
     async def set_val(self, val: int):

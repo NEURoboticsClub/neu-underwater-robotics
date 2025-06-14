@@ -6,10 +6,10 @@ import time
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
-CONTROL_LOOP_FREQ = 5  # Hz
+CONTROL_LOOP_FREQ = 10  # Hz
 
 # Print readings
-def read_depth(sensor):        
+def read_depth(sensor):
         if sensor.read():
                 print(("P: %0.1f mbar  %0.3f psi\tDepth: %0.3f\tT: %0.2f C  %0.2f F") % (
                 sensor.pressure(), # Default is mbar (no arguments)
@@ -20,19 +20,20 @@ def read_depth(sensor):
                 return sensor.depth()
         else:
                 print("Sensor read failed!")
-                exit(1)
+                raise LookupError("Encountered error reading from depth sensor: Sensor read failed")
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
     s.connect((HOST, PORT))
     last_time = time.time()
-    sensor = ms5837.MS5837_02BA(1) # Default I2C bus is 1 (Raspberry Pi 3)
+    sensor = ms5837.MS5837_02BA() # Default I2C bus is 1 (Raspberry Pi 3)
 
     # We must initialize the sensor before reading it
     if not sensor.init():
         print("Sensor could not be initialized")
         exit(1)
 
+    # TODO: Rewrite this to standard
     # store target height as a variable
     # come up with target velocity based on current velocity, 
     # target height and target depth
@@ -52,16 +53,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         # appends the newest depth to the depth list
         # pops off the oldest if there are enough values
-        depth = read_depth(sensor)
-        depth_list.append(depth)
-        if len(depth_list) >= depth_list_length:
-            depth_list.pop(0)
+        try:
+            depth = read_depth(sensor)
+            depth_list.append(depth)
+            if len(depth_list) >= depth_list_length:
+                depth_list.pop(0)
 
-        msg = {
-            "depth": json.dumps(depth_list),
-        }
-        s.send(str.encode(json.dumps(msg)))
-        print(f"sent: {msg}")
+            msg = {
+                "depth": json.dumps(depth_list),
+            }
+            s.send(str.encode(json.dumps(msg)))
+            print(f"sent: {msg}")
+        except Exception as err:
+            print("Error encountered in depth sensor client execution: " + str(err))
 
         # sleep for remainder of loop
         if time.time() - last_time < 1 / CONTROL_LOOP_FREQ:

@@ -14,11 +14,6 @@ folder_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 os.makedirs(f"images/{folder_name}", exist_ok=True)
 
-# def get_image_request(port):
-#     url = f'http://{IP}:5000/raw_frame/{port}'
-#     r = requests.get(url)
-#     im = Image.open(BytesIO(base64.b64decode(r.text[34:-10])))
-#     return im
 
 def make_folder():
     global folder_name
@@ -42,8 +37,6 @@ def add_metadata(img: Image):
     
 def save_image(img: Image, name: str):
     img.save(f"images/{folder_name}/{name}.jpg", exif=add_metadata(img))
-
-# save_image(Image.open("images/MATE_5601_4.png"), "images/MATE_5601_4_edited")
 
 
 if __name__ == "__main__":
