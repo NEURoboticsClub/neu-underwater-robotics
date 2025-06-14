@@ -71,7 +71,8 @@ class SurfaceCentralWidget(QWidget):
 
     def update_imu(self, imu_data):
         """Sets depth on the GUI and updates label"""
-        self.telemetry_velocity = imu_data["acceleration"]
+        self.telemetry_velocity = imu_data["velocity"]
+        self.telemetry_acceleration = imu_data["acceleration"]
         self.telemetry.setText(self._format_telemetry_text())
         game_quaternion = imu_data["game_quaternion"]
         roll, pitch, yaw = utils.euler_from_quaternion(game_quaternion["i"], game_quaternion["j"], game_quaternion["k"], game_quaternion["real"])

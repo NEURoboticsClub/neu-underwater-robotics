@@ -230,7 +230,7 @@ class ROVState:
 
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity, dt)
-            print(thruster_mix)
+            # print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
             for name, value in thruster_mix.items():
