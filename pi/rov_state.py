@@ -54,7 +54,9 @@ class ROVState:
         self._slew_limiters = {}
         for name, thruster in self.thrusters.items():
             self._slew_limiters[name] = SlewRateLimiter(
-                max_rate=((thruster.active_range[1] - thruster.active_range[0]) / 10) # max rate of change per second
+                max_rate = ((thruster.active_range[1] - thruster.active_range[0]) / 10), 
+                initial_value = thruster.angle,
+                min_value = thruster.active_range[0]
             )
 
         # for axis in self._current_velocity.keys():
