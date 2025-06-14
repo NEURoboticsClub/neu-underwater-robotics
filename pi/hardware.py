@@ -108,7 +108,8 @@ class Thruster(Servo):
 
     active_range: tuple
 
-    def __init__(self, pin: Pin, active_range: tuple = (1300, 1700), reverse=False):
+    # TOASK: are we limiting our range here for all thrusters
+    def __init__(self, pin: Pin, active_range: tuple = (1200, 1800), reverse=False):
         super().__init__(pin)
         self.angle = 1500
         self.active_range = active_range

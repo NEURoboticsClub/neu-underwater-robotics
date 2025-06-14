@@ -179,3 +179,24 @@ class PIDController:
         self.last_error = error
         self.last_output = output
         return output
+
+class SlewRateLimiter:
+    def __init__(self, max_rate: float, initial_value: float):
+        self.max_rate = max_rate   # Maximum rate of change
+        self.last_value = initial_value
+
+    def update(self, target_value: float, dt: float):
+        """Update the slew rate limiter.
+        Args:
+            target_value (float): target value to limit
+            dt (float): time since last update (seconds)
+        Returns:
+            float: limited value
+        """
+        change = target_value - self.last_value
+        max_change = self.max_rate * dt
+        if abs(change) > max_change:
+            change = max_change * (1.0 if change > 0.0 else -1.0)
+        self.last_value += change
+        
+        return self.last_value
