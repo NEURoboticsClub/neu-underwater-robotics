@@ -6,7 +6,7 @@ from .ai import AttitudeIndicator
 from typing import List
 import os
 
-PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_no : f"gst-launch-1.0 udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! v4l2sink device=/dev/video{port_no} sync=false drop=true"
+PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_no : f"gst-launch-1.0 udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! v4l2sink device=/dev/video{port_no} sync=false"
 
 class GridVideoPlayersWidget(QWidget):
     """A grid of [1,4] video player widgets.
