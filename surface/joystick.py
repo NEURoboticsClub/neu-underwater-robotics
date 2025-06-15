@@ -195,7 +195,7 @@ class XBoxDriveController(Controller):
                         (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 2 + 92
         self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
                         int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
-        self.claw_vec["sample"] = (int(self.buttons_dict["Y"].get_joy_val()) - 
+        self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
                          int(self.buttons_dict["A"].get_joy_val())) 
         self.claw_vec["camera_servo"] += self.hat_dict["hat"].get_joy_val()[0]
 
