@@ -42,7 +42,8 @@ class GridVideoPlayersWidget(QWidget):
             modprobe_str = f"sudo modprobe v4l2loopback video_nr={i}"
             print(modprobe_str)
             os.system(modprobe_str)
-            time.sleep(1)
+        time.sleep(2)
+        for i, _ in enumerate(port_nums):
             os.system(PORT_NUM_TO_GST_PIPELINE_COMMAND(i))
         
         self._video_players = [VideoPlayerWidget(port, i) for i, port in enumerate(port_nums)]
