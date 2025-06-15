@@ -31,7 +31,7 @@ class SurfaceCentralWidget(QWidget):
 
         # telemetry box
         self.telemetry = QLabel(self._format_telemetry_text(), self)
-        self.telemetry.setFixedSize(575, 150)
+        self.telemetry.setFixedSize(280, 75)
         layout.addWidget(self.telemetry, 0, 0, Qt.AlignTop | Qt.AlignRight)
 
         # status flags
@@ -41,21 +41,21 @@ class SurfaceCentralWidget(QWidget):
 
         # status flags box
         self.status_flags = QLabel(self._format_status_flags_text(), self)
-        self.status_flags.setFixedSize(575, 150)
+        self.status_flags.setFixedSize(175, 50)
         layout.addWidget(self.status_flags, 0, 0, Qt.AlignBottom | Qt.AlignLeft)
 
         self.telemetry.setStyleSheet("""
             background-color: rgb(42, 107, 126);  /* Semi-transparent teal background */
             color: white;
-            font-size: 32px;
-            padding: 10px;
+            font-size: 16px;
+            padding: 5px;
         """)
 
         self.status_flags.setStyleSheet("""
             background-color: rgb(42, 107, 126);  /* Semi-transparent teal background */
             color: white;
-            font-size: 32px;
-            padding: 10px;
+            font-size: 16px;
+            padding: 5px;
         """)
 
         #TODO:
@@ -81,7 +81,7 @@ class SurfaceCentralWidget(QWidget):
     
     def _format_status_flags_text(self):
         """Helper method to format the status flags text."""
-        return f"Agnes Mode {'ON' if self.agnes_mode_flag else 'OFF'}\nAgnes Mode Multiplier: {self.agnes_mode_multiplier:.2f}\nAuto-depth {'ON' if self.auto_depth_flag else 'OFF'}"
+        return f"Agnes Mode {'ON' if self.agnes_mode_flag else 'OFF'}\nMultiplier: {self.agnes_mode_multiplier:.2f}"
 
     def update_depth(self, depth):
         """Sets depth on the GUI and updates label"""
