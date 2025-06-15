@@ -158,7 +158,7 @@ class XBoxDriveController(Controller):
             "agnes_mode":False,
             "auto_depth":False,
         }
-        self.claw_vec = {"camera_servo": 30}
+        self.claw_vec = {"camera_servo": 0.0}
         self.agnes_factor_scale = 0.002
 
     def get_velocity_vector(self) -> VelocityVector:
