@@ -35,6 +35,7 @@ class ROVState:
         self._current_velocity = VelocityVector()
         self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90,
                               "close_side": 90, "sample": 0, "camera_servo": 30}
+        self._camera_servo_factor = 0.5
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things
@@ -130,6 +131,8 @@ class ROVState:
         Args:
             claw (dict): current claw movement values
         """
+
+        claw["camera_servo"] = max((min((self._current_claw["camera_servo"] + (claw["camera_servo"] * self._camera_servo_factor)), 180)), 30)
         self._current_claw = claw
         self._last_current_claw_update = time_ms()
 
