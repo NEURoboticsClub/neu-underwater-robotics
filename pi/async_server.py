@@ -143,6 +143,7 @@ class Server:
                 response = {
                     "imu_data": json.dumps(self.rov_state._current_imu_data),
                     "depth": json.dumps(self.rov_state._current_depth),
+                    "status_flags": json.dumps(self.rov_state.status_flags),
                 }
                 await self._send_response(writer, response)
                 if time.time() - last_response_time < 1 / RESPONSE_LOOP_FREQ:
