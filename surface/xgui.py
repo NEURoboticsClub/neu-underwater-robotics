@@ -223,6 +223,7 @@ class XguiApplication():
 
         self.depth = 0
         self.imu_data = ""
+        self.status_flags = {}
     
     def __del__(self):
         self.loop.close()
@@ -272,6 +273,14 @@ class XguiApplication():
                     if hasattr(self.scw, 'update_depth'):
                         self.scw.update_depth(self.depth)
                         print(self.depth)
+                    else:
+                        print("Warning: GUI not fully initialized, skipping update.")
+            if "status_flags" in json_msg:
+                self.status_flags = dict(json.loads(json_msg["status_flags"]))
+                if self.scw != None:
+                    if hasattr(self.scw, 'update_status_flags'):
+                        self.scw.update_status_flags(self.status_flags)
+                        print(str(self.status_flags))
                     else:
                         print("Warning: GUI not fully initialized, skipping update.")
             
