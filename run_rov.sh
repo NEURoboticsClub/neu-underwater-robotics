@@ -11,7 +11,7 @@ killall() {
 
 # run the async server and all clients
 python -m pi.async_server &
-sleep 6
+sleep 10
 python -m pi.imu &
 sleep 1
 python -m pi.depth-sensor &
