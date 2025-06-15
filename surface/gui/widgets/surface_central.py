@@ -25,10 +25,8 @@ class SurfaceCentralWidget(QWidget):
 
         # telemetry attributes
         self.telemetry_depth = 0
-        self.telemetry_velocity = {}
-        self.telemetry_velocity["x"] = 0
-        self.telemetry_velocity["y"] = 0
-        self.telemetry_velocity["z"] = 0
+        self.telemetry_velocity = utils.make_xyz_dict(0,0,0)
+        self.telemetry_acceleration = utils.make_xyz_dict(0,0,0)
         self.elapsed_timer = QElapsedTimer()
         self.elapsed_timer.start()
 
@@ -63,7 +61,7 @@ class SurfaceCentralWidget(QWidget):
         sec = (elapsed_ms // 1000)  % 60
         ms2 = (elapsed_ms  % 1000) // 10
 
-        return f"Depth: {self.telemetry_depth:.2f}\nAcceleration(x, y, z): {self.telemetry_velocity['x']:.2f}, {self.telemetry_velocity['y']:.2f}, {self.telemetry_velocity['z']:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
+        return f"Depth: {self.telemetry_depth:.2f}\nAcceleration(x, y, z): {self.telemetry_acceleration['x']:.2f}, {self.telemetry_acceleration['y']:.2f}, {self.telemetry_acceleration['z']:.2f}\nTimer: {min:02}:{sec:02}:{ms2:02}"
     
     def update_depth(self, depth):
         """Sets depth on the GUI and updates label"""
@@ -72,7 +70,8 @@ class SurfaceCentralWidget(QWidget):
 
     def update_imu(self, imu_data):
         """Sets depth on the GUI and updates label"""
-        self.telemetry_velocity = imu_data["acceleration"]
+        self.telemetry_velocity = imu_data["velocity"]
+        self.telemetry_acceleration = imu_data["acceleration"]
         self.telemetry.setText(self._format_telemetry_text())
         game_quaternion = imu_data["game_quaternion"]
         roll, pitch, yaw = utils.euler_from_quaternion(game_quaternion["i"], game_quaternion["j"], game_quaternion["k"], game_quaternion["real"])
