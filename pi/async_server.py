@@ -169,7 +169,7 @@ class Server:
     async def _parse(self):
         """parses incoming messages"""
         while True:
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.005)
             async with self.lock:
                 if len(self.incoming) > 0:
                     msg = self.incoming.pop()
@@ -186,7 +186,7 @@ class Server:
                 json_msg = json.loads(msg)
             except json.JSONDecodeError as e:
                 print(f"error decoding json: {e} | received: {msg}")
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.005)
                 continue
 
             if "target_velocity" in json_msg:
