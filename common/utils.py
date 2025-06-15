@@ -51,8 +51,11 @@ def init_imu_data() -> dict:
     # acceleration
     data["acceleration"] = make_xyz_dict(0,0,0)
 
+    # velocity
+    data["velocity"] = make_xyz_dict(0,0,0)
+
     # gyro
-    data["gyroscope"] = make_xyz_dict(0,0,0)
+    # data["gyroscope"] = make_xyz_dict(0,0,0)
 
     # magnetometer
     data["magnetometer"] = make_xyz_dict(0,0,0)
@@ -200,3 +203,9 @@ class SlewRateLimiter:
         self.last_value += change
         
         return self.last_value
+
+# TODO: make deadzone value configurable somewhere
+def deadzone_retrict(val: float) -> float:
+    if abs(val) < 0.07:
+        val = 0.0
+    return val
