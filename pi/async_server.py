@@ -58,7 +58,7 @@ class Server:
                 },
                 status_flags={
                     "agnes_mode": False,
-                    "gictor": 0.3,
+                    "agnes_factor": 0.3,
                     "auto_depth": False,
                 }
             )
