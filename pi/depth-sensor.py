@@ -29,9 +29,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     sensor = ms5837.MS5837_02BA() # Default I2C bus is 1 (Raspberry Pi 3)
 
     # We must initialize the sensor before reading it
-    if not sensor.init():
-        print("Sensor could not be initialized")
-        exit(1)
+    while not sensor.init():
+        print("Error: depth sensor could not be initialized")
+        time.sleep(1.0)
 
     # TODO: Rewrite this to standard
     # store target height as a variable
