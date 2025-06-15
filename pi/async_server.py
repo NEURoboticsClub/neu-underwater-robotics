@@ -131,7 +131,8 @@ class Server:
             print(f"received first message: {msg}")
             while msg:
                 async with self.lock:
-                    self.incoming.append(msg)
+                    for spl in msg.split("~"):
+                        self.incoming.append(spl)
                     self.last_update = utils.time_ms()
                 msg = (await reader.read(1024)).decode("utf-8")
             print("client disconnected, closing parser")

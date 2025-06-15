@@ -99,7 +99,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 "imu_data": json.dumps(data),
             }
             
-            s.send(str.encode(json.dumps(msg)))
+            s.send(str.encode(json.dumps(msg) + "~"))
 
             print(f"sent: {msg}")
         except RuntimeError as err:
