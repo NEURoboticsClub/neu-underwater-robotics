@@ -3,10 +3,6 @@ import cv2
 from os.path import expanduser
 from datetime import datetime
 
-# TODO(config): Users ought to be able to specify this without prying
-# into the code.
-PORT_NO_TO_CV2_GST_PIPELINE_COMMAND = lambda port_no : f"t{port_no}. ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink async=0 max-buffers=1 sync=false drop=true"
-
 class CameraFeed(QThread):
 
     def __init__(self, port_no : int, camera_no : int):
@@ -14,14 +10,13 @@ class CameraFeed(QThread):
 
         print("Initializing camera feed on port " + str(port_no))
 
-        self.video_capture_pipeline = PORT_NO_TO_CV2_GST_PIPELINE_COMMAND(port_no)
         self.camera_no = camera_no
         self._current_frame = None
         self._num_saved_images = 0
         self._do_save_img = False
 
         print("opening video capture")
-        self.capture = cv2.VideoCapture(self.video_capture_pipeline, cv2.CAP_GSTREAMER)
+        self.capture = cv2.VideoCapture(camera_no)
         print("opened video capture")
         if not self.capture.isOpened():
             print("Error: Failed to start video capture")

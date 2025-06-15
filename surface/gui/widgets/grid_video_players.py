@@ -4,6 +4,9 @@ from PyQt5.QtGui import QKeyEvent
 from .video_player import VideoPlayerWidget
 from .ai import AttitudeIndicator
 from typing import List
+import os
+
+PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_no : f"gst-launch-1.0 udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! v4l2sink device=/dev/video{port_no} async=0 sync=false max-buffers=1 drop=true"
 
 class GridVideoPlayersWidget(QWidget):
     """A grid of [1,4] video player widgets.
@@ -34,6 +37,10 @@ class GridVideoPlayersWidget(QWidget):
         self.grid.setSpacing(0)
         self.grid.setContentsMargins(0, 0, 0, 0)
 
+        for i, port_no in enumerate(port_nums):
+            os.system(f"sudo modprobe v4l2loopback video_nr={i}")
+            os.system(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_no))
+        
         self._video_players = [VideoPlayerWidget(port, i) for i, port in enumerate(port_nums)]
 
         for i, video_player in enumerate(self._video_players):

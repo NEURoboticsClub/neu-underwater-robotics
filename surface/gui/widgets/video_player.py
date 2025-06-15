@@ -6,9 +6,7 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import QUrl
 import time
 
-# TODO(config): Users ought to be able to specify this without prying
-# into the code.
-PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_no : f"gst-pipeline: udpsrc port={port_no} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! tee name=t{port_no} t{port_no}. ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! xvimagesink async=0 name=\"qtvideosink\""
+PORT_NUM_TO_VIDEO_PATH = lambda port_no : f"/dev/video{port_no}"
 
 class VideoPlayerWidget(QWidget):
     """A PyQt5 Widget that plays a video with the given QUrl.
@@ -46,7 +44,7 @@ class VideoPlayerWidget(QWidget):
         self._set_layout_to_given(video_widget)
 
         self.media_player.setVideoOutput(video_widget)
-        self.media_player.setMedia(QMediaContent(QUrl(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_no))))
+        self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(PORT_NUM_TO_VIDEO_PATH(camera_no))))
         self.media_player.play()
         self.camera_feed = CameraFeed(port_no, camera_no)
         self.open_camera()
