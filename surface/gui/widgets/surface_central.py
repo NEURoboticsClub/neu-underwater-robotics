@@ -42,9 +42,16 @@ class SurfaceCentralWidget(QWidget):
         # status flags box
         self.status_flags = QLabel(self._format_status_flags_text(), self)
         self.status_flags.setFixedSize(575, 150)
-        layout.addWidget(self.status_flags, 0, 0, Qt.AlignTop | Qt.AlignLeft)
+        layout.addWidget(self.status_flags, 0, 0, Qt.AlignBottom | Qt.AlignLeft)
 
         self.telemetry.setStyleSheet("""
+            background-color: rgb(42, 107, 126);  /* Semi-transparent teal background */
+            color: white;
+            font-size: 32px;
+            padding: 10px;
+        """)
+
+        self.status_flags.setStyleSheet("""
             background-color: rgb(42, 107, 126);  /* Semi-transparent teal background */
             color: white;
             font-size: 32px;
@@ -74,7 +81,7 @@ class SurfaceCentralWidget(QWidget):
     
     def _format_status_flags_text(self):
         """Helper method to format the status flags text."""
-        return f"Agnes Mode {"ON" if self.agnes_mode_flag else "OFF"}\nAgnes Mode Multiplier: {self.agnes_mode_multiplier:.2f}\nAuto-depth {"ON" if self.auto_depth_flag else "OFF"}"
+        return f"Agnes Mode {'ON' if self.agnes_mode_flag else 'OFF'}\nAgnes Mode Multiplier: {self.agnes_mode_multiplier:.2f}\nAuto-depth {'ON' if self.auto_depth_flag else 'OFF'}"
 
     def update_depth(self, depth):
         """Sets depth on the GUI and updates label"""
