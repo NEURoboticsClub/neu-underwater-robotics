@@ -41,7 +41,7 @@ class SurfaceCentralWidget(QWidget):
 
         # status flags box
         self.status_flags = QLabel(self._format_status_flags_text(), self)
-        self.status_flags.setFixedSize(125, 50)
+        self.status_flags.setFixedSize(150, 50)
         layout.addWidget(self.status_flags, 0, 0, Qt.AlignBottom | Qt.AlignLeft)
 
         self.telemetry.setStyleSheet("""
