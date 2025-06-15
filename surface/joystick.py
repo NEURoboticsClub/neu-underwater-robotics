@@ -158,7 +158,7 @@ class XBoxDriveController(Controller):
             "agnes_mode":False,
             "auto_depth":False,
         }
-        self.claw_vec = {"camera_servo": 0.0}
+        self.claw_vec = {"camera_servo": 90}
         self.agnes_factor_scale = 0.002
 
     def get_velocity_vector(self) -> VelocityVector:
@@ -197,7 +197,7 @@ class XBoxDriveController(Controller):
                         int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
         self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
                          int(self.buttons_dict["A"].get_joy_val()))
-        self.claw_vec["camera_servo"] = max(min(self.claw_vec["camera_servo"] + (self.hat_dict["hat"].get_joy_val()[0] / 200.0), 1.0), -1.0)
+        self.claw_vec["camera_servo"] = max(min(self.claw_vec["camera_servo"] + (self.hat_dict["hat"].get_joy_val()[0] / 2.0), 180), 0)
 
         return self.claw_vec
     
