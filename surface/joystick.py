@@ -69,8 +69,8 @@ class Hat(JoyItem[tuple[float, float]]):
 
     def update(self, state):
         """update the hat values"""
-        self.up = state[0]
-        self.right = state[1]
+        self.up = state[1]
+        self.right = state[0]
 
     def get_joy_val(self):
         """get the hat values"""
@@ -142,7 +142,7 @@ class XBoxDriveController(Controller):
             "right_stick": self._buttons[9],
         }
         self.hat_dict = {
-            "hat": self._hats[1]
+            "hat": self._hats[0]
         }
         self.axis_dict = {
             "left_x": self._axes[0],
