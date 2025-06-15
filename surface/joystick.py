@@ -191,13 +191,13 @@ class XBoxDriveController(Controller):
         # TODO: control scheme goes here     
         self.claw_vec["extend"] = utils.deadzone_retrict(self.axis_dict["left_y"].get_joy_val())
         self.claw_vec["rotate"] = utils.deadzone_retrict(self.axis_dict["right_x"].get_joy_val()) * -90 + 90
-        self.claw_vec["close_main"] = (utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) * -2 + \
-                        (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 2 + 92
+        self.claw_vec["close_main"] = (utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) * -4 + \
+                        (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 4 + 92
         self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
                         int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
         self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
                          int(self.buttons_dict["A"].get_joy_val())) 
-        self.claw_vec["camera_servo"] += self.hat_dict["hat"].get_joy_val()[0]
+        self.claw_vec["camera_servo"] += max(min((self.hat_dict["hat"].get_joy_val()[0] / 200.0), 1.0), -1.0)
 
         return self.claw_vec
     
