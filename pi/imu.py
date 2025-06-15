@@ -101,7 +101,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             
             s.send(str.encode(json.dumps(msg)))
 
-            print(f"sent: {msg}")
+            # print(f"sent: {msg}")
         except RuntimeError as err:
             print(f"Fatal error: {err=}. Resetting.")
             bno.hard_reset()
