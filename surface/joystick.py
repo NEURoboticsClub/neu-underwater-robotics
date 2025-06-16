@@ -69,8 +69,8 @@ class Hat(JoyItem[tuple[float, float]]):
 
     def update(self, state):
         """update the hat values"""
-        self.up = state[0]
-        self.right = state[1]
+        self.up = state[1]
+        self.right = state[0]
 
     def get_joy_val(self):
         """get the hat values"""
@@ -158,7 +158,7 @@ class XBoxDriveController(Controller):
             "agnes_mode":False,
             "auto_depth":False,
         }
-        self.claw_vec = {"camera_servo": 30}
+        self.claw_vec = {"camera_servo": 90}
         self.agnes_factor_scale = 0.002
 
     def get_velocity_vector(self) -> VelocityVector:
@@ -191,14 +191,14 @@ class XBoxDriveController(Controller):
         # TODO: control scheme goes here     
         self.claw_vec["extend"] = utils.deadzone_retrict(self.axis_dict["left_y"].get_joy_val())
         self.claw_vec["rotate"] = utils.deadzone_retrict(self.axis_dict["right_x"].get_joy_val()) * -90 + 90
-        self.claw_vec["close_main"] = (utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) * -5 + \
-                        (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 5 + 92
+        self.claw_vec["close_main"] = (utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) * -4 + \
+                        (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 4 + 92
         self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
                         int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
         self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
                          int(self.buttons_dict["A"].get_joy_val()))
-        self.claw_vec["camera_servo"] += self.hat_dict["hat"].get_joy_val()[0]
-        
+        self.claw_vec["camera_servo"] = max(min(self.claw_vec["camera_servo"] + (self.hat_dict["hat"].get_joy_val()[0] / 2.0), 180), 0)
+
         return self.claw_vec
     
     def update_sensor_reading(self, sensor_dict):
