@@ -62,7 +62,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             msg = {
                 "depth": json.dumps(depth_list),
             }
-            s.send(str.encode(json.dumps(msg)))
+            s.send(str.encode(json.dumps(msg) + "~"))
             print(f"sent: {msg}")
         except Exception as err:
             print("Error encountered in depth sensor client execution: " + str(err))
