@@ -47,7 +47,10 @@ class GridVideoPlayersWidget(QWidget):
         PORT = 2049  # Same port as the GUI listener
         self.attitude_indicator = AttitudeIndicator()
         self.attitude_indicator.setFixedSize(200, 200)
-        grid.addWidget(self.attitude_indicator, 0, 0, 2, 2, alignment=Qt.AlignCenter)
+        if num_cells == 1:
+            grid.addWidget(self.attitude_indicator, 0, 0, alignment=(Qt.AlignBottom | Qt.AlignRight))
+        else:
+            grid.addWidget(self.attitude_indicator, 0, 0, 2, 2, alignment=Qt.AlignCenter)
 
 
 

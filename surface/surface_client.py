@@ -59,7 +59,7 @@ class SurfaceClient:
                 "claw_movement": json.dumps(claw_vec),
                 "status_flags": json.dumps(status_flags),
             }
-            writer.write(str.encode(json.dumps(msg)))
+            writer.write(str.encode(json.dumps(msg) + "~"))
             await writer.drain()
             print(f"sent: {msg}")
 
