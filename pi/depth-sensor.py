@@ -24,7 +24,14 @@ def read_depth(sensor):
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(f"connecting to {HOST}:{PORT}")
-    s.connect((HOST, PORT))
+    while True:
+            try:
+                s.connect((HOST, PORT))
+                break
+            except Exception as err:
+                print("Depth sensor enocuntered error connecting to server: " + str(err))
+                print("Retrying in 1 second")
+                time.sleep(1.0)
     last_time = time.time()
     sensor = ms5837.MS5837_02BA() # Default I2C bus is 1 (Raspberry Pi 3)
 
