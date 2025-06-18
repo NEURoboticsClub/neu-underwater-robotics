@@ -294,7 +294,14 @@ class XguiApplication():
     
     async def run_asyncio(self):
         """start reader, writer, and parser"""
-        reader, writer = await asyncio.open_connection(HOST, PORT)
+        while True:
+            try:
+                reader, writer = await asyncio.open_connection(HOST, PORT)
+                break
+            except Exception as err:
+                print("GUI enocuntered error connecting to server: " + str(err))
+                print("Retrying in 1 second")
+                time.sleep(1.0)
 
         receive_task = asyncio.create_task(self.receive_messages(reader))
         parse_task = asyncio.create_task(self._parse())
