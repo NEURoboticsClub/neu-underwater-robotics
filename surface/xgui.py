@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
 from surface.gui.widgets.surface_central import SurfaceCentralWidget
 from surface.gui.surface_window import SurfaceWindow
-from xgui_with_save import XguiApplicationWithSave
+from surface.xgui_with_save import XguiApplicationWithSave
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
@@ -35,7 +35,7 @@ MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
-PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! xvimagesink name=\"qtvideosink\" max-buffers=1 sync=false drop=true"
+PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! xvimagesink name=\"qtvideosink\" sync=false"
 
 def get_cmdline_args():
     """Gets the values of the command line arguments.
