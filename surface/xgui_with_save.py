@@ -17,9 +17,8 @@ from common import utils
 import time
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QtMsgType, QUrl, qInstallMessageHandler
-from surface.gui.widgets.surface_central import SurfaceCentralWidget
+from surface.gui.widgets_old.surface_central import SurfaceCentralWidget
 from surface.gui.surface_window import SurfaceWindow
-from xgui_with_save import XguiApplicationWithSave
 
 HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
@@ -28,14 +27,10 @@ READ_LOOP_FREQ = 5
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s')
 
-RPATH_TO_SURPRESSED_MESSAGES_FILE = './surpressed_qt_messages.txt'
-PATH_TO_SURPRESSED_MESSAGES_FILE = os.path.join(os.path.dirname(__file__),
-                                                RPATH_TO_SURPRESSED_MESSAGES_FILE)
+RPATH_TO_SUPRESSED_MESSAGES_FILE = './supressed_qt_messages.txt'
+PATH_TO_SUPRESSED_MESSAGES_FILE = os.path.join(os.path.dirname(__file__),
+                                                RPATH_TO_SUPRESSED_MESSAGES_FILE)
 MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
-
-# TODO(config): Users ought to be able to specify this without prying
-# into the code.
-PORT_NUM_TO_GST_PIPELINE_COMMAND = lambda port_num : f"gst-pipeline: udpsrc port={port_num} ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! queue max-size-buffers=1 leaky=downstream ! videoconvert ! xvimagesink name=\"qtvideosink\" max-buffers=1 sync=false drop=true"
 
 def get_cmdline_args():
     """Gets the values of the command line arguments.
@@ -52,30 +47,28 @@ def get_cmdline_args():
     parser.add_argument('-p', '--lowest-port-num', type=int, required=True)
     parser.add_argument('-n', '--num-cameras', type=int, required=True)
     parser.add_argument('-w', '--widget', default=None)
-    parser.add_argument('-s', '--show-surpressed', action='store_true')
-    parser.add_argument('-o', '--other', action='store_true')
+    parser.add_argument('-s', '--show-supressed', action='store_true')
 
     return parser.parse_args()
 
-def get_qurls_or_exit(lowest_port_num, num_cameras):
-    """Gets the QUrls list if the port numbers are legal, exits
-    with error code 1 otherwise.
+def get_port_nums_or_exit(lowest_port_num, num_cameras):
+    """Gets the port number list if the port numbers are legal;
+    else exits with error code 1.
 
-    The length of the output list equals to the given number of
-    cameras, and each QUrl has the port number equal to the given
+    The length of the output list equals the given number of
+    cameras, and each port number is equal to the given
     lowest_port_num plus its index.
 
     lowest_port_num : nat
     num_cameras : nat
 
-    Returns: List[QUrl]
+    Returns: List[int]
 
     """
     highest_port_num = lowest_port_num + num_cameras - 1
 
     if _check_valid_port_num(lowest_port_num) and _check_valid_port_num(highest_port_num):
-        return [QUrl(PORT_NUM_TO_GST_PIPELINE_COMMAND(port_num))
-                for port_num in range(lowest_port_num, highest_port_num + 1)]
+        return range(lowest_port_num, highest_port_num + 1)
     else:
         logger.error(('Invalid port number. A port number must be between 1 and 65536. '
                       'The given port numbers are in range [%s,%s]. Shutting down...'), 
@@ -147,18 +140,18 @@ def class_for_name(module_name, class_name):
         # Thrown when class_name not found in m
         return False
 
-def get_surpressed_message_handler(msgs_to_surpress):
-    """Gets the custom message handler that surpresses the given messages.
+def get_supressed_message_handler(msgs_to_supress):
+    """Gets the custom message handler that supresses the given messages.
 
-    If no messages to surpress, then the check is skipped completely.
+    If no messages to supress, then the check is skipped completely.
 
-    messages_to_surpress : List[str]
+    messages_to_supress : List[str]
 
     Returns: [QtMsgType, QMessageLogContext, str] -> None
 
     """
     def custom_message_handler_checked(msg_type, msg_log_context, msg):
-        if msg in msgs_to_surpress:
+        if msg in msgs_to_supress:
             return
         custom_message_handler(msg_type, msg_log_context, msg)
 
@@ -189,29 +182,29 @@ def get_surpressed_message_handler(msgs_to_surpress):
             case QtMsgType.QtWarningMsg:
                 return logging.warning
 
-    return custom_message_handler_checked if msgs_to_surpress else custom_message_handler
+    return custom_message_handler_checked if msgs_to_supress else custom_message_handler
 
-def get_messages_to_surpress(should_show_surpressed):
-    """Gets the list of messages to surpress.
+def get_messages_to_supress(should_show_supressed):
+    """Gets the list of messages to supress.
 
-    should_show_surpressed : bool
+    should_show_supressed : bool
 
     Returns: List[String]
     """
-    if should_show_surpressed:
+    if should_show_supressed:
         return []
     else:
-        with open(PATH_TO_SURPRESSED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
+        with open(PATH_TO_SUPRESSED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
             return [line for line in (x.strip() for x in f)]
 
-class XguiApplication():
+class XguiApplicationWithSave():
     """Xgui Application Class. 
     Intended for running Xgui as an attribute or an object from other entrypoints.    
     """
     def __init__(self, args):
-        self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
+        self.port_nums = get_port_nums_or_exit(args.lowest_port_num, args.num_cameras)
         self.sc_widget_cls = get_surface_central_if_can(args.widget)
-        self.messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
+        self.messages_to_supress = get_messages_to_supress(args.show_supressed)
         self.scw = None
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
@@ -225,7 +218,6 @@ class XguiApplication():
 
         self.depth = 0
         self.imu_data = ""
-        self.status_flags = {}
     
     def __del__(self):
         self.loop.close()
@@ -277,14 +269,6 @@ class XguiApplication():
                         print(self.depth)
                     else:
                         print("Warning: GUI not fully initialized, skipping update.")
-            if "status_flags" in json_msg:
-                self.status_flags = dict(json.loads(json_msg["status_flags"]))
-                if self.scw != None:
-                    if hasattr(self.scw, 'update_status_flags'):
-                        self.scw.update_status_flags(self.status_flags)
-                        print(str(self.status_flags))
-                    else:
-                        print("Warning: GUI not fully initialized, skipping update.")
             
             if time.time() - last_parse_time < 1 / READ_LOOP_FREQ:
                 await asyncio.sleep(1 / READ_LOOP_FREQ - (time.time() - last_parse_time))
@@ -306,9 +290,9 @@ class XguiApplication():
             sys.exit(1)
         
         self.app = QApplication(sys.argv)
-        qInstallMessageHandler(get_surpressed_message_handler(self.messages_to_surpress))
+        qInstallMessageHandler(get_supressed_message_handler(self.messages_to_supress))
         try:
-            self.scw = self.sc_widget_cls(self.qurls)
+            self.scw = self.sc_widget_cls(self.port_nums)
         except TypeError as e:
             logger.error(('There is a TypeError with the instantiation of the widget class. '
                         'Make sure that the __init__ of the widget class takes in the expected '
@@ -320,15 +304,5 @@ class XguiApplication():
 
         main_window = SurfaceWindow(self.scw)
         main_window.show()
+        self.scw.grid_player.setFocus()
         self.app.exec_()
-
-
-if __name__ == '__main__':
-    args = get_cmdline_args()
-    if args.other:
-        gui = XguiApplicationWithSave(args)
-    else:
-        gui = XguiApplication(args)
-    asyncio_thread = threading.Thread(target=lambda: asyncio.run(gui.run_asyncio()))
-    asyncio_thread.start()
-    gui.run()
