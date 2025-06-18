@@ -19,7 +19,7 @@ To launch the surface GUI app,
 ```sh
 ./xgui -p <PORT NUM> -n <NUM CAMERAS>
 ```
-One can add `-s` flag to show surpressed messages. One can also add 
+One can add `-s` flag to show supressed messages. One can also add 
 `-w <Widget Name>` which locates the surface central to be used in
 `./gui/widgets/surface_central.py`.
 
@@ -45,7 +45,7 @@ tellin you so.
 - `xgui`: The script to launch the GUI.
 - `xgui.py`: The code which `xgui` calls into.
 - `gui`: Responsible for defining PyQt5 GUI elements.
-- `surpressed_qt_messages.txt`: Qt messages that should not be logged. Each line
+- `supressed_qt_messages.txt`: Qt messages that should not be logged. Each line
   is one message.
 
 ### Sturgeon
@@ -92,7 +92,7 @@ You may modify the diagram in the link below, but be sure to download it as a
 JPG and replace the current JPG under the same name. 
 https://docs.google.com/drawings/d/1sxUdhup1p8CZiSeZzCpBNy8SAKoo_eIB_ZVpaZL_PD8/edit?usp=sharing
 
-### Surpressed Warnings
+### Supressed Warnings
 ```
 QWidget::paintEngine: Should no longer be called
 ```

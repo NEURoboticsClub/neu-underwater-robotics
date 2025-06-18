@@ -28,9 +28,9 @@ READ_LOOP_FREQ = 5
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s')
 
-RPATH_TO_SURPRESSED_MESSAGES_FILE = './surpressed_qt_messages.txt'
-PATH_TO_SURPRESSED_MESSAGES_FILE = os.path.join(os.path.dirname(__file__),
-                                                RPATH_TO_SURPRESSED_MESSAGES_FILE)
+RPATH_TO_SUPRESSED_MESSAGES_FILE = './supressed_qt_messages.txt'
+PATH_TO_SUPRESSED_MESSAGES_FILE = os.path.join(os.path.dirname(__file__),
+                                                RPATH_TO_SUPRESSED_MESSAGES_FILE)
 MODULE_PATH_TO_SURFACE_CENTRAL_WIDGETS = '.gui.widgets.surface_central'
 
 # TODO(config): Users ought to be able to specify this without prying
@@ -52,7 +52,7 @@ def get_cmdline_args():
     parser.add_argument('-p', '--lowest-port-num', type=int, required=True)
     parser.add_argument('-n', '--num-cameras', type=int, required=True)
     parser.add_argument('-w', '--widget', default=None)
-    parser.add_argument('-s', '--show-surpressed', action='store_true')
+    parser.add_argument('-s', '--show-supressed', action='store_true')
     parser.add_argument('-o', '--other', action='store_true')
 
     return parser.parse_args()
@@ -147,18 +147,18 @@ def class_for_name(module_name, class_name):
         # Thrown when class_name not found in m
         return False
 
-def get_surpressed_message_handler(msgs_to_surpress):
-    """Gets the custom message handler that surpresses the given messages.
+def get_supressed_message_handler(msgs_to_supress):
+    """Gets the custom message handler that supresses the given messages.
 
-    If no messages to surpress, then the check is skipped completely.
+    If no messages to supress, then the check is skipped completely.
 
-    messages_to_surpress : List[str]
+    messages_to_supress : List[str]
 
     Returns: [QtMsgType, QMessageLogContext, str] -> None
 
     """
     def custom_message_handler_checked(msg_type, msg_log_context, msg):
-        if msg in msgs_to_surpress:
+        if msg in msgs_to_supress:
             return
         custom_message_handler(msg_type, msg_log_context, msg)
 
@@ -189,19 +189,19 @@ def get_surpressed_message_handler(msgs_to_surpress):
             case QtMsgType.QtWarningMsg:
                 return logging.warning
 
-    return custom_message_handler_checked if msgs_to_surpress else custom_message_handler
+    return custom_message_handler_checked if msgs_to_supress else custom_message_handler
 
-def get_messages_to_surpress(should_show_surpressed):
-    """Gets the list of messages to surpress.
+def get_messages_to_supress(should_show_supressed):
+    """Gets the list of messages to supress.
 
-    should_show_surpressed : bool
+    should_show_supressed : bool
 
     Returns: List[String]
     """
-    if should_show_surpressed:
+    if should_show_supressed:
         return []
     else:
-        with open(PATH_TO_SURPRESSED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
+        with open(PATH_TO_SUPRESSED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
             return [line for line in (x.strip() for x in f)]
 
 class XguiApplication():
@@ -211,7 +211,7 @@ class XguiApplication():
     def __init__(self, args):
         self.qurls = get_qurls_or_exit(args.lowest_port_num, args.num_cameras)
         self.sc_widget_cls = get_surface_central_if_can(args.widget)
-        self.messages_to_surpress = get_messages_to_surpress(args.show_surpressed)
+        self.messages_to_supress = get_messages_to_supress(args.show_supressed)
         self.scw = None
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
@@ -306,7 +306,7 @@ class XguiApplication():
             sys.exit(1)
         
         self.app = QApplication(sys.argv)
-        qInstallMessageHandler(get_surpressed_message_handler(self.messages_to_surpress))
+        qInstallMessageHandler(get_supressed_message_handler(self.messages_to_supress))
         try:
             self.scw = self.sc_widget_cls(self.qurls)
         except TypeError as e:
