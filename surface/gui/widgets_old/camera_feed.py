@@ -3,6 +3,7 @@ from PyQt5.QtCore import QThread, pyqtSignal as Signal
 import cv2
 from os.path import expanduser
 import time
+import datetime
 
 # TODO(config): Users ought to be able to specify this without prying
 # into the code.
@@ -57,10 +58,13 @@ class CameraFeed(QThread):
         self._num_saved_images += 1
     
     def _save_image(self):
-        img_save_path = expanduser("~/neu-underwater-robotics/surface/camera_"
+        img_save_path = expanduser("/media/jonah/D092-06F1/mate-2025-photos-competition/camera_"
                                    + str(self.camera_no)
                                    + "_capture_"
-                                   + str(self._num_saved_images) + ".jpg")
+                                   + str(self._num_saved_images)
+                                   + "_"
+                                   + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                                   + ".jpg")
 
         img_save_successful = cv2.imwrite(img_save_path, self._current_frame)
         if img_save_successful:
