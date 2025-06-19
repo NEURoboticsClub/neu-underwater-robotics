@@ -58,13 +58,13 @@ class CameraFeed(QThread):
         self._num_saved_images += 1
     
     def _save_image(self):
-        img_save_path = expanduser("/media/jonah/D092-06F1/mate-2025-photos-competition/camera_"
-                                   + str(self.camera_no)
-                                   + "_capture_"
-                                   + str(self._num_saved_images)
-                                   + "_"
-                                   + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                                   + ".jpg")
+        img_save_path = "/media/jonah/D092-06F1/mate-2025-photos-competition/camera_" \
+                                + str(self.camera_no) \
+                                + "_capture_" \
+                                + str(self._num_saved_images) \
+                                + "_" \
+                                + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") \
+                                + ".jpg"
 
         img_save_successful = cv2.imwrite(img_save_path, self._current_frame)
         if img_save_successful:
