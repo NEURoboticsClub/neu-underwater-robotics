@@ -71,8 +71,8 @@ class Hat(JoyItem[tuple[float, float]]):
 
     def update(self, state):
         """update the hat values"""
-        self.up = state[0]
-        self.right = state[1]
+        self.up = state[1]
+        self.right = state[0]
 
     def get_joy_val(self):
         """get the hat values"""
@@ -160,19 +160,19 @@ class XBoxDriveController(Controller):
             "agnes_mode":False,
             "auto_depth":False,
         }
-        self.claw_vec = {"camera_servo": 30}
+        self.claw_vec = {"camera_servo": 90}
         self.agnes_factor_scale = 0.002
 
     def get_velocity_vector(self) -> VelocityVector:
         """get the desired velocity vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        self.velocity_vec.x = self.axis_dict["left_x"].get_joy_val() * -1
-        self.velocity_vec.y = self.axis_dict["left_y"].get_joy_val() 
-        self.velocity_vec.z = self.axis_dict["right_y"].get_joy_val() 
-        self.velocity_vec.yaw = self.axis_dict["right_x"].get_joy_val() * -1
-        self.velocity_vec.pitch = (((self.axis_dict["left_trigger"].get_joy_val() + 1) / 2) - 
-                    ((self.axis_dict["right_trigger"].get_joy_val() + 1) / 2))
+        self.velocity_vec.x = utils.deadzone_retrict(self.axis_dict["left_x"].get_joy_val()) * -1
+        self.velocity_vec.y = utils.deadzone_retrict(self.axis_dict["left_y"].get_joy_val())
+        self.velocity_vec.z = utils.deadzone_retrict(self.axis_dict["right_y"].get_joy_val())
+        self.velocity_vec.yaw = utils.deadzone_retrict(self.axis_dict["right_x"].get_joy_val()) * -1
+        self.velocity_vec.pitch = (((utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) / 2) - 
+                    ((utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) / 2))
         self.velocity_vec.roll = (int(self.buttons_dict["RB"].get_joy_val()) - \
                                  int(self.buttons_dict["LB"].get_joy_val())) * 0.5
         
@@ -189,81 +189,19 @@ class XBoxDriveController(Controller):
         """get the desired claw vector from joystick values"""
         pygame.event.get()  # clear events to get current values (not sure why this is needed)
         self._poll()  # get current joystick values
-        vec = {}
-        # TODO: control scheme goes here
-        vec["extend"] = self.axis_dict["left_y"].get_joy_val()
-        vec["rotate"] = self.axis_dict["right_y"].get_joy_val() * 90 + 90
-        vec["close"] = (self.axis_dict["right_trigger"].get_joy_val() + 1) * -5 + \
-                        (self.axis_dict["right_x"].get_joy_val() + 1) * 5 + 92
+        # TODO: control scheme goes here     
+        self.claw_vec["extend"] = utils.deadzone_retrict(self.axis_dict["left_y"].get_joy_val())
+        self.claw_vec["rotate"] = utils.deadzone_retrict(self.axis_dict["right_x"].get_joy_val()) * -90 + 90
+        self.claw_vec["close_main"] = (utils.deadzone_retrict(self.axis_dict["right_trigger"].get_joy_val()) + 1) * -4 + \
+                        (utils.deadzone_retrict(self.axis_dict["left_trigger"].get_joy_val()) + 1) * 4 + 92
+        self.claw_vec["close_side"] = int(self.buttons_dict["LB"].get_joy_val()) * 6 + \
+                        int(self.buttons_dict["RB"].get_joy_val()) * -4 + 92
+        self.claw_vec["sample"] = (int(self.buttons_dict["B"].get_joy_val()) - 
+                         int(self.buttons_dict["A"].get_joy_val()))
+        self.claw_vec["camera_servo"] = max(min(self.claw_vec["camera_servo"] + (self.hat_dict["hat"].get_joy_val()[0] / 2.0), 180), 0)
 
-        return vec
-
-
-# class ArmJoystick(Joystick):
-#     def __init__(self, buttons, axes, toggle_vals, trigger_vals, center, radius, ratio):
-#         super().__init__(buttons, axes, toggle_vals, trigger_vals, center, radius, ratio)
-#         self.wrist = center - radius
-#         self.claw = center + radius
-#
-#     def get_rov_input(self):
-#         claw_axis = -1 * self.axis_dict[4].get_joy_val()
-#         elbow_down = self.buttons_dict[4].get_joy_val()
-#         elbow_up = self.buttons_dict[5].get_joy_val()
-#         # la is left axis, ua is up axis, both on left stick
-#         la = self.axis_dict[0].get_joy_val()
-#         ua = -1 * self.axis_dict[1].get_joy_val()
-#
-#         # bounding: min = center - radius,   max = center + radius,
-#         # move by radius times ratio each time for how far la is from center
-#         # if is for dead zone in the middle so that you cannot be slightly off and do something
-#         self.wrist = min(
-#             self.center + self.radius,
-#             max(
-#                 self.center - self.radius,
-#                 la * self.radius * self.ratio + self.wrist if la > 0.1 or la < -0.1 else self.wrist,
-#             ),
-#         )
-#         self.claw = min(
-#             self.center + self.radius,
-#             max(
-#                 self.center - 40.0,
-#                 claw_axis * self.radius * self.ratio + self.claw
-#                 if claw_axis > 0.1 or claw_axis < -0.1
-#                 else self.claw,
-#             ),
-#         )
-#         extend = 1 if ua > 0.25 else 0
-#         retract = 1 if ua < -0.25 else 0
-#
-#         pin_dict = {
-#             2: int(extend),
-#             3: int(retract),
-#             10: int(self.wrist),
-#             11: int(self.claw),
-#             12: int(elbow_down),
-#             13: int(elbow_up),
-#         }
-#
-#         output = ""
-#         for pin in pin_dict:
-#             output += f"{pin}:{pin_dict[pin]};"
-#         return output
-#
-#
-# class Joysticks:
-#     def __init__(self, joysticks):
-#         self.joysticks = joysticks
-#
-#     def detect_event(self):
-#         for event in pygame.event.get():
-#             try:
-#                 self.joysticks[event.joy].detect_event(event)
-#             except:
-#                 print(event)
-#
-#     def get_rov_input(self):
-#         output = ""
-#         for joystick in self.joysticks:
-#             output += joystick.get_rov_input()
-#
-#         return output[:-1] + "&"
+        return self.claw_vec
+    
+    def update_sensor_reading(self, sensor_dict):
+        # TODO: implement sensor dict in surface client
+        self.sensor_dict = sensor_dict

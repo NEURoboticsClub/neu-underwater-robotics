@@ -49,8 +49,8 @@ class Server:
                     "back_left_horizontal": Thruster(self._get_pin(6, "s"), active_range=(1250, 1750)),
                     "back_right_horizontal": Thruster(self._get_pin(8, "s"), active_range=(1250, 1750)),
                     "front_left_vertical": Thruster(self._get_pin(3, "s"), reverse=True),
-                    "front_right_vertical": Thruster(self._get_pin(5, "s"), reverse=True),
-                    "back_left_vertical": Thruster(self._get_pin(7, "s"), reverse=True),
+                    "front_right_vertical": Thruster(self._get_pin(25, "s"), reverse=True),
+                    "back_left_vertical": Thruster(self._get_pin(27, "s"), reverse=True),
                     "back_right_vertical": Thruster(self._get_pin(9, "s"), reverse=True),
                 },
                 sensors={
@@ -111,7 +111,7 @@ class Server:
     async def run(self):
         """run the server"""
         _server = await asyncio.start_server(self._handle_client, SERVER_IP, PORT)
-        print(f"{len(self.tasks)}")
+        print(f"{len(self.tasks)}") 
         for task in self.tasks:
             print("ensuring future")
             asyncio.create_task(task)
@@ -131,7 +131,9 @@ class Server:
             print(f"received first message: {msg}")
             while msg:
                 async with self.lock:
-                    self.incoming.append(msg)
+                    for spl in msg.split("~"):
+                        if (spl.strip() != ""):
+                            self.incoming.append(spl)
                     self.last_update = utils.time_ms()
                 msg = (await reader.read(1024)).decode("utf-8")
             print("client disconnected, closing parser")
@@ -143,6 +145,7 @@ class Server:
                 response = {
                     "imu_data": json.dumps(self.rov_state._current_imu_data),
                     "depth": json.dumps(self.rov_state._current_depth),
+                    "status_flags": json.dumps(self.rov_state.status_flags),
                 }
                 await self._send_response(writer, response)
                 if time.time() - last_response_time < 1 / RESPONSE_LOOP_FREQ:
@@ -168,7 +171,7 @@ class Server:
     async def _parse(self):
         """parses incoming messages"""
         while True:
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.005)
             async with self.lock:
                 if len(self.incoming) > 0:
                     msg = self.incoming.pop()
@@ -185,7 +188,6 @@ class Server:
                 json_msg = json.loads(msg)
             except json.JSONDecodeError as e:
                 print(f"error decoding json: {e} | received: {msg}")
-                await asyncio.sleep(0.01)
                 continue
 
             if "target_velocity" in json_msg:

@@ -34,7 +34,7 @@ class ROVState:
         self.status_flags = status_flags
         self._current_velocity = VelocityVector()
         self._current_claw = {"extend": 0, "rotate": 90, "close_main": 90,
-                              "close_side": 90, "sample": 0, "camera_servo": 30}
+                              "close_side": 90, "sample": 0, "camera_servo": 90}
         self._target_velocity = VelocityVector()
         self._pid_controllers = {}  # axis: PIDController
         # TOASK: how are we using this and is it tuned? May explain some things
@@ -56,7 +56,7 @@ class ROVState:
         self._slew_limiters = {}
         for name, _ in self.thrusters.items():
             self._slew_limiters[name] = SlewRateLimiter(
-                max_rate = (2.0 / 1.0), 
+                max_rate = (1.5 / 1.0), 
                 initial_value = 0.0
             )
 
@@ -230,7 +230,7 @@ class ROVState:
 
             # translate output velocity to thruster mix
             thruster_mix = self._translate_velocity_to_thruster_mix(output_velocity, dt)
-            print(thruster_mix)
+            # print(thruster_mix)
             # print(self._current_claw)
             set_val_tasks = []
             for name, value in thruster_mix.items():

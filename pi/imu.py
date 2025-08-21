@@ -39,6 +39,12 @@ HOST = "192.168.0.102"  # The server's hostname or IP address
 PORT = 2049  # The port used by the server
 CONTROL_LOOP_FREQ = 10  # Hz
 
+# Global variables to store velocity
+# These are initialized to 0 and will be updated in the read_data function
+vel_x = 0.0
+vel_y = 0.0
+vel_z = 0.0
+
 """Reads data from the IMU sensor and returns as a dictionary.
 
 Returns:
@@ -51,9 +57,16 @@ def read_data() -> dict:
     accel_x, accel_y, accel_z = bno.linear_acceleration  # pylint:disable=no-member
     data["acceleration"] = utils.make_xyz_dict(accel_x, accel_y, accel_z)
 
+    # velocity
+    global vel_x, vel_y, vel_z
+    vel_x = vel_x + accel_x / CONTROL_LOOP_FREQ
+    vel_y = vel_y + accel_y / CONTROL_LOOP_FREQ
+    vel_z = vel_z + accel_z / CONTROL_LOOP_FREQ
+    data["velocity"] = utils.make_xyz_dict(vel_x, vel_y, vel_z)
+
     # gyro
-    gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
-    data["gyroscope"] = utils.make_xyz_dict(gyro_x, gyro_y, gyro_z)
+    # gyro_x, gyro_y, gyro_z = bno.gyro  # pylint:disable=no-member
+    # data["gyroscope"] = utils.make_xyz_dict(gyro_x, gyro_y, gyro_z)
 
     # magnetometer
     mag_x, mag_y, mag_z = bno.magnetic  # pylint:disable=no-member
@@ -86,7 +99,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 "imu_data": json.dumps(data),
             }
             
-            s.send(str.encode(json.dumps(msg)))
+            s.send(str.encode(json.dumps(msg) + "~"))
 
             print(f"sent: {msg}")
         except RuntimeError as err:
