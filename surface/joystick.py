@@ -183,7 +183,7 @@ class XBoxDriveController(Controller):
         self.status_flags["agnes_mode"] = self.buttons_dict["Y"].get_joy_val()
         self.status_flags["auto_depth"] = self.buttons_dict["X"].get_joy_val()
 
-        return vec
+        return self.status_flags
     
     def get_claw_vector(self) -> dict:
         """get the desired claw vector from joystick values"""
